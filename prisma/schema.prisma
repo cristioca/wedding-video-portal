@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// User model for authentication and project ownership
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // For credentials-based login
+  accounts      Account[]
+  sessions      Session[]
+  projects      Project[] // Relation to projects
+}
+
+// Project model for wedding videos
+model Project {
+  id             String    @id @default(cuid())
+  name           String
+  status         String // e.g., "Planning", "Filming", "Editing", "Completed"
+  dueDate        DateTime
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  // Add the new fields from your component
+  eventDate      DateTime
+  type           String    // "NUNTA" or "BOTEZ"
+  titleVideo     String?
+  city           String?
+  civilSameDay   Boolean   @default(false)
+  civilDate      DateTime?
+  prep           String?
+  church         String?
+  session        String?
+  restaurant     String?
+  detailsExtra   String?
+  editStatus     String    @default("Pending")
+  // Relation to User
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relation to Files
+  files          File[]
+}
+
+// Model for uploaded files
+model File {
+  id          String   @id @default(cuid())
+  displayName String
+  storageKey  String // Key for S3 or other storage
+  sizeBytes   BigInt
+  createdAt   DateTime @default(now())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// --- NextAuth required models ---
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
