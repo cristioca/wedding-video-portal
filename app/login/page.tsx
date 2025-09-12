@@ -4,8 +4,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("admin@example.com");
-  const [password, setPassword] = useState("adminadmin");
+  const [email, setEmail] = useState("admin@admin.com");
+  const [password, setPassword] = useState("password123");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -31,7 +31,7 @@ export default function LoginPage() {
         </div>
         {error && <p className="text-red-400 text-sm">{error}</p>}
         <button className="button w-full" type="submit">Login</button>
-        <p className="text-xs text-[color:var(--muted)]">Demo: admin@example.com / adminadmin sau client@example.com / clientclient</p>
+        <p className="text-xs text-[color:var(--muted)]">Demo: admin@admin.com / password123 sau client@client.com / password123</p>
       </form>
     </div>
   );

@@ -9,15 +9,14 @@ type ProjectWithFiles = Project & { files: FileModel[] };
 
 type Props = {
   project: ProjectWithFiles;
-  // role is not available on the session by default, so we'll remove it for now
-  // role: "ADMIN" | "CLIENT";
+  userRole: "ADMIN" | "CLIENT";
 };
 
-export default function ProjectTabs({ project }: Props) {
+export default function ProjectTabs({ project, userRole }: Props) {
   const [tab, setTab] = useState<"detalii" | "editare" | "filme">("detalii");
 
-  // A simple check to see if the user is an admin based on email
-  const isAdmin = project.userId === "admin@admin.com"; // This is a simplification
+  // Use the passed userRole to determine admin status
+  const isAdmin = userRole === "ADMIN";
 
   return (
     <div className="space-y-4">
