@@ -35,14 +35,14 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 
   // Authorization check: Admin can access all files, clients can only access their own project files
-  const canAccess = currentUser.role === 'ADMIN' || file.project.userId === currentUser.id;
+  const canAccess = (currentUser as any).role === 'ADMIN' || file.project.userId === currentUser.id;
   
   if (!canAccess) {
     return new Response("Forbidden", { status: 403 });
   }
 
   // Log the download attempt
-  await db.fileDownloadEvent.create({
+  await (db as any).fileDownloadEvent.create({
     data: { 
       fileId: file.id, 
       projectId: file.projectId, 

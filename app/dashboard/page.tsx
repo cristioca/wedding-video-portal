@@ -23,7 +23,7 @@ export default async function Dashboard() {
   }
 
   // Fetch projects based on user role
-  const projects = user.role === 'ADMIN' 
+  const projects = (user as any).role === 'ADMIN' 
     ? await db.project.findMany({
         include: {
           user: {
@@ -55,7 +55,7 @@ export default async function Dashboard() {
       </div>
 
       <h2 className="text-xl font-semibold mb-4">
-        {user.role === 'ADMIN' ? 'All Projects' : 'Your Projects'}
+        {(user as any).role === 'ADMIN' ? 'All Projects' : 'Your Projects'}
       </h2>
       <div className="bg-gray-800 rounded-lg shadow">
         <ul className="divide-y divide-gray-700">
@@ -69,7 +69,7 @@ export default async function Dashboard() {
                   <div className="flex justify-between">
                     <div>
                       <p className="font-semibold">{project.name}</p>
-                      {user.role === 'ADMIN' && project.user && (
+                      {(user as any).role === 'ADMIN' && project.user && (
                         <p className="text-sm text-gray-500">
                           Client: {project.user.name || project.user.email}
                         </p>

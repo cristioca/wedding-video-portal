@@ -15,10 +15,15 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?   // For credentials-based login
-  role          String    @default("CLIENT") // "ADMIN" or "CLIENT"
+  role          UserRole  @default(CLIENT) // "ADMIN" or "CLIENT"
   accounts      Account[]
   sessions      Session[]
   projects      Project[] // Relation to projects
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
 }
 
 // Project model for wedding videos

@@ -22,7 +22,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(db) as any,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
           id: existingUser.id,
           name: existingUser.name,
           email: existingUser.email,
-          role: existingUser.role || 'CLIENT',
+          role: (existingUser as any).role || 'CLIENT',
         };
       },
     }),
