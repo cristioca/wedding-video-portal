@@ -26,6 +26,29 @@ enum UserRole {
   CLIENT
 }
 
+// Track field modifications with approval workflow
+model ProjectModification {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fieldName   String   // The field being modified
+  oldValue    String?  // Previous value (JSON string for complex types)
+  newValue    String?  // New proposed value (JSON string for complex types)
+  status      ModificationStatus @default(PENDING)
+  createdBy   String   // User ID who made the modification
+  createdAt   DateTime @default(now())
+  approvedBy  String?  // Admin user ID who approved/rejected
+  approvedAt  DateTime?
+  notes       String?  // Optional notes from admin
+}
+
+enum ModificationStatus {
+  PENDING     // Waiting for admin approval
+  APPROVED    // Approved by admin
+  REJECTED    // Rejected by admin
+  AUTO_APPLIED // Applied directly (admin changes)
+}
+
 // Project model for wedding videos
 model Project {
   id             String    @id @default(cuid())
@@ -54,6 +77,7 @@ model Project {
   // Relation to Files
   files          File[]
   downloads      FileDownloadEvent[]
+  modifications  ProjectModification[] // Track field modifications
 }
 
 // Model for uploaded files

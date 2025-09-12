@@ -22,7 +22,7 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  // Fetch projects based on user role
+  // Fetch projects based on user role with pending modifications count
   const projects = (user as any).role === 'ADMIN' 
     ? await db.project.findMany({
         include: {
@@ -32,6 +32,11 @@ export default async function Dashboard() {
               email: true,
             },
           },
+          modifications: {
+            where: {
+              status: 'PENDING'
+            }
+          } as any
         },
         orderBy: {
           eventDate: "desc",
@@ -40,6 +45,13 @@ export default async function Dashboard() {
     : await db.project.findMany({
         where: {
           userId: user.id,
+        },
+        include: {
+          modifications: {
+            where: {
+              status: 'PENDING'
+            }
+          } as any
         },
         orderBy: {
           eventDate: "desc",
@@ -68,7 +80,14 @@ export default async function Dashboard() {
                 >
                   <div className="flex justify-between">
                     <div>
-                      <p className="font-semibold">{project.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold">{project.name}</p>
+                        {(project as any).modifications?.length > 0 && (
+                          <span className="px-2 py-1 bg-yellow-600 text-yellow-100 text-xs rounded-full">
+                            {(project as any).modifications.length} modificări în așteptare
+                          </span>
+                        )}
+                      </div>
                       {(user as any).role === 'ADMIN' && project.user && (
                         <p className="text-sm text-gray-500">
                           Client: {project.user.name || project.user.email}

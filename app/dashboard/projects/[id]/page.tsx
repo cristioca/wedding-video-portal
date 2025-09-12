@@ -23,7 +23,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
     redirect("/login");
   }
 
-  // Get project with files
+  // Get project with files and pending modifications
   const project = await db.project.findUnique({
     where: {
       id: params.id,
@@ -36,6 +36,14 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         },
       },
       files: true,
+      modifications: {
+        where: {
+          status: 'PENDING'
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      } as any,
     },
   });
 
@@ -75,15 +83,16 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           <p><strong>Type:</strong> {project.type}</p>
           {project.city && <p><strong>City:</strong> {project.city}</p>}
           {project.titleVideo && <p><strong>Title:</strong> {project.titleVideo}</p>}
-          {(user as any).role === 'ADMIN' && project.user && (
-            <p><strong>Client:</strong> {project.user.name || project.user.email}</p>
+          {(user as any).role === 'ADMIN' && (project as any).user && (
+            <p><strong>Client:</strong> {(project as any).user.name || (project as any).user.email}</p>
           )}
         </div>
       </div>
 
       <ProjectTabs 
         project={project as any} 
-        userRole={(user as any).role} 
+        userRole={(user as any).role}
+        pendingModifications={(project as any).modifications || []}
       />
     </div>
   );
