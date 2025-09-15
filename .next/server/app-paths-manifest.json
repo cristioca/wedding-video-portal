@@ -1,7 +1,0 @@
-{
-  "/dashboard/projects/[id]/page": "app/dashboard/projects/[id]/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/login/page": "app/login/page.js",
-  "/dashboard/projects/new/page": "app/dashboard/projects/new/page.js",
-  "/api/users/resend-welcome/route": "app/api/users/resend-welcome/route.js"
-}
