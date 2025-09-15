@@ -59,6 +59,7 @@ function Field({
   isAdmin = false,
   modificationId,
   inputType = 'text',
+  selectOptions,
 }: {
   label: string;
   value?: string | null;
@@ -69,10 +70,15 @@ function Field({
   hasPendingChange?: boolean;
   isAdmin?: boolean;
   modificationId?: string;
-  inputType?: 'text' | 'date';
+  inputType?: 'text' | 'date' | 'select';
+  selectOptions?: { value: string; label: string }[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value || "");
+
+  useEffect(() => {
+    setEditValue(value || "");
+  }, [value]);
 
   const handleSave = async () => {
     try {
@@ -113,7 +119,7 @@ function Field({
       'Data evenimentului': 'eventDate',
       'Titlu video': 'titleVideo',
       'Oraș': 'city',
-      'Căsătorie civilă': 'civilDate',
+      'Căsătorie civilă': 'civilUnionDetails',
       'Pregătiri': 'prep',
       'Biserica': 'church',
       'Sesiune foto-video': 'session',
@@ -189,13 +195,27 @@ function Field({
         <div className="text-sm text-gray-400">{label}</div>
         {isEditing ? (
           <div className="mt-1">
-            <input
-              type={inputType}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              className="w-full bg-gray-900 border border-gray-700 rounded-md px-2 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
-              autoFocus
-            />
+            {inputType === 'select' ? (
+              <select
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-700 rounded-md px-2 py-1.5 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                autoFocus
+              >
+                <option value="">Selectează...</option>
+                {selectOptions?.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type={inputType}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-700 rounded-md px-2 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                autoFocus
+              />
+            )}
             <div className="mt-2 flex gap-2">
               <button
                 onClick={handleSave}
@@ -244,19 +264,23 @@ function Field({
                 </div>
               </div>
             ) : (
-              <div className="font-medium">{value || "-"}</div>
+              <div className="flex items-center justify-between mt-1">
+                <div className={`${hasPendingChange ? 'text-yellow-200' : 'text-white'}`}>
+                  {value || "-"}
+                </div>
+                {editable && (
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-medium ml-2"
+                  >
+                    Editează
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}
       </div>
-      {editable && !isEditing && (
-        <button 
-          onClick={() => setIsEditing(true)}
-          className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-medium"
-        >
-          editează
-        </button>
-      )}
     </div>
   );
 }
@@ -310,17 +334,18 @@ function DetaliiTab({ project, isAdmin, pendingModifications }: { project: any; 
         />
         <Field
           label="Căsătorie civilă"
-          value={
-            project.civilSameDay
-              ? "aceeași zi"
-              : project.civilDate?.toISOString().slice(0, 10) || "-"
-          }
+          value={project.civilUnionDetails}
           editable
           projectId={project.id}
-          pendingValue={getPendingModification('civilDate')?.newValue}
-          hasPendingChange={!!getPendingModification('civilDate')}
+          pendingValue={getPendingModification('civilUnionDetails')?.newValue}
+          hasPendingChange={!!getPendingModification('civilUnionDetails')}
           isAdmin={isAdmin}
-          modificationId={getPendingModification('civilDate')?.id}
+          modificationId={getPendingModification('civilUnionDetails')?.id}
+          inputType="select"
+          selectOptions={[
+            { value: 'Făcută deja', label: 'Făcută deja' },
+            { value: 'Aceeași zi', label: 'Aceeași zi' },
+          ]}
         />
         <Field 
           label="Pregătiri" 

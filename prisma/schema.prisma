@@ -63,8 +63,7 @@ model Project {
   type           String    // "NUNTA" or "BOTEZ"
   titleVideo     String?
   city           String?
-  civilSameDay   Boolean   @default(false)
-  civilDate      DateTime?
+  civilUnionDetails String?  // New field for civil union status
   prep           String?
   church         String?
   session        String?

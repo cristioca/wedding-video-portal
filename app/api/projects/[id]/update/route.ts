@@ -48,8 +48,7 @@ export async function PATCH(
       'eventDate',
       'titleVideo', 
       'city',
-      'civilDate',
-      'civilSameDay',
+      'civilUnionDetails',
       'prep',
       'church',
       'session',
@@ -105,10 +104,8 @@ export async function PATCH(
       const updateData: any = {};
       
       // Handle special field types
-      if (field === 'eventDate' || field === 'civilDate') {
+      if (field === 'eventDate') {
         updateData[field] = new Date(value);
-      } else if (field === 'civilSameDay') {
-        updateData[field] = Boolean(value);
       } else {
         updateData[field] = value;
       }

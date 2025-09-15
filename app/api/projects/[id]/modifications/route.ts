@@ -103,10 +103,8 @@ export async function PATCH(
       const field = modification.fieldName;
       const value = modification.newValue;
 
-      if (field === 'eventDate' || field === 'civilDate') {
+      if (field === 'eventDate') {
         updateData[field] = new Date(value);
-      } else if (field === 'civilSameDay') {
-        updateData[field] = Boolean(value);
       } else {
         updateData[field] = value;
       }
