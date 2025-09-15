@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Project, File as FileModel } from "@prisma/client";
 import StatusBadge from "./StatusBadge";
 
@@ -58,6 +58,7 @@ function Field({
   hasPendingChange,
   isAdmin = false,
   modificationId,
+  inputType = 'text',
 }: {
   label: string;
   value?: string | null;
@@ -68,6 +69,7 @@ function Field({
   hasPendingChange?: boolean;
   isAdmin?: boolean;
   modificationId?: string;
+  inputType?: 'text' | 'date';
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value || "");
@@ -95,16 +97,13 @@ function Field({
           window.location.reload();
         } else {
           // Client change - show pending message
-          alert(result.message || 'Modificarea a fost trimisă pentru aprobare de către Videograf.');
           window.location.reload();
         }
       } else {
         console.error('Failed to save field');
-        alert('Eroare la salvare. Încercați din nou.');
       }
     } catch (error) {
       console.error('Error saving field:', error);
-      alert('Eroare la salvare. Încercați din nou.');
     }
   };
 
@@ -191,7 +190,7 @@ function Field({
         {isEditing ? (
           <div className="mt-1">
             <input
-              type="text"
+              type={inputType}
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               className="w-full bg-gray-900 border border-gray-700 rounded-md px-2 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
@@ -253,7 +252,7 @@ function Field({
       {editable && !isEditing && (
         <button 
           onClick={() => setIsEditing(true)}
-          className="text-sm underline hover:text-indigo-400"
+          className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-medium"
         >
           editează
         </button>
@@ -282,6 +281,7 @@ function DetaliiTab({ project, isAdmin, pendingModifications }: { project: any; 
           hasPendingChange={!!getPendingModification('eventDate')}
           isAdmin={isAdmin}
           modificationId={getPendingModification('eventDate')?.id}
+          inputType="date"
         />
         <Field
           label="Tip eveniment"
@@ -381,6 +381,48 @@ function DetaliiTab({ project, isAdmin, pendingModifications }: { project: any; 
 }
 
 function EditareTab({ project }: { project: Project }) {
+  const [editingPreferences, setEditingPreferences] = useState(false);
+  const [preferences, setPreferences] = useState(project.editingPreferences || '');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setPreferences(project.editingPreferences || '');
+  }, [project.editingPreferences]);
+
+  const handleSavePreferences = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/projects/${project.id}/update`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          field: 'editingPreferences',
+          value: preferences,
+        }),
+      });
+
+      if (response.ok) {
+        setEditingPreferences(false);
+        window.location.reload();
+      } else {
+        console.error('Failed to save preferences');
+        alert('Eroare la salvare. Încercați din nou.');
+      }
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      alert('Eroare la salvare. Încercați din nou.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancelPreferences = () => {
+    setPreferences(project.editingPreferences || '');
+    setEditingPreferences(false);
+  };
+
   return (
     <div className="space-y-3">
       <div className="bg-gray-800 p-4 rounded-lg">
@@ -390,16 +432,48 @@ function EditareTab({ project }: { project: Project }) {
         </div>
       </div>
       <div className="bg-gray-800 p-4 rounded-lg">
-        <div className="text-sm text-gray-400 mb-2">Preferințe editare</div>
-        <textarea
-          className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 h-40 focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="Scrieți aici toate detaliile pe care le considerați necesare pentru editare. Exemplu: ceremonia mai scurtă, melodii pentru fundal sau trailer etc"
-        ></textarea>
-        <div className="mt-2 flex justify-end">
-          <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-sm font-medium">
-            Salvează
-          </button>
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm text-gray-400">Preferințe editare</div>
+          {!editingPreferences && (
+            <button 
+              onClick={() => setEditingPreferences(true)}
+              className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-medium"
+            >
+              editează
+            </button>
+          )}
         </div>
+        {editingPreferences ? (
+          <div>
+            <textarea
+              className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 h-40 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Scrieți aici toate detaliile pe care le considerați necesare pentru editare. Exemplu: ceremonia mai scurtă, melodii pentru fundal sau trailer etc"
+              value={preferences}
+              onChange={(e) => setPreferences(e.target.value)}
+              disabled={isLoading}
+            />
+            <div className="mt-2 flex gap-2">
+              <button 
+                onClick={handleSavePreferences}
+                disabled={isLoading}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-sm font-medium disabled:bg-gray-500"
+              >
+                {isLoading ? 'Se salvează...' : 'Salvează'}
+              </button>
+              <button 
+                onClick={handleCancelPreferences}
+                disabled={isLoading}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md text-sm font-medium"
+              >
+                Anulează
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-gray-900 border border-gray-700 rounded-md p-2 h-40 text-sm text-gray-300">
+            {preferences || "Nu au fost specificate preferințe pentru editare."}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -456,4 +530,6 @@ function FilmeTab({
         </div>
         
       )}
-    </div>)}
+    </div>
+  );
+}

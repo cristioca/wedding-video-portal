@@ -64,6 +64,11 @@ export default async function Dashboard() {
         <h1 className="text-3xl font-bold">
           Welcome back, {user.name || "User"}!
         </h1>
+        {(user as any).role === 'ADMIN' && (
+          <Link href="/dashboard/projects/new" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Create New Project
+          </Link>
+        )}
       </div>
 
       <h2 className="text-xl font-semibold mb-4">

@@ -71,6 +71,7 @@ model Project {
   restaurant     String?
   detailsExtra   String?
   editStatus     String    @default("Pending")
+  editingPreferences String?  // Client's editing preferences
   // Relation to User
   userId         String
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -78,6 +79,7 @@ model Project {
   files          File[]
   downloads      FileDownloadEvent[]
   modifications  ProjectModification[] // Track field modifications
+  adminNotifiedOfChanges Boolean @default(false) // Track if admin has been notified of pending changes
 }
 
 // Model for uploaded files

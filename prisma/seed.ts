@@ -6,36 +6,20 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Start seeding...');
 
-  // --- Clean up previous data to avoid duplicates ---
-  // Deleting projects first because they depend on users
-  await prisma.project.deleteMany();
-  // Deleting non-admin users
-  await prisma.user.deleteMany({
-    where: {
-      email: {
-        not: 'admin@admin.com',
-      },
-    },
-  });
-  console.log('Cleaned up old projects and client users.');
-
   // --- Create Admin User ---
-  const adminEmail = 'admin@admin.com';
-  const adminHashedPassword = await bcrypt.hash('password123', 10);
-  const adminUser = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: { 
-      password: adminHashedPassword,
-      role: 'ADMIN'
-    }, // Ensure password and role are correct
-    create: {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@admin.com';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'password123';
+  const adminHashedPassword = await bcrypt.hash(adminPassword, 10);
+
+  const adminUser = await prisma.user.create({
+    data: {
       email: adminEmail,
       password: adminHashedPassword,
       name: 'Admin User',
       role: 'ADMIN',
     },
   });
-  console.log(`Upserted admin user: ${adminUser.email}`);
+  console.log(`Created admin user: ${adminUser.email}`);
 
   // --- Create Client User ---
   const clientEmail = 'client@client.com';

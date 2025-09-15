@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
 import ProjectTabs from "@/components/ProjectTabs";
+import ResendWelcomeButton from "@/components/ResendWelcomeButton";
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -84,7 +85,10 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           {project.city && <p><strong>City:</strong> {project.city}</p>}
           {project.titleVideo && <p><strong>Title:</strong> {project.titleVideo}</p>}
           {(user as any).role === 'ADMIN' && (project as any).user && (
-            <p><strong>Client:</strong> {(project as any).user.name || (project as any).user.email}</p>
+            <div className="flex items-center gap-4 mt-1">
+              <p><strong>Client:</strong> {(project as any).user.name} ({(project as any).user.email})</p>
+              <ResendWelcomeButton userId={project.userId} />
+            </div>
           )}
         </div>
       </div>

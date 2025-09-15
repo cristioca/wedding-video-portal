@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { sendMail } from "@/lib/mail";
 
 // Get modifications for a project
 export async function GET(
@@ -126,6 +127,21 @@ export async function PATCH(
         }
       });
 
+      // Check if there are any remaining pending modifications
+      const remainingPending = await (db as any).projectModification.count({
+        where: {
+          projectId: modification.projectId,
+          status: 'PENDING',
+        },
+      });
+
+      if (remainingPending === 0) {
+        await db.project.update({
+          where: { id: modification.projectId },
+          data: { adminNotifiedOfChanges: false },
+        });
+      }
+
       return NextResponse.json({ 
         success: true, 
         message: "Modification approved and applied" 
@@ -142,6 +158,42 @@ export async function PATCH(
           notes
         }
       });
+
+      // Send email notification to client if reason is provided
+      if (notes && notes.trim()) {
+        const clientUser = await db.user.findUnique({
+          where: { id: modification.project.userId },
+        });
+
+        if (clientUser?.email) {
+          await sendMail({
+            to: clientUser.email,
+            subject: `Modificare respinsă pentru proiectul: ${modification.project.name}`,
+            html: `
+              <p>Salut, ${clientUser.name || clientUser.email}!</p>
+              <p>Modificarea ta pentru proiectul <strong>${modification.project.name}</strong> a fost respinsă.</p>
+              <p><strong>Motiv:</strong> ${notes}</p>
+              <p>Poți face modificări noi dacă este necesar.</p>
+              <a href="${process.env.NEXTAUTH_URL}/dashboard/projects/${modification.projectId}">Vezi proiectul</a>
+            `,
+          });
+        }
+      }
+
+      // Check if there are any remaining pending modifications
+      const remainingPendingAfterReject = await (db as any).projectModification.count({
+        where: {
+          projectId: modification.projectId,
+          status: 'PENDING',
+        },
+      });
+
+      if (remainingPendingAfterReject === 0) {
+        await db.project.update({
+          where: { id: modification.projectId },
+          data: { adminNotifiedOfChanges: false },
+        });
+      }
 
       return NextResponse.json({ 
         success: true, 

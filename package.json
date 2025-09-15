@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
-    "@prisma/client": "^6.16.0",
+    "@prisma/client": "^5.14.0",
     "autoprefixer": "^10.4.19",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.5.1",

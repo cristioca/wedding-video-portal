@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { sendMail } from "@/lib/mail";
 
 export async function PATCH(
   req: NextRequest,
@@ -53,7 +54,8 @@ export async function PATCH(
       'church',
       'session',
       'restaurant',
-      'detailsExtra'
+      'detailsExtra',
+      'editingPreferences'
     ];
 
     if (!allowedFields.includes(field)) {
@@ -67,6 +69,36 @@ export async function PATCH(
       : String(currentValue || '');
 
     const isAdmin = (currentUser as any).role === 'ADMIN';
+
+    // Special handling for editingPreferences - clients can update this directly
+    if (field === 'editingPreferences') {
+      const updateData: any = { editingPreferences: value };
+
+      const updatedProject = await db.project.update({
+        where: { id: params.id },
+        data: updateData
+      });
+
+      // Create modification record for history
+      await db.projectModification.create({
+        data: {
+          projectId: params.id,
+          fieldName: field,
+          oldValue: currentValueStr,
+          newValue: String(value),
+          status: 'AUTO_APPLIED',
+          createdBy: currentUser.id,
+          approvedBy: currentUser.id,
+          approvedAt: new Date()
+        }
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        applied: true,
+        project: updatedProject 
+      });
+    }
 
     if (isAdmin) {
       // Admin changes are applied immediately
@@ -119,6 +151,28 @@ export async function PATCH(
           createdBy: currentUser.id
         }
       });
+
+      // --- Send notification email to admin if not already sent ---
+      if (!project.adminNotifiedOfChanges) {
+        const adminEmail = process.env.ADMIN_EMAIL;
+        if (adminEmail) {
+          await sendMail({
+            to: adminEmail,
+            subject: `Modificări în așteptare pentru proiectul: ${project.name}`,
+            html: `
+              <p>Clientul <strong>${currentUser.name || currentUser.email}</strong> a propus modificări pentru proiectul <strong>${project.name}</strong>.</p>
+              <p>Te rugăm să revizuiești modificările în panoul de administrare.</p>
+              <a href="${process.env.NEXTAUTH_URL}/dashboard/projects/${project.id}">Vezi proiectul</a>
+            `,
+          });
+
+          // Mark that the admin has been notified
+          await db.project.update({
+            where: { id: params.id },
+            data: { adminNotifiedOfChanges: true },
+          });
+        }
+      }
 
       return NextResponse.json({ 
         success: true, 
