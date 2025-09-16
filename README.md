@@ -1,6 +1,6 @@
-# Wedding Video Portal
+# Wedding Video Portal - Django Edition
 
-A comprehensive client portal for wedding videographers to manage projects, track modifications, and collaborate with clients throughout the video production process.
+A professional wedding video management portal built with Django and Python for managing wedding video projects, client communications, and file deliverables.
 
 ## Features
 
@@ -8,12 +8,12 @@ A comprehensive client portal for wedding videographers to manage projects, trac
 - **Project Dashboard**: Overview of all wedding projects with status tracking
 - **Event Details**: Comprehensive project information including dates, locations, and requirements
 - **File Management**: Secure file uploads and downloads for video deliverables
-- **Status Tracking**: Real-time project status updates (Planning, In Progress, Review, Completed)
+- **Status Tracking**: Real-time project status updates (Planning, Filming, Editing, Completed)
 
 ### 👥 Role-Based Access Control
 - **Admin (Videographer)**: Full access to all projects and client management
 - **Client**: Access only to their own projects and modification requests
-- **Secure Authentication**: NextAuth.js with credential-based login
+- **Django Authentication**: Built-in secure user authentication system
 
 ### ✏️ Modification Tracking System
 - **Client Requests**: Clients can request changes to project details
@@ -24,85 +24,98 @@ A comprehensive client portal for wedding videographers to manage projects, trac
 
 ### 🎨 Modern UI/UX
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Dark Theme**: Professional dark interface optimized for video professionals
-- **Intuitive Navigation**: Tab-based project views for easy information access
+- **Bootstrap 5**: Professional gradient interface with modern styling
+- **Intuitive Navigation**: Clean dashboard and project detail views
 - **Real-time Updates**: Instant feedback on actions and status changes
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Backend**: Next.js API Routes, Prisma ORM
-- **Database**: SQLite (easily configurable for PostgreSQL/MySQL)
-- **Authentication**: NextAuth.js
-- **Styling**: Tailwind CSS
-- **File Handling**: Built-in file upload/download system
+- **Backend**: Django 5.0.2, Python 3.10+
+- **Database**: SQLite (development) / PostgreSQL (production ready)
+- **Frontend**: Django Templates, Bootstrap 5, Custom CSS
+- **Authentication**: Django built-in authentication
+- **Forms**: Django Crispy Forms with Bootstrap 5
+- **File Handling**: Django file upload/download system
 
-## Database Schema
+## Database Models
 
 ### Core Models
-- **User**: Admin and client user management with role-based access
+- **User**: Custom user model with role-based access (ADMIN/CLIENT)
 - **Project**: Wedding project details with comprehensive event information
-- **File**: Secure file storage and download tracking
+- **File**: Secure file storage and download tracking with size management
 - **ProjectModification**: Modification requests with approval workflow
+- **FileDownloadEvent**: Download activity tracking and analytics
 
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+- Python 3.10+
+- pip (Python package manager)
 
 ### Installation
 
-1. **Clone and install dependencies**
+1. **Clone and setup virtual environment**
    ```bash
    git clone <repository-url>
    cd wedding-video-portal
-   npm install
+   python -m venv venv
+   
+   # On Windows:
+   venv\Scripts\activate
+   
+   # On macOS/Linux:
+   source venv/bin/activate
    ```
 
-2. **Environment setup**
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Environment setup**
    ```bash
    cp .env.example .env
    ```
    Update `.env` with:
-   - `DATABASE_URL`: Your database connection string
-   - `NEXTAUTH_SECRET`: Random secret for NextAuth.js
-   - `NEXTAUTH_URL`: Your application URL (http://localhost:3000 for development)
+   - `SECRET_KEY`: Django secret key
+   - `DEBUG`: Set to True for development
+   - `DATABASE_URL`: Database connection string
 
-3. **Database setup**
+4. **Database setup**
    ```bash
-   npx prisma db push
-   npx prisma generate
-   npm run db:seed
+   python manage.py makemigrations
+   python manage.py migrate
+   python manage.py seed_data
    ```
 
-4. **Start development server**
+5. **Start development server**
    ```bash
-   npm run dev
+   python manage.py runserver
    ```
 
-5. **Access the application**
-   Open [http://localhost:3000](http://localhost:3000)
+6. **Access the application**
+   Open [http://localhost:8000](http://localhost:8000)
 
 ## Demo Accounts
 
 ### Admin (Videographer)
-- **Email**: `admin@admin.com`
-- **Password**: `adminadmin`
+- **Username**: `admin`
+- **Password**: `admin123`
 - **Access**: All projects, client management, modification approvals
 
-### Client
-- **Email**: `client@client.com`  
-- **Password**: `clientclient`
+### Clients
+- **Username**: `client` / **Password**: `client123`
+- **Username**: `maria` / **Password**: `maria123`
 - **Access**: Own projects only, can request modifications
 
 ## Usage
 
 ### For Videographers (Admin)
 1. **Dashboard Overview**: View all client projects with pending modification indicators
-2. **Project Management**: Access detailed project information and files
+2. **Project Management**: Create, edit, and manage project details
 3. **Modification Approval**: Review and approve/reject client change requests
 4. **File Management**: Upload final videos and track client downloads
+5. **Admin Interface**: Access Django admin at `/admin/` for advanced management
 
 ### For Clients
 1. **Project Access**: View your wedding project details and status
@@ -110,65 +123,93 @@ A comprehensive client portal for wedding videographers to manage projects, trac
 3. **File Downloads**: Access and download your completed videos
 4. **Real-time Updates**: See approval status of your modification requests
 
-## API Endpoints
+## Django URLs
 
-### Authentication
-- `POST /api/auth/signin` - User login
-- `POST /api/auth/signout` - User logout
+### Main URLs
+- `/` - Home (redirects to dashboard or login)
+- `/login/` - User login
+- `/logout/` - User logout
+- `/dashboard/` - Main dashboard
+- `/admin/` - Django admin interface
 
-### Projects
-- `GET /api/projects` - List projects (filtered by user role)
-- `GET /api/projects/[id]` - Get project details
-- `PATCH /api/projects/[id]/update` - Update project (creates modification request)
-
-### Modifications
-- `GET /api/projects/[id]/modifications` - Get project modifications
-- `PATCH /api/projects/[id]/modifications` - Approve/reject modifications (admin only)
-
-### Files
-- `POST /api/files/upload` - Upload files
-- `GET /api/files/[id]/download` - Download files (with access control)
+### Project URLs
+- `/projects/<id>/` - Project detail view
+- `/projects/create/` - Create new project (admin only)
+- `/projects/<id>/archive/` - Archive project (admin only)
+- `/projects/file/<id>/download/` - Download file
+- `/projects/<id>/notify/` - Send client notification (admin only)
 
 ## Development
 
 ### Database Management
 ```bash
-# View database in browser
-npm run db:studio
+# Create new migrations after model changes
+python manage.py makemigrations
 
-# Reset database
-npx prisma db push --force-reset
-npm run db:seed
+# Apply migrations
+python manage.py migrate
 
-# Generate Prisma client after schema changes
-npx prisma generate
+# Create superuser
+python manage.py createsuperuser
+
+# Seed database with sample data
+python manage.py seed_data
+
+# Access Django shell
+python manage.py shell
 ```
 
 ### Project Structure
 ```
-├── app/                    # Next.js 13+ app directory
-│   ├── api/               # API routes
-│   ├── dashboard/         # Main dashboard pages
-│   ├── login/            # Authentication pages
-│   └── globals.css       # Global styles
-├── components/            # Reusable React components
-├── lib/                  # Utility functions and configurations
-├── prisma/               # Database schema and migrations
-└── public/               # Static assets
+wedding-video-portal/
+├── wedding_portal/         # Django project settings
+│   ├── settings.py        # Main configuration
+│   ├── urls.py           # URL routing
+│   └── wsgi.py           # WSGI configuration
+├── projects/              # Main Django app
+│   ├── models.py         # Database models
+│   ├── views.py          # View functions
+│   ├── forms.py          # Django forms
+│   ├── admin.py          # Admin configuration
+│   ├── urls.py           # App URL patterns
+│   └── management/       # Custom management commands
+├── templates/             # HTML templates
+├── static/               # Static files (CSS, JS, images)
+├── media/                # User uploaded files
+└── requirements.txt      # Python dependencies
 ```
 
 ## Deployment
 
-### Production Build
+### Production Setup
 ```bash
-npm run build
-npm start
+# Install production dependencies
+pip install -r requirements.txt
+
+# Collect static files
+python manage.py collectstatic
+
+# Run with production server (e.g., Gunicorn)
+pip install gunicorn
+gunicorn wedding_portal.wsgi:application
 ```
 
 ### Environment Variables (Production)
-- Set `DATABASE_URL` to your production database
-- Generate secure `NEXTAUTH_SECRET`
-- Update `NEXTAUTH_URL` to your domain
+- Set `DEBUG=False`
+- Generate secure `SECRET_KEY`
+- Configure production database URL
+- Set up email backend for notifications
+
+## Management Commands
+
+### Custom Commands
+```bash
+# Seed database with sample data
+python manage.py seed_data
+
+# Create admin user (if not using seed_data)
+python manage.py createsuperuser
+```
 
 ## Contributing
 

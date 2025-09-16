@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Wedding Video Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="text-white">
+            <i class="bi bi-speedometer2"></i> Dashboard
+            {% if is_admin %}
+                <span class="badge bg-danger">Admin</span>
+            {% endif %}
+        </h2>
+    </div>
+    {% if is_admin %}
+    <div class="col-auto">
+        <a href="{% url 'create_project' %}" class="btn btn-light">
+            <i class="bi bi-plus-circle"></i> New Project
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% if is_admin and pending_modifications %}
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <i class="bi bi-exclamation-triangle"></i> Pending Modifications ({{ pending_modifications|length }})
+    </div>
+    <div class="card-body">
+        <div class="list-group">
+            {% for mod in pending_modifications %}
+            <a href="{% url 'project_detail' mod.project.pk %}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">{{ mod.project.name }}</h6>
+                    <small>{{ mod.created_at|timesince }} ago</small>
+                </div>
+                <p class="mb-1">Field: {{ mod.field_name|title }}</p>
+                <small>By: {{ mod.created_by.username }}</small>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-folder-fill"></i> Projects
+    </div>
+    <div class="card-body">
+        {% if projects %}
+        <div class="row">
+            {% for project in projects %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card project-card" onclick="window.location='{% url 'project_detail' project.pk %}'">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.name }}</h5>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-person"></i> {{ project.user.get_full_name|default:project.user.username }}
+                        </p>
+                        <p class="mb-2">
+                            <i class="bi bi-calendar"></i> {{ project.event_date|date:"M d, Y" }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="status-badge status-{{ project.status|lower|cut:' ' }}">
+                                {{ project.status }}
+                            </span>
+                            <span class="badge bg-secondary">
+                                {{ project.type }}
+                            </span>
+                        </div>
+                        {% if project.admin_notified_of_changes %}
+                        <div class="mt-2">
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-exclamation-circle"></i> Has Changes
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-folder-x" style="font-size: 3rem; color: var(--text-muted);"></i>
+            <p class="mt-3 text-muted">No projects found</p>
+            {% if is_admin %}
+            <a href="{% url 'create_project' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create First Project
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
