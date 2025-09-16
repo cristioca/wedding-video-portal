@@ -69,36 +69,6 @@ export async function PATCH(
 
     const isAdmin = (currentUser as any).role === 'ADMIN';
 
-    // Special handling for editingPreferences - clients can update this directly
-    if (field === 'editingPreferences') {
-      const updateData: any = { editingPreferences: value };
-
-      const updatedProject = await db.project.update({
-        where: { id: params.id },
-        data: updateData
-      });
-
-      // Create modification record for history
-      await db.projectModification.create({
-        data: {
-          projectId: params.id,
-          fieldName: field,
-          oldValue: currentValueStr,
-          newValue: String(value),
-          status: 'AUTO_APPLIED',
-          createdBy: currentUser.id,
-          approvedBy: currentUser.id,
-          approvedAt: new Date()
-        }
-      });
-
-      return NextResponse.json({ 
-        success: true, 
-        applied: true,
-        project: updatedProject 
-      });
-    }
-
     if (isAdmin) {
       // Admin changes are applied immediately
       const updateData: any = {};
@@ -130,13 +100,21 @@ export async function PATCH(
         }
       });
 
+      // Mark project as having unsent changes instead of sending email immediately
+      await db.project.update({
+        where: { id: params.id },
+        data: { hasUnsentChanges: true }
+      });
+
       return NextResponse.json({ 
         success: true, 
         applied: true,
-        project: updatedProject 
+        project: updatedProject,
+        hasUnsentChanges: true
       });
+    }
 
-    } else {
+    else {
       // Client changes require approval
       await db.projectModification.create({
         data: {

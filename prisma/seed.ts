@@ -39,7 +39,6 @@ async function main() {
     data: {
       name: 'Nunta Popescu',
       status: 'Editing',
-      dueDate: new Date('2025-10-20'),
       eventDate: new Date('2025-09-15'),
       type: 'NUNTA',
       titleVideo: 'Andrei & Maria Popescu',
@@ -56,7 +55,6 @@ async function main() {
     data: {
       name: 'Botez Ionescu',
       status: 'Planning',
-      dueDate: new Date('2025-11-30'),
       eventDate: new Date('2025-11-05'),
       type: 'BOTEZ',
       titleVideo: 'Micul Matei Ionescu',

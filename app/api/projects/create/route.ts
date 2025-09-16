@@ -51,9 +51,6 @@ export async function POST(req: Request) {
           role: 'CLIENT',
         },
       });
-      
-      // TODO: Send email to client with their new password
-      console.log(`New client created. Email: ${clientEmail}, Password: ${randomPassword}`);
     }
 
     // Create the project
@@ -63,7 +60,6 @@ export async function POST(req: Request) {
         eventDate: new Date(eventDate),
         type: projectType,
         status: 'Planning',
-        dueDate: new Date(new Date(eventDate).setDate(new Date(eventDate).getDate() + 30)), // Due 30 days after event
         userId: clientUser.id,
       },
     });

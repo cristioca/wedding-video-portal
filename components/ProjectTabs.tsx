@@ -293,8 +293,30 @@ function DetaliiTab({ project, isAdmin, pendingModifications }: { project: any; 
     );
   };
 
+  const displayedFieldNames = [
+    'eventDate', 'titleVideo', 'city', 'civilUnionDetails', 'prep', 
+    'church', 'session', 'restaurant', 'detailsExtra'
+  ];
+
+  const unmappedModifications = pendingModifications.filter(
+    (mod: any) => !displayedFieldNames.includes(mod.fieldName) && mod.status === 'PENDING'
+  );
+
   return (
     <div className="bg-gray-800 p-4 rounded-lg">
+      {isAdmin && unmappedModifications.length > 0 && (
+        <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-sm">
+          <p className="font-bold text-red-400">Atenție: Există {unmappedModifications.length} modificări în așteptare pentru câmpuri care nu pot fi afișate:</p>
+          <ul className="list-disc list-inside mt-2 text-red-300">
+            {unmappedModifications.map((mod: any) => (
+              <li key={mod.id}>
+                Câmp: <strong>{mod.fieldName}</strong>, Valoare nouă: "{mod.newValue}"
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-red-400 mt-2">Acestea pot fi modificări vechi sau corupte. Contactați suportul tehnic dacă nu pot fi rezolvate.</p>
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
         <Field
           label="Data evenimentului"

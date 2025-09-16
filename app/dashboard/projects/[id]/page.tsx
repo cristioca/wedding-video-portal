@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { format } from "date-fns";
 import ProjectTabs from "@/components/ProjectTabs";
 import ResendWelcomeButton from "@/components/ResendWelcomeButton";
+import NotifyClientButton from "@/components/NotifyClientButton";
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -29,7 +30,24 @@ export default async function ProjectPage({ params }: { params: { id: string } }
     where: {
       id: params.id,
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      status: true,
+      eventDate: true,
+      type: true,
+      city: true,
+      titleVideo: true,
+      civilUnionDetails: true,
+      prep: true,
+      church: true,
+      session: true,
+      restaurant: true,
+      detailsExtra: true,
+      editStatus: true,
+      editingPreferences: true,
+      userId: true,
+      hasUnsentChanges: true,
       user: {
         select: {
           name: true,
@@ -44,7 +62,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         orderBy: {
           createdAt: 'desc'
         }
-      } as any,
+      },
     },
   });
 
@@ -60,7 +78,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
   }
 
   // Authorization check: Admin can see all projects, clients can only see their own
-  const canAccess = (user as any).role === 'ADMIN' || project.userId === user.id;
+  const canAccess = user.role === 'ADMIN' || project.userId === user.id;
   
   if (!canAccess) {
     return (
@@ -76,17 +94,25 @@ export default async function ProjectPage({ params }: { params: { id: string } }
   return (
     <div className="container mx-auto p-4">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{project.name}</h1>
+        <div className="flex items-center gap-4 mb-2">
+          <h1 className="text-3xl font-bold">{project.name}</h1>
+          {user.role === 'ADMIN' && project.hasUnsentChanges && (
+            <NotifyClientButton 
+              projectId={project.id} 
+              hasUnsentChanges={project.hasUnsentChanges}
+              size="small"
+            />
+          )}
+        </div>
         <div className="mt-2 space-y-1 text-gray-600">
-          <p><strong>Event Date:</strong> {format(project.eventDate, "MMMM d, yyyy")}</p>
-          <p><strong>Due Date:</strong> {format(project.dueDate, "MMMM d, yyyy")}</p>
+          <p><strong>Data eveniment:</strong> {format(project.eventDate, "MMMM d, yyyy")}</p>
           <p><strong>Status:</strong> {project.status}</p>
-          <p><strong>Type:</strong> {project.type}</p>
-          {project.city && <p><strong>City:</strong> {project.city}</p>}
-          {project.titleVideo && <p><strong>Title:</strong> {project.titleVideo}</p>}
-          {(user as any).role === 'ADMIN' && (project as any).user && (
+          <p><strong>Tip:</strong> {project.type}</p>
+          {project.city && <p><strong>Oraș:</strong> {project.city}</p>}
+          {project.titleVideo && <p><strong>Titlu:</strong> {project.titleVideo}</p>}
+          {user.role === 'ADMIN' && project.user && (
             <div className="flex items-center gap-4 mt-1">
-              <p><strong>Client:</strong> {(project as any).user.name} ({(project as any).user.email})</p>
+              <p><strong>Client:</strong> {project.user.name} ({project.user.email})</p>
               <ResendWelcomeButton userId={project.userId} />
             </div>
           )}
@@ -94,9 +120,9 @@ export default async function ProjectPage({ params }: { params: { id: string } }
       </div>
 
       <ProjectTabs 
-        project={project as any} 
-        userRole={(user as any).role}
-        pendingModifications={(project as any).modifications || []}
+        project={project} 
+        userRole={user.role}
+        pendingModifications={project.modifications || []}
       />
     </div>
   );

@@ -54,10 +54,10 @@ model Project {
   id             String    @id @default(cuid())
   name           String
   status         String // e.g., "Planning", "Filming", "Editing", "Completed"
-  dueDate        DateTime
   notes          String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  isArchived     Boolean   @default(false) // New field for archiving
   // Add the new fields from your component
   eventDate      DateTime
   type           String    // "NUNTA" or "BOTEZ"
@@ -79,6 +79,8 @@ model Project {
   downloads      FileDownloadEvent[]
   modifications  ProjectModification[] // Track field modifications
   adminNotifiedOfChanges Boolean @default(false) // Track if admin has been notified of pending changes
+  lastClientNotificationDate DateTime? // Track last email sent to client to prevent spam
+  hasUnsentChanges Boolean @default(false) // Track if there are changes that haven't been sent to client
 }
 
 // Model for uploaded files

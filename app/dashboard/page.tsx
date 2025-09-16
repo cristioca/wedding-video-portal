@@ -3,8 +3,11 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
+import CleanupButton from "@/components/CleanupButton";
+import ProjectActions from "@/components/ProjectActions";
+import NotifyClientButton from "@/components/NotifyClientButton";
 
-export default async function Dashboard() {
+export default async function Dashboard({ searchParams }: { searchParams: { showArchived?: string } }) {
   const session = await getSession();
 
   if (!session?.user?.email) {
@@ -22,39 +25,50 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
+  // Check for outdated modifications that need cleanup, only for admins
+  let needsCleanup = 0;
+  if ((user as any).role === 'ADMIN') {
+    needsCleanup = await db.projectModification.count({
+      where: {
+        fieldName: 'editingPreferences',
+        status: 'PENDING',
+      },
+    });
+  }
+
+  const showArchived = searchParams.showArchived === 'true';
+
+  // Base query options
+  const queryOptions = {
+    where: {
+      isArchived: showArchived,
+    },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      modifications: {
+        where: {
+          status: 'PENDING'
+        }
+      } as any
+    },
+    orderBy: {
+      eventDate: "desc",
+    },
+  };
+
   // Fetch projects based on user role with pending modifications count
   const projects = (user as any).role === 'ADMIN' 
-    ? await db.project.findMany({
-        include: {
-          user: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
-          modifications: {
-            where: {
-              status: 'PENDING'
-            }
-          } as any
-        },
-        orderBy: {
-          eventDate: "desc",
-        },
-      })
+    ? await db.project.findMany(queryOptions)
     : await db.project.findMany({
+        ...queryOptions,
         where: {
+          ...queryOptions.where,
           userId: user.id,
-        },
-        include: {
-          modifications: {
-            where: {
-              status: 'PENDING'
-            }
-          } as any
-        },
-        orderBy: {
-          eventDate: "desc",
         },
       });
 
@@ -71,17 +85,26 @@ export default async function Dashboard() {
         )}
       </div>
 
-      <h2 className="text-xl font-semibold mb-4">
-        {(user as any).role === 'ADMIN' ? 'All Projects' : 'Your Projects'}
-      </h2>
+      {(user as any).role === 'ADMIN' && <CleanupButton needsCleanup={needsCleanup > 0} />}
+
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">
+          {(user as any).role === 'ADMIN' ? 'Toate proiectele' : 'Your Projects'}
+        </h2>
+        {(user as any).role === 'ADMIN' && (
+          <Link href={showArchived ? '/dashboard' : '/dashboard?showArchived=true'} className="text-sm text-indigo-400 hover:underline">
+            {showArchived ? 'Ascunde arhiva' : 'Arată arhiva'}
+          </Link>
+        )}
+      </div>
       <div className="bg-gray-800 rounded-lg shadow">
         <ul className="divide-y divide-gray-700">
           {projects.length > 0 ? (
             projects.map((project: any) => (
-              <li key={project.id}>
+              <li key={project.id} className="p-4 hover:bg-gray-700 flex justify-between items-center">
                 <Link
                   href={`/dashboard/projects/${project.id}`}
-                  className="block p-4 hover:bg-gray-700"
+                  className="flex-grow"
                 >
                   <div className="flex justify-between">
                     <div>
@@ -99,16 +122,28 @@ export default async function Dashboard() {
                         </p>
                       )}
                     </div>
-                    <p className="text-sm text-gray-400">
-                      {format(project.eventDate, "MMMM d, yyyy")}
-                    </p>
+                    <div className="flex flex-col items-end gap-2">
+                      <p className="text-sm text-gray-400">
+                        {format(project.eventDate, "MMMM d, yyyy")}
+                      </p>
+                    </div>
                   </div>
                 </Link>
+                <div className="ml-4 flex items-center gap-2">
+                  {(user as any).role === 'ADMIN' && <ProjectActions project={project} />}
+                  {(user as any).role === 'ADMIN' && (project as any).hasUnsentChanges && (
+                    <NotifyClientButton 
+                      projectId={project.id} 
+                      hasUnsentChanges={(project as any).hasUnsentChanges}
+                      size="small"
+                    />
+                  )}
+                </div>
               </li>
             ))
           ) : (
             <p className="p-4 text-center text-gray-500">
-              You have no projects yet.
+              Nu ai proiecte încă.
             </p>
           )}
         </ul>
