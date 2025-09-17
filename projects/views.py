@@ -246,6 +246,86 @@ def notify_client(request, pk):
 
 
 @login_required
+def update_project_field(request, pk):
+    """Update a single project field via AJAX"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    project = get_object_or_404(Project, pk=pk)
+    
+    # Check permissions
+    if not request.user.is_admin() and project.user != request.user:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    try:
+        data = json.loads(request.body)
+        field_name = data.get('field_name')
+        field_value = data.get('field_value')
+        
+        if not field_name:
+            return JsonResponse({'error': 'Field name is required'}, status=400)
+        
+        # Validate field exists on model
+        if not hasattr(project, field_name):
+            return JsonResponse({'error': 'Invalid field name'}, status=400)
+        
+        # Store old value for modification tracking
+        old_value = str(getattr(project, field_name) or '')
+        
+        # Handle different field types
+        field = project._meta.get_field(field_name)
+        if hasattr(field, 'choices') and field.choices:
+            # Validate choice field
+            valid_choices = [choice[0] for choice in field.choices]
+            if field_value not in valid_choices:
+                return JsonResponse({'error': 'Invalid choice'}, status=400)
+        
+        # Track modifications if client is editing
+        if request.user.is_client():
+            ProjectModification.objects.create(
+                project=project,
+                field_name=field_name,
+                old_value=old_value,
+                new_value=str(field_value),
+                created_by=request.user,
+                status='PENDING'
+            )
+            project.admin_notified_of_changes = True
+            project.save()
+            return JsonResponse({
+                'success': True, 
+                'message': 'Change submitted for admin approval',
+                'pending_approval': True
+            })
+        
+        # Admin changes are applied immediately
+        if request.user.is_admin():
+            setattr(project, field_name, field_value)
+            project.save()
+            
+            # Create auto-applied modification record
+            ProjectModification.objects.create(
+                project=project,
+                field_name=field_name,
+                old_value=old_value,
+                new_value=str(field_value),
+                created_by=request.user,
+                status='AUTO_APPLIED'
+            )
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Field updated successfully',
+                'new_value': str(getattr(project, field_name))
+            })
+            
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
 def approve_modification(request, mod_id):
     """Approve or reject a modification - admin only"""
     if not request.user.is_admin():

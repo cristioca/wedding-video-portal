@@ -69,98 +69,263 @@
                 <i class="bi bi-info-circle"></i> Project Details
             </div>
             <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="update_project" value="1">
+                <!-- Basic Information -->
+                <div class="editable-section mb-4" data-section="basic">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Basic Information</h6>
+                        <button class="btn btn-sm btn-outline-primary edit-btn" onclick="toggleEdit('basic')">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                    </div>
                     
-                    <div class="row mb-3">
-                        <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Project Name</label>
-                            {{ form.name }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.name }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <input type="text" class="form-control" data-field="name" value="{{ project.name }}">
+                            </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Client</label>
-                            {{ form.user }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.user.get_full_name|default:project.user.username }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <select class="form-control" data-field="user">
+                                    {% for user in form.user.field.queryset %}
+                                    <option value="{{ user.pk }}" {% if user.pk == project.user.pk %}selected{% endif %}>
+                                        {{ user.get_full_name|default:user.username }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="row mb-3">
-                        <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Type</label>
-                            {{ form.type }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.get_type_display }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <select class="form-control" data-field="type">
+                                    {% for value, label in form.type.field.choices %}
+                                    <option value="{{ value }}" {% if value == project.type %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Status</label>
-                            {{ form.status }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.get_status_display }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <select class="form-control" data-field="status">
+                                    {% for value, label in form.status.field.choices %}
+                                    <option value="{{ value }}" {% if value == project.status %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Edit Status</label>
-                            {{ form.edit_status }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.get_edit_status_display }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <select class="form-control" data-field="edit_status">
+                                    {% for value, label in form.edit_status.field.choices %}
+                                    <option value="{{ value }}" {% if value == project.edit_status %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="row mb-3">
-                        <div class="col-md-6">
+                    <div class="edit-actions" style="display: none;">
+                        <button class="btn btn-success btn-sm me-2" onclick="saveSection('basic')">
+                            <i class="bi bi-check"></i> Save
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelEdit('basic')">
+                            <i class="bi bi-x"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Event Details -->
+                <div class="editable-section mb-4" data-section="event">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Event Details</h6>
+                        <button class="btn btn-sm btn-outline-primary edit-btn" onclick="toggleEdit('event')">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Event Date</label>
-                            {{ form.event_date }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.event_date|date:"Y-m-d H:i" }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <input type="datetime-local" class="form-control" data-field="event_date" value="{{ project.event_date|date:'Y-m-d\TH:i' }}">
+                            </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">City</label>
-                            {{ form.city }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.city|default:"Not specified" }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <input type="text" class="form-control" data-field="city" value="{{ project.city|default:'' }}">
+                            </div>
                         </div>
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label">Video Title</label>
-                        {{ form.title_video }}
+                        <div class="view-mode">
+                            <p class="form-control-plaintext">{{ project.title_video|default:"Not specified" }}</p>
+                        </div>
+                        <div class="edit-mode" style="display: none;">
+                            <input type="text" class="form-control" data-field="title_video" value="{{ project.title_video|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="edit-actions" style="display: none;">
+                        <button class="btn btn-success btn-sm me-2" onclick="saveSection('event')">
+                            <i class="bi bi-check"></i> Save
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelEdit('event')">
+                            <i class="bi bi-x"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ceremony Details -->
+                <div class="editable-section mb-4" data-section="ceremony">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Ceremony Details</h6>
+                        <button class="btn btn-sm btn-outline-primary edit-btn" onclick="toggleEdit('ceremony')">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label">Civil Union Details</label>
-                        {{ form.civil_union_details }}
+                        <div class="view-mode">
+                            <p class="form-control-plaintext">{{ project.civil_union_details|default:"Not specified" }}</p>
+                        </div>
+                        <div class="edit-mode" style="display: none;">
+                            <textarea class="form-control" data-field="civil_union_details" rows="3">{{ project.civil_union_details|default:'' }}</textarea>
+                        </div>
                     </div>
                     
-                    <div class="row mb-3">
-                        <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Preparation</label>
-                            {{ form.prep }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.prep|default:"Not specified" }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <textarea class="form-control" data-field="prep" rows="2">{{ project.prep|default:'' }}</textarea>
+                            </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Church</label>
-                            {{ form.church }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.church|default:"Not specified" }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <textarea class="form-control" data-field="church" rows="2">{{ project.church|default:'' }}</textarea>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="row mb-3">
-                        <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Photo Session</label>
-                            {{ form.session }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.session|default:"Not specified" }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <textarea class="form-control" data-field="session" rows="2">{{ project.session|default:'' }}</textarea>
+                            </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Restaurant</label>
-                            {{ form.restaurant }}
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.restaurant|default:"Not specified" }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <textarea class="form-control" data-field="restaurant" rows="2">{{ project.restaurant|default:'' }}</textarea>
+                            </div>
                         </div>
+                    </div>
+                    
+                    <div class="edit-actions" style="display: none;">
+                        <button class="btn btn-success btn-sm me-2" onclick="saveSection('ceremony')">
+                            <i class="bi bi-check"></i> Save
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelEdit('ceremony')">
+                            <i class="bi bi-x"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="editable-section mb-4" data-section="additional">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Additional Information</h6>
+                        <button class="btn btn-sm btn-outline-primary edit-btn" onclick="toggleEdit('additional')">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label">Extra Details</label>
-                        {{ form.details_extra }}
+                        <div class="view-mode">
+                            <p class="form-control-plaintext">{{ project.details_extra|default:"Not specified" }}</p>
+                        </div>
+                        <div class="edit-mode" style="display: none;">
+                            <textarea class="form-control" data-field="details_extra" rows="3">{{ project.details_extra|default:'' }}</textarea>
+                        </div>
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label">Editing Preferences</label>
-                        {{ form.editing_preferences }}
+                        <div class="view-mode">
+                            <p class="form-control-plaintext">{{ project.editing_preferences|default:"Not specified" }}</p>
+                        </div>
+                        <div class="edit-mode" style="display: none;">
+                            <textarea class="form-control" data-field="editing_preferences" rows="3">{{ project.editing_preferences|default:'' }}</textarea>
+                        </div>
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label">Notes</label>
-                        {{ form.notes }}
+                        <div class="view-mode">
+                            <p class="form-control-plaintext">{{ project.notes|default:"Not specified" }}</p>
+                        </div>
+                        <div class="edit-mode" style="display: none;">
+                            <textarea class="form-control" data-field="notes" rows="3">{{ project.notes|default:'' }}</textarea>
+                        </div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i> Save Changes
-                    </button>
-                </form>
+                    <div class="edit-actions" style="display: none;">
+                        <button class="btn btn-success btn-sm me-2" onclick="saveSection('additional')">
+                            <i class="bi bi-check"></i> Save
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="cancelEdit('additional')">
+                            <i class="bi bi-x"></i> Cancel
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -214,6 +379,188 @@
 </div>
 
 <script>
+// Store original values for cancel functionality
+let originalValues = {};
+
+function toggleEdit(section) {
+    const sectionElement = document.querySelector(`[data-section="${section}"]`);
+    const viewModes = sectionElement.querySelectorAll('.view-mode');
+    const editModes = sectionElement.querySelectorAll('.edit-mode');
+    const editBtn = sectionElement.querySelector('.edit-btn');
+    const editActions = sectionElement.querySelector('.edit-actions');
+    
+    // Store original values
+    originalValues[section] = {};
+    editModes.forEach(editMode => {
+        const field = editMode.querySelector('[data-field]');
+        if (field) {
+            const fieldName = field.getAttribute('data-field');
+            originalValues[section][fieldName] = field.value;
+        }
+    });
+    
+    // Toggle visibility
+    viewModes.forEach(vm => vm.style.display = 'none');
+    editModes.forEach(em => em.style.display = 'block');
+    editBtn.style.display = 'none';
+    editActions.style.display = 'block';
+}
+
+function cancelEdit(section) {
+    const sectionElement = document.querySelector(`[data-section="${section}"]`);
+    const viewModes = sectionElement.querySelectorAll('.view-mode');
+    const editModes = sectionElement.querySelectorAll('.edit-mode');
+    const editBtn = sectionElement.querySelector('.edit-btn');
+    const editActions = sectionElement.querySelector('.edit-actions');
+    
+    // Restore original values
+    if (originalValues[section]) {
+        editModes.forEach(editMode => {
+            const field = editMode.querySelector('[data-field]');
+            if (field) {
+                const fieldName = field.getAttribute('data-field');
+                if (originalValues[section][fieldName] !== undefined) {
+                    field.value = originalValues[section][fieldName];
+                }
+            }
+        });
+    }
+    
+    // Toggle visibility back
+    viewModes.forEach(vm => vm.style.display = 'block');
+    editModes.forEach(em => em.style.display = 'none');
+    editBtn.style.display = 'inline-block';
+    editActions.style.display = 'none';
+}
+
+function saveSection(section) {
+    const sectionElement = document.querySelector(`[data-section="${section}"]`);
+    const editModes = sectionElement.querySelectorAll('.edit-mode');
+    const saveBtn = sectionElement.querySelector('.edit-actions .btn-success');
+    
+    // Disable save button to prevent double-clicks
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+    
+    // Collect all field changes in this section
+    const promises = [];
+    editModes.forEach(editMode => {
+        const field = editMode.querySelector('[data-field]');
+        if (field) {
+            const fieldName = field.getAttribute('data-field');
+            const fieldValue = field.value;
+            
+            // Only save if value changed
+            if (originalValues[section] && originalValues[section][fieldName] !== fieldValue) {
+                promises.push(updateField(fieldName, fieldValue));
+            }
+        }
+    });
+    
+    if (promises.length === 0) {
+        // No changes made
+        cancelEdit(section);
+        return;
+    }
+    
+    // Wait for all field updates to complete
+    Promise.all(promises)
+        .then(results => {
+            const hasErrors = results.some(result => !result.success);
+            if (hasErrors) {
+                const errors = results.filter(r => !r.success).map(r => r.error);
+                alert('Some fields could not be saved:\n' + errors.join('\n'));
+            } else {
+                // Update view mode with new values
+                updateViewMode(section);
+                cancelEdit(section);
+                
+                // Show success message
+                const hasApprovalPending = results.some(r => r.pending_approval);
+                if (hasApprovalPending) {
+                    showMessage('Changes submitted for admin approval', 'info');
+                } else {
+                    showMessage('Changes saved successfully', 'success');
+                    // Reload page to show updated values
+                    setTimeout(() => location.reload(), 1000);
+                }
+            }
+        })
+        .catch(error => {
+            alert('Error saving changes: ' + error);
+        })
+        .finally(() => {
+            // Re-enable save button
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="bi bi-check"></i> Save';
+        });
+}
+
+function updateField(fieldName, fieldValue) {
+    return fetch(`/projects/{{ project.pk }}/update-field/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            field_name: fieldName,
+            field_value: fieldValue
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            return { success: true, pending_approval: data.pending_approval };
+        } else {
+            return { success: false, error: data.error || 'Unknown error' };
+        }
+    })
+    .catch(error => {
+        return { success: false, error: 'Network error: ' + error.message };
+    });
+}
+
+function updateViewMode(section) {
+    const sectionElement = document.querySelector(`[data-section="${section}"]`);
+    const editModes = sectionElement.querySelectorAll('.edit-mode');
+    
+    editModes.forEach(editMode => {
+        const field = editMode.querySelector('[data-field]');
+        if (field) {
+            const fieldName = field.getAttribute('data-field');
+            const newValue = field.value;
+            
+            // Find corresponding view mode element
+            const viewMode = editMode.parentElement.querySelector('.view-mode p');
+            if (viewMode) {
+                viewMode.textContent = newValue || 'Not specified';
+            }
+        }
+    });
+}
+
+function showMessage(message, type) {
+    // Create Bootstrap alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'info'} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Insert at top of main content
+    const mainContent = document.querySelector('.row');
+    mainContent.insertBefore(alertDiv, mainContent.firstChild);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentElement) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
 function notifyClient(projectId) {
     if (!confirm('Send notification email to client?')) return;
     
