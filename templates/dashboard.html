@@ -52,32 +52,34 @@
         <div class="row">
             {% for project in projects %}
             <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card project-card" onclick="window.location='{% url 'project_detail' project.pk %}'">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ project.name }}</h5>
-                        <p class="text-muted mb-2">
-                            <i class="bi bi-person"></i> {{ project.user.get_full_name|default:project.user.username }}
-                        </p>
-                        <p class="mb-2">
-                            <i class="bi bi-calendar"></i> {{ project.event_date|date:"M d, Y" }}
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="status-badge status-{{ project.status|lower|cut:' ' }}">
-                                {{ project.status }}
-                            </span>
-                            <span class="badge bg-secondary">
-                                {{ project.type }}
-                            </span>
+                <a href="{% url 'project_detail' project.pk %}" class="text-decoration-none text-reset stretched-link">
+                    <div class="card project-card position-relative">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ project.name }}</h5>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-person"></i> {{ project.user.get_full_name|default:project.user.username }}
+                            </p>
+                            <p class="mb-2">
+                                <i class="bi bi-calendar"></i> {{ project.event_date|date:"M d, Y" }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="status-badge status-{{ project.status|lower|cut:" " }}">
+                                    {{ project.status }}
+                                </span>
+                                <span class="badge bg-secondary">
+                                    {{ project.type }}
+                                </span>
+                            </div>
+                            {% if project.admin_notified_of_changes %}
+                            <div class="mt-2">
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-exclamation-circle"></i> Has Changes
+                                </span>
+                            </div>
+                            {% endif %}
                         </div>
-                        {% if project.admin_notified_of_changes %}
-                        <div class="mt-2">
-                            <span class="badge bg-warning text-dark">
-                                <i class="bi bi-exclamation-circle"></i> Has Changes
-                            </span>
-                        </div>
-                        {% endif %}
                     </div>
-                </div>
+                </a>
             </div>
             {% endfor %}
         </div>

@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.utils import timezone
+from datetime import datetime
 from django.db.models import Q
 from .models import Project, File, FileDownloadEvent, ProjectModification
 from .forms import LoginForm, ProjectForm, FileUploadForm
@@ -300,6 +301,25 @@ def update_project_field(request, pk):
         
         # Admin changes are applied immediately
         if request.user.is_admin():
+            # Convert date strings for DateTimeField where needed
+            if field_name == 'event_date':
+                # Accept either 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM'
+                parsed = None
+                try:
+                    if isinstance(field_value, str):
+                        if 'T' in field_value:
+                            # datetime-local format
+                            parsed = datetime.strptime(field_value, '%Y-%m-%dT%H:%M')
+                        else:
+                            # date-only, default to midnight
+                            parsed = datetime.strptime(field_value, '%Y-%m-%d')
+                    if parsed is not None:
+                        # Make timezone-aware using current timezone
+                        tz = timezone.get_current_timezone()
+                        field_value = timezone.make_aware(parsed, tz)
+                except Exception:
+                    return JsonResponse({'error': 'Invalid date format for event_date'}, status=400)
+
             setattr(project, field_name, field_value)
             project.save()
             
@@ -337,7 +357,24 @@ def approve_modification(request, mod_id):
     if action == 'approve':
         # Apply the change
         project = modification.project
-        setattr(project, modification.field_name, modification.new_value)
+        new_val = modification.new_value
+        # Convert date strings when applying approved changes
+        if modification.field_name == 'event_date':
+            try:
+                if isinstance(new_val, str):
+                    if 'T' in new_val:
+                        dt = datetime.strptime(new_val, '%Y-%m-%dT%H:%M')
+                    else:
+                        dt = datetime.strptime(new_val, '%Y-%m-%d')
+                else:
+                    dt = new_val
+                tz = timezone.get_current_timezone()
+                new_val = timezone.make_aware(dt, tz) if isinstance(dt, datetime) and dt.tzinfo is None else dt
+            except Exception:
+                messages.error(request, 'Invalid date format in approved modification for event_date.')
+                return redirect('project_detail', pk=project.pk)
+
+        setattr(project, modification.field_name, new_val)
         project.save()
         
         modification.status = 'APPROVED'

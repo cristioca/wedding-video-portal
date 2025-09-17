@@ -13,7 +13,7 @@
     </div>
     <div class="col-auto">
         {% if is_admin %}
-        <button class="btn btn-warning" onclick="notifyClient({{ project.pk }})">
+        <button class="btn btn-warning js-notify" data-project-id="{{ project.pk }}">
             <i class="bi bi-envelope"></i> Notify Client
         </button>
         <a href="{% url 'archive_project' project.pk %}" class="btn btn-danger" 
@@ -73,7 +73,7 @@
                 <div class="editable-section mb-4" data-section="basic">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">Basic Information</h6>
-                        <button class="btn btn-sm btn-outline-primary edit-btn" onclick="toggleEdit('basic')">
+                        <button class="btn btn-sm btn-outline-primary edit-btn" data-section="basic">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
                     </div>
@@ -148,10 +148,10 @@
                     </div>
                     
                     <div class="edit-actions" style="display: none;">
-                        <button class="btn btn-success btn-sm me-2" onclick="saveSection('basic')">
+                        <button class="btn btn-success btn-sm me-2 save-btn" data-section="basic">
                             <i class="bi bi-check"></i> Save
                         </button>
-                        <button class="btn btn-secondary btn-sm" onclick="cancelEdit('basic')">
+                        <button class="btn btn-secondary btn-sm cancel-btn" data-section="basic">
                             <i class="bi bi-x"></i> Cancel
                         </button>
                     </div>
@@ -161,7 +161,7 @@
                 <div class="editable-section mb-4" data-section="event">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">Event Details</h6>
-                        <button class="btn btn-sm btn-outline-primary edit-btn" onclick="toggleEdit('event')">
+                        <button class="btn btn-sm btn-outline-primary edit-btn" data-section="event">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
                     </div>
@@ -170,10 +170,10 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Event Date</label>
                             <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.event_date|date:"Y-m-d H:i" }}</p>
+                                <p class="form-control-plaintext">{{ project.event_date|date:"Y-m-d" }}</p>
                             </div>
                             <div class="edit-mode" style="display: none;">
-                                <input type="datetime-local" class="form-control" data-field="event_date" value="{{ project.event_date|date:'Y-m-d\TH:i' }}">
+                                <input type="date" class="form-control" data-field="event_date" value="{{ project.event_date|date:'Y-m-d' }}">
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -198,10 +198,10 @@
                     </div>
                     
                     <div class="edit-actions" style="display: none;">
-                        <button class="btn btn-success btn-sm me-2" onclick="saveSection('event')">
+                        <button class="btn btn-success btn-sm me-2 save-btn" data-section="event">
                             <i class="bi bi-check"></i> Save
                         </button>
-                        <button class="btn btn-secondary btn-sm" onclick="cancelEdit('event')">
+                        <button class="btn btn-secondary btn-sm cancel-btn" data-section="event">
                             <i class="bi bi-x"></i> Cancel
                         </button>
                     </div>
@@ -211,7 +211,7 @@
                 <div class="editable-section mb-4" data-section="ceremony">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">Ceremony Details</h6>
-                        <button class="btn btn-sm btn-outline-primary edit-btn" onclick="toggleEdit('ceremony')">
+                        <button class="btn btn-sm btn-outline-primary edit-btn" data-section="ceremony">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
                     </div>
@@ -269,10 +269,10 @@
                     </div>
                     
                     <div class="edit-actions" style="display: none;">
-                        <button class="btn btn-success btn-sm me-2" onclick="saveSection('ceremony')">
+                        <button class="btn btn-success btn-sm me-2 save-btn" data-section="ceremony">
                             <i class="bi bi-check"></i> Save
                         </button>
-                        <button class="btn btn-secondary btn-sm" onclick="cancelEdit('ceremony')">
+                        <button class="btn btn-secondary btn-sm cancel-btn" data-section="ceremony">
                             <i class="bi bi-x"></i> Cancel
                         </button>
                     </div>
@@ -282,7 +282,7 @@
                 <div class="editable-section mb-4" data-section="additional">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">Additional Information</h6>
-                        <button class="btn btn-sm btn-outline-primary edit-btn" onclick="toggleEdit('additional')">
+                        <button class="btn btn-sm btn-outline-primary edit-btn" data-section="additional">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
                     </div>
@@ -318,10 +318,10 @@
                     </div>
                     
                     <div class="edit-actions" style="display: none;">
-                        <button class="btn btn-success btn-sm me-2" onclick="saveSection('additional')">
+                        <button class="btn btn-success btn-sm me-2 save-btn" data-section="additional">
                             <i class="bi bi-check"></i> Save
                         </button>
-                        <button class="btn btn-secondary btn-sm" onclick="cancelEdit('additional')">
+                        <button class="btn btn-secondary btn-sm cancel-btn" data-section="additional">
                             <i class="bi bi-x"></i> Cancel
                         </button>
                     </div>
@@ -404,6 +404,8 @@ function toggleEdit(section) {
     editModes.forEach(em => em.style.display = 'block');
     editBtn.style.display = 'none';
     editActions.style.display = 'block';
+    // Add visual editing state
+    sectionElement.classList.add('editing');
 }
 
 function cancelEdit(section) {
@@ -431,6 +433,8 @@ function cancelEdit(section) {
     editModes.forEach(em => em.style.display = 'none');
     editBtn.style.display = 'inline-block';
     editActions.style.display = 'none';
+    // Remove visual editing state
+    sectionElement.classList.remove('editing');
 }
 
 function saveSection(section) {
@@ -580,5 +584,36 @@ function notifyClient(projectId) {
         }
     });
 }
+
+// Attach click handlers without inline JS to avoid IDE lint errors
+document.addEventListener('DOMContentLoaded', function() {
+    const notifyButtons = document.querySelectorAll('.js-notify');
+    notifyButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-project-id');
+            if (id) notifyClient(id);
+        });
+    });
+
+    // Inline editing handlers
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const section = this.getAttribute('data-section');
+            if (section) toggleEdit(section);
+        });
+    });
+    document.querySelectorAll('.save-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const section = this.getAttribute('data-section');
+            if (section) saveSection(section);
+        });
+    });
+    document.querySelectorAll('.cancel-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const section = this.getAttribute('data-section');
+            if (section) cancelEdit(section);
+        });
+    });
+});
 </script>
 {% endblock %}
