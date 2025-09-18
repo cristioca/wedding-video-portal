@@ -14,8 +14,11 @@
     </div>
     {% if is_admin %}
     <div class="col-auto">
-        <a href="{% url 'create_project' %}" class="btn btn-light">
+        <a href="{% url 'create_project' %}" class="btn btn-light me-2">
             <i class="bi bi-plus-circle"></i> New Project
+        </a>
+        <a href="{% url 'archived_projects' %}" class="btn btn-outline-light">
+            <i class="bi bi-archive"></i> Archived Projects
         </a>
     </div>
     {% endif %}
@@ -44,42 +47,132 @@
 {% endif %}
 
 <div class="card">
-    <div class="card-header">
-        <i class="bi bi-folder-fill"></i> Projects
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="bi bi-folder-fill"></i> Projects
+            {% if projects %}
+                <span class="badge bg-secondary ms-2">{{ projects|length }}</span>
+            {% endif %}
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <!-- Search Field -->
+            <div class="input-group" style="width: 250px;">
+                <input type="text" class="form-control form-control-sm" id="projectSearch" 
+                       placeholder="Search projects..." value="{{ search_query }}"
+                       style="background-color: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white;">
+                <button class="btn btn-outline-light btn-sm" type="button" id="searchButton">
+                    <i class="bi bi-search"></i>
+                </button>
+                {% if search_query %}
+                <button class="btn btn-outline-light btn-sm" type="button" id="clearSearch" title="Clear search">
+                    <i class="bi bi-x"></i>
+                </button>
+                {% endif %}
+            </div>
+            
+            <!-- Include Archived Checkbox -->
+            <div class="form-check" style="min-width: 140px;">
+                <input class="form-check-input" type="checkbox" id="includeArchived" 
+                       {% if include_archived %}checked{% endif %}
+                       style="background-color: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);">
+                <label class="form-check-label text-light small" for="includeArchived">
+                    <i class="bi bi-archive"></i> Include archived
+                </label>
+            </div>
+            
+            <!-- Sort Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" 
+                        id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-sort-down"></i> Sort
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item {% if current_sort == 'newest' %}active{% endif %}" 
+                           href="#" data-sort="newest">
+                        <i class="bi bi-sort-numeric-down"></i> Newest First
+                    </a></li>
+                    <li><a class="dropdown-item {% if current_sort == 'oldest' %}active{% endif %}" 
+                           href="#" data-sort="oldest">
+                        <i class="bi bi-sort-numeric-up"></i> Oldest First
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item {% if current_sort == 'name' %}active{% endif %}" 
+                           href="#" data-sort="name">
+                        <i class="bi bi-sort-alpha-down"></i> Name A-Z
+                    </a></li>
+                    <li><a class="dropdown-item {% if current_sort == '-name' %}active{% endif %}" 
+                           href="#" data-sort="-name">
+                        <i class="bi bi-sort-alpha-up"></i> Name Z-A
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item {% if current_sort == 'date' %}active{% endif %}" 
+                           href="#" data-sort="date">
+                        <i class="bi bi-calendar"></i> Event Date (Early)
+                    </a></li>
+                    <li><a class="dropdown-item {% if current_sort == '-date' %}active{% endif %}" 
+                           href="#" data-sort="-date">
+                        <i class="bi bi-calendar"></i> Event Date (Late)
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item {% if current_sort == 'status' %}active{% endif %}" 
+                           href="#" data-sort="status">
+                        <i class="bi bi-flag"></i> Status A-Z
+                    </a></li>
+                    <li><a class="dropdown-item {% if current_sort == '-status' %}active{% endif %}" 
+                           href="#" data-sort="-status">
+                        <i class="bi bi-flag"></i> Status Z-A
+                    </a></li>
+                    {% if is_admin %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item {% if current_sort == 'client' %}active{% endif %}" 
+                           href="#" data-sort="client">
+                        <i class="bi bi-person"></i> Client A-Z
+                    </a></li>
+                    <li><a class="dropdown-item {% if current_sort == '-client' %}active{% endif %}" 
+                           href="#" data-sort="-client">
+                        <i class="bi bi-person"></i> Client Z-A
+                    </a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </div>
     <div class="card-body">
         {% if projects %}
         <div class="row">
             {% for project in projects %}
             <div class="col-md-6 col-lg-4 mb-3">
-                <a href="{% url 'project_detail' project.pk %}" class="text-decoration-none text-reset stretched-link">
-                    <div class="card project-card position-relative">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ project.name }}</h5>
-                            <p class="text-muted mb-2">
-                                <i class="bi bi-person"></i> {{ project.user.get_full_name|default:project.user.username }}
-                            </p>
-                            <p class="mb-2">
-                                <i class="bi bi-calendar"></i> {{ project.event_date|date:"M d, Y" }}
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="status-badge status-{{ project.status|lower|cut:" " }}">
-                                    {{ project.status }}
-                                </span>
-                                <span class="badge bg-secondary">
-                                    {{ project.type }}
-                                </span>
-                            </div>
-                            {% if project.admin_notified_of_changes %}
-                            <div class="mt-2">
-                                <span class="badge bg-warning text-dark">
-                                    <i class="bi bi-exclamation-circle"></i> Has Changes
-                                </span>
-                            </div>
+                <div class="card project-card position-relative" style="cursor: pointer;" data-project-url="{% url 'project_detail' project.pk %}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.name }}</h5>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-person"></i> {{ project.client_name|default:project.user.get_full_name|default:project.user.username }}
+                        </p>
+                        <p class="mb-2">
+                            <i class="bi bi-calendar"></i> {{ project.event_date|date:"M d, Y" }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="status-badge status-{{ project.status|lower|cut:" " }}">
+                                {{ project.status }}
+                            </span>
+                            <span class="badge bg-secondary">
+                                {{ project.type }}
+                            </span>
+                        </div>
+                        <div class="mt-2">
+                            {% if project.has_unsent_changes %}
+                            <span class="badge bg-warning text-dark me-1">
+                                <i class="bi bi-exclamation-circle"></i> Has Changes
+                            </span>
+                            {% endif %}
+                            {% if project.is_archived %}
+                            <span class="badge bg-dark">
+                                <i class="bi bi-archive"></i> Archived
+                            </span>
                             {% endif %}
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -96,4 +189,164 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click handlers to project cards
+    document.querySelectorAll('.project-card[data-project-url]').forEach(card => {
+        card.addEventListener('click', function() {
+            const url = this.getAttribute('data-project-url');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
+    
+    // Search functionality
+    const searchInput = document.getElementById('projectSearch');
+    const searchButton = document.getElementById('searchButton');
+    const clearSearchButton = document.getElementById('clearSearch');
+    const includeArchivedCheckbox = document.getElementById('includeArchived');
+    
+    function performSearch() {
+        const searchQuery = searchInput.value.trim();
+        const includeArchived = includeArchivedCheckbox.checked;
+        const currentUrl = new URL(window.location);
+        
+        if (searchQuery) {
+            currentUrl.searchParams.set('search', searchQuery);
+        } else {
+            currentUrl.searchParams.delete('search');
+        }
+        
+        if (includeArchived) {
+            currentUrl.searchParams.set('include_archived', 'on');
+        } else {
+            currentUrl.searchParams.delete('include_archived');
+        }
+        
+        // Preserve current sort
+        const currentSort = '{{ current_sort }}';
+        if (currentSort && currentSort !== 'newest') {
+            currentUrl.searchParams.set('sort', currentSort);
+        }
+        
+        window.location.href = currentUrl.toString();
+    }
+    
+    // Search on button click
+    if (searchButton) {
+        searchButton.addEventListener('click', performSearch);
+    }
+    
+    // Search on Enter key
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Style the search input placeholder
+        searchInput.style.setProperty('--bs-form-control-bg', 'rgba(255,255,255,0.1)');
+    }
+    
+    // Checkbox change event
+    if (includeArchivedCheckbox) {
+        includeArchivedCheckbox.addEventListener('change', performSearch);
+    }
+    
+    // Clear search functionality
+    if (clearSearchButton) {
+        clearSearchButton.addEventListener('click', function() {
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.delete('search');
+            
+            // Preserve current sort and archived setting
+            const currentSort = '{{ current_sort }}';
+            if (currentSort && currentSort !== 'newest') {
+                currentUrl.searchParams.set('sort', currentSort);
+            }
+            
+            const includeArchived = includeArchivedCheckbox.checked;
+            if (includeArchived) {
+                currentUrl.searchParams.set('include_archived', 'on');
+            }
+            
+            window.location.href = currentUrl.toString();
+        });
+    }
+    
+    // Sort functionality
+    document.querySelectorAll('[data-sort]').forEach(sortLink => {
+        sortLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sortValue = this.getAttribute('data-sort');
+            const currentUrl = new URL(window.location);
+            
+            if (sortValue && sortValue !== 'newest') {
+                currentUrl.searchParams.set('sort', sortValue);
+            } else {
+                currentUrl.searchParams.delete('sort');
+            }
+            
+            // Preserve current search
+            const currentSearch = '{{ search_query }}';
+            if (currentSearch) {
+                currentUrl.searchParams.set('search', currentSearch);
+            }
+            
+            // Preserve archived setting
+            const includeArchived = '{{ include_archived }}' === 'True';
+            if (includeArchived) {
+                currentUrl.searchParams.set('include_archived', 'on');
+            }
+            
+            window.location.href = currentUrl.toString();
+        });
+    });
+    
+    // Fix search input styling for dark theme
+    const style = document.createElement('style');
+    style.textContent = `
+        #projectSearch::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+        #projectSearch:focus {
+            background-color: rgba(255,255,255,0.15) !important;
+            border-color: rgba(255,255,255,0.4) !important;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }
+        .dropdown-menu {
+            background-color: var(--card-bg) !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+        }
+        .dropdown-item {
+            color: var(--text-color) !important;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(255,255,255,0.1) !important;
+            color: white !important;
+        }
+        .dropdown-item.active {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
+        #includeArchived {
+            background-color: rgba(255,255,255,0.1) !important;
+            border-color: rgba(255,255,255,0.3) !important;
+        }
+        #includeArchived:checked {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+        #includeArchived:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1) !important;
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+
 {% endblock %}

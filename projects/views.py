@@ -6,11 +6,14 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods
 from datetime import datetime
 from django.db.models import Q
-from .models import Project, File, FileDownloadEvent, ProjectModification
-from .forms import LoginForm, ProjectForm, FileUploadForm
+from .models import Project, File, FileDownloadEvent, ProjectModification, User
+from .forms import LoginForm, ProjectForm, ProjectDetailForm, FileUploadForm
 import json
+import secrets
+import string
 
 
 def home(request):
@@ -54,22 +57,81 @@ def logout_view(request):
 def dashboard(request):
     """Dashboard view - shows projects based on user role"""
     user = request.user
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', 'newest')  # Default sort by newest first
+    include_archived = request.GET.get('include_archived', '') == 'on'
+    
+    # Valid sort options
+    valid_sorts = {
+        'name': 'name',
+        '-name': '-name',
+        'date': 'event_date',
+        '-date': '-event_date',
+        'status': 'status',
+        '-status': '-status',
+        'client': 'client_name',
+        '-client': '-client_name',
+        'newest': '-id',
+        'oldest': 'id'
+    }
+    
+    # Use valid sort or default
+    sort_field = valid_sorts.get(sort_by, '-id')
     
     if user.is_admin():
         # Admin sees all projects
-        projects = Project.objects.filter(is_archived=False)
+        if include_archived:
+            projects = Project.objects.all()  # Include both archived and active
+        else:
+            projects = Project.objects.filter(is_archived=False)
         pending_modifications = ProjectModification.objects.filter(status='PENDING')
+        
+        # Apply search filter
+        if search_query:
+            projects = projects.filter(
+                Q(name__icontains=search_query) |
+                Q(client_name__icontains=search_query) |
+                Q(user__username__icontains=search_query) |
+                Q(user__first_name__icontains=search_query) |
+                Q(user__last_name__icontains=search_query) |
+                Q(status__icontains=search_query) |
+                Q(type__icontains=search_query)
+            )
+        
+        projects = projects.order_by(sort_field)
+        
         context = {
             'projects': projects,
             'pending_modifications': pending_modifications,
             'is_admin': True,
+            'search_query': search_query,
+            'current_sort': sort_by,
+            'include_archived': include_archived,
         }
     else:
         # Client sees only their projects
-        projects = Project.objects.filter(user=user, is_archived=False)
+        if include_archived:
+            projects = Project.objects.filter(user=user)  # Include both archived and active
+        else:
+            projects = Project.objects.filter(user=user, is_archived=False)
+        
+        # Apply search filter
+        if search_query:
+            projects = projects.filter(
+                Q(name__icontains=search_query) |
+                Q(client_name__icontains=search_query) |
+                Q(status__icontains=search_query) |
+                Q(type__icontains=search_query)
+            )
+        
+        projects = projects.order_by(sort_field)
+        
         context = {
             'projects': projects,
             'is_admin': False,
+            'search_query': search_query,
+            'current_sort': sort_by,
+            'include_archived': include_archived,
         }
     
     return render(request, 'dashboard.html', context)
@@ -87,7 +149,7 @@ def project_detail(request, pk):
     
     if request.method == 'POST':
         if 'update_project' in request.POST:
-            form = ProjectForm(request.POST, instance=project)
+            form = ProjectDetailForm(request.POST, instance=project)
             if form.is_valid():
                 # Track modifications if client is editing
                 if request.user.is_client():
@@ -125,11 +187,12 @@ def project_detail(request, pk):
                 messages.success(request, 'File uploaded successfully.')
                 return redirect('project_detail', pk=project.pk)
     else:
-        form = ProjectForm(instance=project)
+        form = ProjectDetailForm(instance=project)
         file_form = FileUploadForm()
     
     files = project.files.all()
     modifications = project.modifications.filter(status='PENDING') if request.user.is_admin() else None
+    ceremony_fields = project.get_ceremony_fields_ordered()
     
     context = {
         'project': project,
@@ -138,6 +201,7 @@ def project_detail(request, pk):
         'files': files,
         'modifications': modifications,
         'is_admin': request.user.is_admin(),
+        'ceremony_fields': ceremony_fields,
     }
     
     return render(request, 'project_detail.html', context)
@@ -153,7 +217,55 @@ def create_project(request):
     if request.method == 'POST':
         form = ProjectForm(request.POST)
         if form.is_valid():
-            project = form.save()
+            project = form.save(commit=False)
+            # Set defaults for required fields not in form
+            project.status = 'Planning'
+            project.edit_status = 'Pending'
+            
+            # Handle client user creation/assignment
+            client_email = form.cleaned_data.get('client_email')
+            client_name = form.cleaned_data.get('client_name')
+            
+            if client_email:
+                try:
+                    client_user = User.objects.get(email=client_email)
+                    # Update name if different
+                    if client_name and client_user.first_name != client_name.split()[0]:
+                        name_parts = client_name.split()
+                        client_user.first_name = name_parts[0] if len(name_parts) > 0 else ''
+                        client_user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+                        client_user.save()
+                except User.DoesNotExist:
+                    # Create new client user with temporary username
+                    username = client_email.split('@')[0]
+                    counter = 1
+                    original_username = username
+                    while User.objects.filter(username=username).exists():
+                        username = f"{original_username}{counter}"
+                        counter += 1
+                    
+                    name_parts = client_name.split() if client_name else ['', '']
+                    client_user = User.objects.create_user(
+                        username=username,
+                        email=client_email,
+                        first_name=name_parts[0] if len(name_parts) > 0 else '',
+                        last_name=' '.join(name_parts[1:]) if len(name_parts) > 1 else '',
+                        role='CLIENT',
+                        password='temp_password_needs_reset'
+                    )
+                project.user = client_user
+            else:
+                # Create a default client user if no email provided
+                client_user = User.objects.create_user(
+                    username=f"client_{timezone.now().strftime('%Y%m%d_%H%M%S')}",
+                    email='',
+                    first_name=client_name.split()[0] if client_name else 'Client',
+                    last_name=' '.join(client_name.split()[1:]) if client_name and len(client_name.split()) > 1 else '',
+                    role='CLIENT',
+                    password='temp_password_needs_reset'
+                )
+                project.user = client_user
+            project.save()
             messages.success(request, f'Project "{project.name}" created successfully.')
             return redirect('project_detail', pk=project.pk)
     else:
@@ -164,7 +276,7 @@ def create_project(request):
 
 @login_required
 def archive_project(request, pk):
-    """Archive a project - admin only"""
+    """Archive project - admin only"""
     if not request.user.is_admin():
         messages.error(request, 'Only administrators can archive projects.')
         return redirect('dashboard')
@@ -172,8 +284,42 @@ def archive_project(request, pk):
     project = get_object_or_404(Project, pk=pk)
     project.is_archived = True
     project.save()
+    
     messages.success(request, f'Project "{project.name}" has been archived.')
     return redirect('dashboard')
+
+
+@login_required
+def delete_project(request, pk):
+    """Delete project permanently - admin only"""
+    if not request.user.is_admin():
+        messages.error(request, 'Only administrators can delete projects.')
+        return redirect('dashboard')
+    
+    project = get_object_or_404(Project, pk=pk)
+    project_name = project.name
+    project.delete()
+    
+    messages.success(request, f'Project "{project_name}" has been deleted permanently.')
+    return redirect('dashboard')
+
+
+@login_required
+def archived_projects(request):
+    """View archived projects - admin only"""
+    if not request.user.is_admin():
+        messages.error(request, 'Only administrators can view archived projects.')
+        return redirect('dashboard')
+    
+    projects = Project.objects.filter(is_archived=True).order_by('-id')
+    
+    context = {
+        'projects': projects,
+        'is_admin': True,
+        'page_title': 'Archived Projects'
+    }
+    
+    return render(request, 'archived_projects.html', context)
 
 
 @login_required
@@ -205,14 +351,31 @@ def notify_client(request, pk):
     """Send notification email to client - admin only"""
     if not request.user.is_admin():
         return JsonResponse({'error': 'Unauthorized'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     project = get_object_or_404(Project, pk=pk)
     
-    # Check if we should send notification
-    if project.last_client_notification_date:
+    # Parse request body to check for force parameter
+    force_send = False
+    if request.content_type == 'application/json':
+        try:
+            import json
+            body = json.loads(request.body)
+            force_send = body.get('force', False)
+        except:
+            pass
+    
+    # Check if we should send notification (unless forced)
+    if not force_send and project.last_client_notification_date:
         time_since_last = timezone.now() - project.last_client_notification_date
         if time_since_last.total_seconds() < 3600:  # 1 hour cooldown
-            return JsonResponse({'error': 'Please wait before sending another notification'}, status=429)
+            minutes_remaining = int((3600 - time_since_last.total_seconds()) / 60) + 1
+            return JsonResponse({
+                'cooldown': True, 
+                'minutes_remaining': minutes_remaining,
+                'message': f'A notification was sent {int(time_since_last.total_seconds() / 60)} minutes ago. Send another one anyway?'
+            })
     
     # Send email
     try:
@@ -292,6 +455,7 @@ def update_project_field(request, pk):
                 status='PENDING'
             )
             project.admin_notified_of_changes = True
+            project.has_unsent_changes = True
             project.save()
             return JsonResponse({
                 'success': True, 
@@ -321,6 +485,13 @@ def update_project_field(request, pk):
                     return JsonResponse({'error': 'Invalid date format for event_date'}, status=400)
 
             setattr(project, field_name, field_value)
+            
+            # If title_video is updated, also update the project name
+            if field_name == 'title_video' and field_value:
+                project.name = field_value
+            
+            # Mark that there are changes not yet notified to the client
+            project.has_unsent_changes = True
             project.save()
             
             # Create auto-applied modification record
@@ -375,6 +546,8 @@ def approve_modification(request, mod_id):
                 return redirect('project_detail', pk=project.pk)
 
         setattr(project, modification.field_name, new_val)
+        # Mark as having unnotified changes (client should be notified)
+        project.has_unsent_changes = True
         project.save()
         
         modification.status = 'APPROVED'
@@ -393,3 +566,153 @@ def approve_modification(request, mod_id):
         messages.info(request, 'Modification rejected.')
     
     return redirect('project_detail', pk=modification.project.pk)
+
+
+@login_required
+def clear_notification(request, pk):
+    """Clear unnotified changes flag for a project - admin only"""
+    if not request.user.is_admin():
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    project = get_object_or_404(Project, pk=pk)
+    project.has_unsent_changes = False
+    project.admin_notified_of_changes = False
+    project.save()
+    return JsonResponse({'success': True, 'message': 'Notifications cleared'})
+
+
+@login_required
+def send_credentials(request, pk):
+    """Send login credentials to client - admin only"""
+    if not request.user.is_admin():
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    project = get_object_or_404(Project, pk=pk)
+    client_user = project.user
+    
+    if not project.client_email:
+        return JsonResponse({'error': 'No client email set for this project'}, status=400)
+    
+    # Generate a new password
+    password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
+    client_user.set_password(password)
+    client_user.save()
+    
+    # Send email with credentials
+    try:
+        send_mail(
+            subject=f'Login Credentials for Wedding Video Portal - {project.name}',
+            message=f'''
+            Dear {project.client_name or client_user.get_full_name() or client_user.username},
+            
+            Your login credentials for the Wedding Video Portal have been created for project "{project.name}".
+            
+            Portal URL: {request.build_absolute_uri('/dashboard/')}
+            Username: {client_user.username}
+            Password: {password}
+            
+            Please log in and change your password after your first login.
+            
+            Best regards,
+            Wedding Video Portal Team
+            ''',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[project.client_email],
+            fail_silently=False,
+        )
+        
+        return JsonResponse({'success': True, 'message': 'Credentials sent successfully'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def change_client_data(request, pk):
+    """Change client name and email for a project - admin only"""
+    if not request.user.is_admin():
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    project = get_object_or_404(Project, pk=pk)
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            new_name = data.get('client_name', '').strip()
+            new_email = data.get('client_email', '').strip()
+            
+            if not new_name or not new_email:
+                return JsonResponse({'error': 'Both name and email are required'}, status=400)
+            
+            # Update project fields
+            project.client_name = new_name
+            project.client_email = new_email
+            
+            # Update user fields
+            name_parts = new_name.split() if new_name else ['', '']
+            project.user.first_name = name_parts[0] if len(name_parts) > 0 else ''
+            project.user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+            project.user.email = new_email
+            project.user.save()
+            
+            project.save()
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Client data updated successfully',
+                'client_name': new_name,
+                'client_email': new_email
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    # GET request - return current data
+    return JsonResponse({
+        'client_name': project.client_name or '',
+        'client_email': project.client_email or ''
+    })
+
+
+@login_required
+@require_http_methods(['POST'])
+def update_field_order(request, pk):
+    """Update the order of ceremony fields for a project"""
+    project = get_object_or_404(Project, pk=pk)
+    
+    # Check permissions
+    if not request.user.is_admin() and project.user != request.user:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    try:
+        data = json.loads(request.body)
+        field_order = data.get('field_order', [])
+        
+        if not isinstance(field_order, list):
+            return JsonResponse({'error': 'field_order must be a list'}, status=400)
+        
+        # Validate that all fields are valid ceremony fields
+        valid_fields = ['civil_union_details', 'prep', 'church', 'session', 'restaurant']
+        for field in field_order:
+            if field not in valid_fields:
+                return JsonResponse({'error': f'Invalid field: {field}'}, status=400)
+        
+        # Save the field order to the project
+        project.ceremony_field_order = {'order': field_order}
+        project.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Field order updated successfully',
+            'field_order': field_order
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

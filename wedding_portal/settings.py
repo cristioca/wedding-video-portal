@@ -142,6 +142,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Email settings (for development)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@weddingportal.com'
 
 # For production, use SMTP
 if not DEBUG:

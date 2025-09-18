@@ -21,24 +21,80 @@ class LoginForm(forms.Form):
 
 
 class ProjectForm(forms.ModelForm):
-    """Project creation/update form"""
+    """Project creation form - simplified"""
+    client_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Client full name',
+            'id': 'id_client_name'
+        })
+    )
+    client_email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'client@example.com',
+            'id': 'id_client_email'
+        })
+    )
+    
     class Meta:
         model = Project
         fields = [
-            'name', 'user', 'type', 'status', 'edit_status',
+            'name', 'client_name', 'client_email', 'type', 'event_date', 'city'
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_name'}),
+            'type': forms.Select(attrs={'class': 'form-control', 'id': 'id_type'}),
+            'event_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'id': 'id_event_date',
+                'lang': 'en-GB'
+            }),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Pre-populate client fields if editing existing project
+        if self.instance and self.instance.pk:
+            self.fields['client_name'].initial = self.instance.client_name
+            self.fields['client_email'].initial = self.instance.client_email
+
+
+class ProjectDetailForm(forms.ModelForm):
+    """Project detail/editing form - includes all fields for editing"""
+    client_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    client_email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+    
+    class Meta:
+        model = Project
+        fields = [
+            'name', 'client_name', 'client_email', 'type', 'status', 'edit_status',
             'event_date', 'city', 'title_video', 'civil_union_details',
             'prep', 'church', 'session', 'restaurant',
             'details_extra', 'editing_preferences', 'notes'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'user': forms.Select(attrs={'class': 'form-control'}),
             'type': forms.Select(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
             'edit_status': forms.Select(attrs={'class': 'form-control'}),
-            'event_date': forms.DateTimeInput(attrs={
+            'event_date': forms.DateInput(attrs={
                 'class': 'form-control',
-                'type': 'datetime-local'
+                'type': 'date',
+                'lang': 'en-GB'
             }),
             'city': forms.TextInput(attrs={'class': 'form-control'}),
             'title_video': forms.TextInput(attrs={'class': 'form-control'}),
@@ -54,12 +110,11 @@ class ProjectForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Only show clients in user dropdown
-        self.fields['user'].queryset = User.objects.filter(role='CLIENT')
         
-        # Format event_date for datetime-local input
-        if self.instance and self.instance.event_date:
-            self.initial['event_date'] = self.instance.event_date.strftime('%Y-%m-%dT%H:%M')
+        # Pre-populate client fields if editing existing project
+        if self.instance and self.instance.pk:
+            self.fields['client_name'].initial = self.instance.client_name
+            self.fields['client_email'].initial = self.instance.client_email
 
 
 class FileUploadForm(forms.ModelForm):

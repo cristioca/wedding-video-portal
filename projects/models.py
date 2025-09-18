@@ -42,6 +42,8 @@ class Project(models.Model):
     # Basic fields
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
+    client_name = models.CharField(max_length=255, blank=True, null=True)
+    client_email = models.EmailField(blank=True, null=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Planning')
     edit_status = models.CharField(max_length=50, choices=EDIT_STATUS_CHOICES, default='Pending')
     notes = models.TextField(blank=True, null=True)
@@ -60,6 +62,13 @@ class Project(models.Model):
     details_extra = models.TextField(blank=True, null=True)
     editing_preferences = models.TextField(blank=True, null=True)
     
+    # Field ordering configuration
+    ceremony_field_order = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Custom order for ceremony detail fields"
+    )
+    
     # Notification tracking
     admin_notified_of_changes = models.BooleanField(default=False)
     last_client_notification_date = models.DateTimeField(blank=True, null=True)
@@ -74,6 +83,39 @@ class Project(models.Model):
     
     def __str__(self):
         return f"{self.name} - {self.user.username}"
+    
+    def get_ceremony_fields_ordered(self):
+        """Return ceremony fields in custom order"""
+        default_order = [
+            {'field': 'civil_union_details', 'label': 'Civil Union Details', 'rows': 3},
+            {'field': 'prep', 'label': 'Preparation', 'rows': 2},
+            {'field': 'church', 'label': 'Church', 'rows': 2},
+            {'field': 'session', 'label': 'Photo Session', 'rows': 2},
+            {'field': 'restaurant', 'label': 'Restaurant', 'rows': 2}
+        ]
+        
+        if not self.ceremony_field_order:
+            return default_order
+        
+        # Use custom order if available
+        order = self.ceremony_field_order.get('order', [])
+        if not order:
+            return default_order
+        
+        # Create ordered list based on saved order
+        ordered_fields = []
+        field_map = {f['field']: f for f in default_order}
+        
+        for field_name in order:
+            if field_name in field_map:
+                ordered_fields.append(field_map[field_name])
+        
+        # Add any missing fields at the end
+        for field_info in default_order:
+            if field_info['field'] not in order:
+                ordered_fields.append(field_info)
+        
+        return ordered_fields
 
 
 class ProjectModification(models.Model):

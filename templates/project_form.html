@@ -13,14 +13,19 @@
                 <form method="post">
                     {% csrf_token %}
                     
+                    <div class="mb-3">
+                        <label class="form-label">Project Title</label>
+                        {{ form.name }}
+                    </div>
+                    
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">Project Name</label>
-                            {{ form.name }}
+                            <label class="form-label">Client Name</label>
+                            {{ form.client_name }}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Client</label>
-                            {{ form.user }}
+                            <label class="form-label">Client Email</label>
+                            {{ form.client_email }}
                         </div>
                     </div>
                     
@@ -30,74 +35,16 @@
                             {{ form.type }}
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Status</label>
-                            {{ form.status }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Edit Status</label>
-                            {{ form.edit_status }}
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
                             <label class="form-label">Event Date</label>
                             {{ form.event_date }}
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">City</label>
                             {{ form.city }}
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label">Video Title</label>
-                        {{ form.title_video }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Civil Union Details</label>
-                        {{ form.civil_union_details }}
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Preparation</label>
-                            {{ form.prep }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Church</label>
-                            {{ form.church }}
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Photo Session</label>
-                            {{ form.session }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Restaurant</label>
-                            {{ form.restaurant }}
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Extra Details</label>
-                        {{ form.details_extra }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Editing Preferences</label>
-                        {{ form.editing_preferences }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        {{ form.notes }}
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="create-btn" disabled>
                         <i class="bi bi-save"></i> Create Project
                     </button>
                     <a href="{% url 'dashboard' %}" class="btn btn-secondary">
@@ -108,4 +55,74 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nameField = document.getElementById('id_name');
+    const typeField = document.getElementById('id_type');
+    const eventDateField = document.getElementById('id_event_date');
+    const clientNameField = document.getElementById('id_client_name');
+    const createBtn = document.getElementById('create-btn');
+    
+    // Set calendar to start with Monday
+    if (eventDateField) {
+        // Set multiple locale attributes to force Monday start
+        eventDateField.setAttribute('lang', 'en-GB');
+        eventDateField.setAttribute('locale', 'en-GB');
+        
+        // Add CSS to force Monday start in webkit browsers
+        const style = document.createElement('style');
+        style.textContent = `
+            input[type="date"] {
+                locale: en-GB;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Set the first day of week via JavaScript if browser supports it
+        if (eventDateField.showPicker) {
+            eventDateField.addEventListener('click', function() {
+                // Force locale setting on click
+                this.setAttribute('lang', 'en-GB');
+            });
+        }
+    }
+    
+    function validateForm() {
+        const hasName = nameField.value.trim() !== '';
+        const hasType = typeField.value !== '';
+        const hasEventDate = eventDateField.value !== '';
+        
+        createBtn.disabled = !(hasName && hasType && hasEventDate);
+    }
+    
+    function autoFillTitle() {
+        if (nameField.value.trim() === '' && typeField.value !== '') {
+            let title = typeField.options[typeField.selectedIndex].text;
+            if (clientNameField.value.trim() !== '') {
+                title += ' - ' + clientNameField.value.trim();
+            }
+            nameField.value = title;
+            validateForm();
+        }
+    }
+    
+    // Add event listeners
+    nameField.addEventListener('input', validateForm);
+    typeField.addEventListener('change', function() {
+        autoFillTitle();
+        validateForm();
+    });
+    eventDateField.addEventListener('change', validateForm);
+    clientNameField.addEventListener('input', function() {
+        if (typeField.value !== '' && nameField.value.includes(typeField.options[typeField.selectedIndex].text)) {
+            autoFillTitle();
+        }
+    });
+    
+    // Initial validation
+    validateForm();
+});
+</script>
+
 {% endblock %}

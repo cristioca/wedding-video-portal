@@ -156,6 +156,16 @@ input[type="file"]::file-selector-button:hover {
   background: var(--surface-600);
 }
 
+/* Select dropdown options in dark mode */
+select.form-control option {
+  background-color: var(--surface-600);
+  color: var(--text-100);
+}
+select.form-control optgroup {
+  background-color: var(--surface-700);
+  color: var(--text-100);
+}
+
 /* View mode fields (read-only look) */
 .form-control-plaintext {
   display: block;

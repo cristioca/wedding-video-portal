@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load project_filters %}
 
 {% block title %}{{ project.name }} - Wedding Video Portal{% endblock %}
 
@@ -7,19 +8,42 @@
     <div class="col">
         <h2 class="text-white">{{ project.name }}</h2>
         <p class="text-white-50">
-            <i class="bi bi-person"></i> {{ project.user.get_full_name|default:project.user.username }}
+            <i class="bi bi-person"></i> {{ project.client_name|default:project.user.get_full_name|default:project.user.username }}
             | <i class="bi bi-calendar"></i> {{ project.event_date|date:"M d, Y" }}
         </p>
+        {% if is_admin %}
+        <div class="mt-2">
+            <button class="btn btn-light btn-sm js-send-credentials" data-project-id="{{ project.pk }}" style="background-color: rgba(85, 215, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);">
+                <i class="bi bi-envelope-at"></i> Send credentials email
+            </button>
+            <button class="btn btn-light btn-sm js-change-client" data-project-id="{{ project.pk }}" style="background-color: rgba(85, 255, 105, 0.5); border: 1px solid rgba(255, 255, 255, 0.3);">
+                <i class="bi bi-person-gear"></i> Change client data
+            </button>
+        </div>
+        {% endif %}
     </div>
     <div class="col-auto">
         {% if is_admin %}
-        <button class="btn btn-warning js-notify" data-project-id="{{ project.pk }}">
+        <!-- Always show notify button, but style differently based on changes -->
+        <button class="btn {% if project.has_unsent_changes %}btn-warning{% else %}btn-secondary{% endif %} js-notify" data-project-id="{{ project.pk }}">
             <i class="bi bi-envelope"></i> Notify Client
         </button>
-        <a href="{% url 'archive_project' project.pk %}" class="btn btn-danger" 
-           onclick="return confirm('Are you sure you want to archive this project?')">
+        <!-- Show clear button only when there are changes, with less contrast -->
+        {% if project.has_unsent_changes %}
+        <button class="btn btn-outline-secondary opacity-75 js-clear-notify" data-project-id="{{ project.pk }}">
+            <i class="bi bi-bell-slash"></i> Clear notification
+        </button>
+        {% else %}
+        <button class="btn btn-outline-secondary opacity-50" disabled>
+            <i class="bi bi-bell-slash"></i> Clear notification
+        </button>
+        {% endif %}
+        <button class="btn btn-warning btn-sm me-2 js-archive-project" data-project-id="{{ project.pk }}" data-url="{% url 'archive_project' project.pk %}">
             <i class="bi bi-archive"></i> Archive
-        </a>
+        </button>
+        <button class="btn btn-danger btn-sm js-delete-project" data-project-id="{{ project.pk }}" data-url="{% url 'delete_project' project.pk %}">
+            <i class="bi bi-trash"></i> Delete
+        </button>
         {% endif %}
     </div>
 </div>
@@ -91,16 +115,14 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Client</label>
                             <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.user.get_full_name|default:project.user.username }}</p>
+                                <p class="form-control-plaintext">{{ project.client_name|default:project.user.get_full_name|default:project.user.username }}</p>
+                                {% if project.client_email %}
+                                <small class="text-muted">{{ project.client_email }}</small>
+                                {% endif %}
                             </div>
                             <div class="edit-mode" style="display: none;">
-                                <select class="form-control" data-field="user">
-                                    {% for user in form.user.field.queryset %}
-                                    <option value="{{ user.pk }}" {% if user.pk == project.user.pk %}selected{% endif %}>
-                                        {{ user.get_full_name|default:user.username }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
+                                <input type="text" class="form-control mb-2" data-field="client_name" value="{{ project.client_name|default:'' }}" placeholder="Client name">
+                                <input type="email" class="form-control" data-field="client_email" value="{{ project.client_email|default:'' }}" placeholder="Client email">
                             </div>
                         </div>
                     </div>
@@ -211,61 +233,42 @@
                 <div class="editable-section mb-4" data-section="ceremony">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">Ceremony Details</h6>
-                        <button class="btn btn-sm btn-outline-primary edit-btn" data-section="ceremony">
-                            <i class="bi bi-pencil"></i> Edit
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary reorder-btn" data-section="ceremony" title="Reorder fields">
+                                <i class="bi bi-arrows-move"></i> Reorder
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-section="ceremony">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="ceremony-fields-container" class="ceremony-fields">
+                        {% for field_info in ceremony_fields %}
+                        <div class="ceremony-field-item mb-3" data-field-name="{{ field_info.field }}">
+                            <div class="drag-handle" style="display: none;">
+                                <i class="bi bi-grip-vertical text-muted"></i>
+                            </div>
+                            <div class="field-content col-md-6 d-inline-block">
+                                <label class="form-label">{{ field_info.label }}</label>
+                                <div class="view-mode">
+                                    <p class="form-control-plaintext">{{ project|attr:field_info.field|default:"Not specified" }}</p>
+                                </div>
+                                <div class="edit-mode" style="display: none;">
+                                    <textarea class="form-control" data-field="{{ field_info.field }}" rows="{{ field_info.rows }}">{{ project|attr:field_info.field|default:'' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="reorder-actions" style="display: none;">
+                        <button class="btn btn-success btn-sm me-2 save-order-btn" data-section="ceremony">
+                            <i class="bi bi-check"></i> Save Order
                         </button>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Civil Union Details</label>
-                        <div class="view-mode">
-                            <p class="form-control-plaintext">{{ project.civil_union_details|default:"Not specified" }}</p>
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <textarea class="form-control" data-field="civil_union_details" rows="3">{{ project.civil_union_details|default:'' }}</textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Preparation</label>
-                            <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.prep|default:"Not specified" }}</p>
-                            </div>
-                            <div class="edit-mode" style="display: none;">
-                                <textarea class="form-control" data-field="prep" rows="2">{{ project.prep|default:'' }}</textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Church</label>
-                            <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.church|default:"Not specified" }}</p>
-                            </div>
-                            <div class="edit-mode" style="display: none;">
-                                <textarea class="form-control" data-field="church" rows="2">{{ project.church|default:'' }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Photo Session</label>
-                            <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.session|default:"Not specified" }}</p>
-                            </div>
-                            <div class="edit-mode" style="display: none;">
-                                <textarea class="form-control" data-field="session" rows="2">{{ project.session|default:'' }}</textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Restaurant</label>
-                            <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.restaurant|default:"Not specified" }}</p>
-                            </div>
-                            <div class="edit-mode" style="display: none;">
-                                <textarea class="form-control" data-field="restaurant" rows="2">{{ project.restaurant|default:'' }}</textarea>
-                            </div>
-                        </div>
+                        <button class="btn btn-secondary btn-sm cancel-reorder-btn" data-section="ceremony">
+                            <i class="bi bi-x"></i> Cancel
+                        </button>
                     </div>
                     
                     <div class="edit-actions" style="display: none;">
@@ -378,6 +381,55 @@
     </div>
 </div>
 
+<style>
+/* Ceremony field reordering styles */
+.ceremony-fields.reordering {
+    position: relative;
+}
+
+.ceremony-field-item {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.ceremony-field-item.dragging {
+    opacity: 0.5;
+}
+
+.ceremony-field-item .drag-handle {
+    position: absolute;
+    left: -25px;
+    top: 35px;
+    cursor: move;
+    padding: 5px;
+}
+
+.ceremony-field-item.reorderable {
+    padding-left: 30px;
+    border: 1px dashed #dee2e6;
+    border-radius: 0.25rem;
+    padding: 15px 15px 15px 40px;
+    margin-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.ceremony-field-item.reorderable:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.ceremony-field-item.sortable-ghost {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: #0d6efd;
+}
+
+.reorder-mode .field-content {
+    pointer-events: none;
+}
+</style>
+
+<!-- Load SortableJS from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
 <script>
 // Store original values for cancel functionality
 let originalValues = {};
@@ -473,7 +525,7 @@ function saveSection(section) {
             const hasErrors = results.some(result => !result.success);
             if (hasErrors) {
                 const errors = results.filter(r => !r.success).map(r => r.error);
-                alert('Some fields could not be saved:\n' + errors.join('\n'));
+                showMessage('Some fields could not be saved: ' + errors.join(', '), 'error');
             } else {
                 // Update view mode with new values
                 updateViewMode(section);
@@ -491,7 +543,7 @@ function saveSection(section) {
             }
         })
         .catch(error => {
-            alert('Error saving changes: ' + error);
+            showMessage('Error saving changes: ' + error, 'error');
         })
         .finally(() => {
             // Re-enable save button
@@ -547,7 +599,12 @@ function updateViewMode(section) {
 function showMessage(message, type) {
     // Create Bootstrap alert
     const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'info'} alert-dismissible fade show`;
+    let alertClass = 'alert-info';
+    if (type === 'success') alertClass = 'alert-success';
+    if (type === 'error') alertClass = 'alert-danger';
+    if (type === 'warning') alertClass = 'alert-warning';
+    
+    alertDiv.className = `alert ${alertClass} alert-dismissible fade show`;
     alertDiv.innerHTML = `
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -565,33 +622,336 @@ function showMessage(message, type) {
     }, 5000);
 }
 
-function notifyClient(projectId) {
-    if (!confirm('Send notification email to client?')) return;
+function notifyClient(projectId, force = false) {
+    console.log('notifyClient function called with ID:', projectId, 'force:', force);
     
-    fetch(`/projects/${projectId}/notify/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
+    const sendNotification = () => {
+        console.log('Confirmation accepted, sending request...');
+        const requestBody = force ? JSON.stringify({ force: true }) : '';
+        
+        fetch(`/projects/${projectId}/notify/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: requestBody
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('Notification sent successfully!', 'success');
+                
+                // Update button appearance to reflect no unsent changes
+                const notifyButton = document.querySelector('.js-notify');
+                if (notifyButton && notifyButton.classList.contains('btn-warning')) {
+                    notifyButton.classList.remove('btn-warning');
+                    notifyButton.classList.add('btn-secondary');
+                }
+                
+                // Replace the active clear button with a disabled one
+                const clearButton = document.querySelector('.js-clear-notify');
+                if (clearButton) {
+                    // Create disabled version of the clear button
+                    const disabledButton = clearButton.cloneNode(true);
+                    disabledButton.className = 'btn btn-outline-secondary opacity-50';
+                    disabledButton.disabled = true;
+                    disabledButton.classList.remove('js-clear-notify');
+                    disabledButton.removeAttribute('data-project-id');
+                    
+                    // Replace the active button with the disabled one
+                    clearButton.parentNode.replaceChild(disabledButton, clearButton);
+                }
+            } else if (data.cooldown) {
+                // Show cooldown confirmation dialog
+                showConfirmation(
+                    data.message,
+                    function() {
+                        // Resend with force parameter
+                        notifyClient(projectId, true);
+                    },
+                    {
+                        title: 'Recent Notification Sent',
+                        icon: 'bi-clock-history',
+                        confirmText: 'Send Anyway',
+                        confirmClass: 'btn-warning'
+                    }
+                );
+            } else {
+                showMessage('Error: ' + (data.error || 'Failed to send notification'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Network error: Failed to send notification', 'error');
+        });
+    };
+    
+    if (!force) {
+        showConfirmation(
+            'Send notification email to client?',
+            sendNotification,
+            {
+                title: 'Send Notification',
+                icon: 'bi-envelope',
+                confirmText: 'Send',
+                confirmClass: 'btn-primary'
+            }
+        );
+    } else {
+        sendNotification();
+    }
+}
+
+function clearNotification(projectId) {
+    console.log('clearNotification function called with ID:', projectId);
+    showConfirmation(
+        'Clear unnotified changes for this project?',
+        function() {
+            console.log('Clear confirmation accepted, sending request...');
+            fetch(`/projects/${projectId}/clear-notification/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Notification cleared for this project', 'success');
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    showMessage('Error: ' + (data.error || 'Failed to clear notification'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Network error: Failed to clear notification', 'error');
+            });
+        },
+        {
+            title: 'Clear Notification',
+            icon: 'bi-bell-slash',
+            confirmText: 'Clear',
+            confirmClass: 'btn-warning'
         }
-    })
+    );
+}
+
+function sendCredentials(projectId) {
+    showConfirmation(
+        'Send login credentials to client?',
+        function() {
+            fetch(`/projects/${projectId}/send-credentials/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Credentials sent successfully!', 'success');
+                } else {
+                    showMessage('Error: ' + (data.error || 'Failed to send credentials'), 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('Network error: ' + error.message, 'error');
+            });
+        },
+        {
+            title: 'Send Credentials',
+            icon: 'bi-envelope-at',
+            confirmText: 'Send',
+            confirmClass: 'btn-primary'
+        }
+    );
+}
+
+function changeClientData(projectId) {
+    // Get current data first
+    fetch(`/projects/${projectId}/change-client-data/`)
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            alert('Notification sent successfully!');
-        } else {
-            alert('Error: ' + (data.error || 'Failed to send notification'));
-        }
+        // Populate modal with current data
+        document.getElementById('clientName').value = data.client_name || '';
+        document.getElementById('clientEmail').value = data.client_email || '';
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('changeClientModal'));
+        modal.show();
+        
+        // Handle save button click
+        const saveBtn = document.getElementById('saveClientDataBtn');
+        const newSaveBtn = saveBtn.cloneNode(true);
+        saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+        
+        newSaveBtn.addEventListener('click', function() {
+            const newName = document.getElementById('clientName').value.trim();
+            const newEmail = document.getElementById('clientEmail').value.trim();
+            
+            if (!newName || !newEmail) {
+                showMessage('Both name and email are required', 'error');
+                return;
+            }
+            
+            // Disable button to prevent double-clicks
+            newSaveBtn.disabled = true;
+            newSaveBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+            
+            // Update client data
+            fetch(`/projects/${projectId}/change-client-data/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    client_name: newName,
+                    client_email: newEmail
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modal.hide();
+                    showMessage('Client data updated successfully', 'success');
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    showMessage('Error: ' + (data.error || 'Failed to update client data'), 'error');
+                    newSaveBtn.disabled = false;
+                    newSaveBtn.innerHTML = '<i class="bi bi-check"></i> Save Changes';
+                }
+            })
+            .catch(error => {
+                showMessage('Network error: ' + error.message, 'error');
+                newSaveBtn.disabled = false;
+                newSaveBtn.innerHTML = '<i class="bi bi-check"></i> Save Changes';
+            });
+        });
+    })
+    .catch(error => {
+        showMessage('Error loading client data: ' + error.message, 'error');
     });
+}
+
+// Custom confirmation modal function (must be global)
+function showConfirmation(message, onConfirm, options = {}) {
+    const modal = document.getElementById('confirmationModal');
+    const messageElement = document.getElementById('confirmationMessage');
+    const confirmButton = document.getElementById('confirmButton');
+    const modalTitle = document.getElementById('confirmationModalLabel');
+    
+    // Set message
+    messageElement.textContent = message;
+    
+    // Customize button and title based on options
+    if (options.title) {
+        modalTitle.innerHTML = `<i class="bi ${options.icon || 'bi-exclamation-triangle'} text-warning me-2"></i>${options.title}`;
+    }
+    
+    if (options.confirmText) {
+        confirmButton.innerHTML = `<i class="bi ${options.confirmIcon || 'bi-check'}"></i> ${options.confirmText}`;
+    }
+    
+    if (options.confirmClass) {
+        confirmButton.className = `btn ${options.confirmClass}`;
+    } else {
+        confirmButton.className = 'btn btn-danger';
+    }
+    
+    // Remove any existing event listeners
+    const newConfirmButton = confirmButton.cloneNode(true);
+    confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+    
+    // Add new event listener
+    newConfirmButton.addEventListener('click', function() {
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        bootstrapModal.hide();
+        if (onConfirm) onConfirm();
+    });
+    
+    // Show modal
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
 }
 
 // Attach click handlers without inline JS to avoid IDE lint errors
 document.addEventListener('DOMContentLoaded', function() {
     const notifyButtons = document.querySelectorAll('.js-notify');
+    console.log('Found notify buttons:', notifyButtons.length);
     notifyButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             const id = this.getAttribute('data-project-id');
+            console.log('Notify button clicked, project ID:', id);
             if (id) notifyClient(id);
+        });
+    });
+    const clearButtons = document.querySelectorAll('.js-clear-notify');
+    console.log('Found clear buttons:', clearButtons.length);
+    clearButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-project-id');
+            console.log('Clear button clicked, project ID:', id);
+            if (id) clearNotification(id);
+        });
+    });
+    
+    const credentialsButtons = document.querySelectorAll('.js-send-credentials');
+    credentialsButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-project-id');
+            if (id) sendCredentials(id);
+        });
+    });
+    
+    const changeClientButtons = document.querySelectorAll('.js-change-client');
+    changeClientButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-project-id');
+            if (id) changeClientData(id);
+        });
+    });
+    
+    // Archive and delete project handlers
+    const archiveButtons = document.querySelectorAll('.js-archive-project');
+    archiveButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            showConfirmation(
+                'Are you sure you want to archive this project?',
+                function() {
+                    window.location.href = url;
+                },
+                {
+                    title: 'Archive Project',
+                    icon: 'bi-archive',
+                    confirmText: 'Archive',
+                    confirmClass: 'btn-warning'
+                }
+            );
+        });
+    });
+    
+    const deleteButtons = document.querySelectorAll('.js-delete-project');
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            showConfirmation(
+                'Are you sure you want to permanently delete this project? This action cannot be undone.',
+                function() {
+                    window.location.href = url;
+                },
+                {
+                    title: 'Delete Project',
+                    icon: 'bi-trash',
+                    confirmText: 'Delete',
+                    confirmClass: 'btn-danger'
+                }
+            );
         });
     });
 
@@ -614,6 +974,194 @@ document.addEventListener('DOMContentLoaded', function() {
             if (section) cancelEdit(section);
         });
     });
+    
+    // Reordering functionality
+    let sortableInstance = null;
+    const reorderBtn = document.querySelector('.reorder-btn[data-section="ceremony"]');
+    const saveOrderBtn = document.querySelector('.save-order-btn');
+    const cancelReorderBtn = document.querySelector('.cancel-reorder-btn');
+    
+    if (reorderBtn) {
+        reorderBtn.addEventListener('click', function() {
+            startReordering();
+        });
+    }
+    
+    if (saveOrderBtn) {
+        saveOrderBtn.addEventListener('click', function() {
+            saveFieldOrder();
+        });
+    }
+    
+    if (cancelReorderBtn) {
+        cancelReorderBtn.addEventListener('click', function() {
+            cancelReordering();
+        });
+    }
+    
+    function startReordering() {
+        const container = document.getElementById('ceremony-fields-container');
+        const editBtn = document.querySelector('.edit-btn[data-section="ceremony"]');
+        const reorderBtn = document.querySelector('.reorder-btn[data-section="ceremony"]');
+        const reorderActions = document.querySelector('.reorder-actions');
+        
+        // Hide edit button and reorder button
+        editBtn.style.display = 'none';
+        reorderBtn.style.display = 'none';
+        reorderActions.style.display = 'block';
+        
+        // Add reorder mode class
+        container.classList.add('reorder-mode');
+        
+        // Show drag handles and add reorderable class
+        document.querySelectorAll('.ceremony-field-item').forEach(item => {
+            item.classList.add('reorderable');
+            const handle = item.querySelector('.drag-handle');
+            if (handle) handle.style.display = 'block';
+        });
+        
+        // Initialize Sortable
+        sortableInstance = Sortable.create(container, {
+            handle: '.drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            dragClass: 'dragging',
+            onEnd: function(evt) {
+                // Field order changed, enable save button
+                const saveBtn = document.querySelector('.save-order-btn');
+                if (saveBtn) saveBtn.disabled = false;
+            }
+        });
+    }
+    
+    function cancelReordering() {
+        const container = document.getElementById('ceremony-fields-container');
+        const editBtn = document.querySelector('.edit-btn[data-section="ceremony"]');
+        const reorderBtn = document.querySelector('.reorder-btn[data-section="ceremony"]');
+        const reorderActions = document.querySelector('.reorder-actions');
+        
+        // Destroy sortable instance
+        if (sortableInstance) {
+            sortableInstance.destroy();
+            sortableInstance = null;
+        }
+        
+        // Show edit and reorder buttons
+        editBtn.style.display = 'inline-block';
+        reorderBtn.style.display = 'inline-block';
+        reorderActions.style.display = 'none';
+        
+        // Remove reorder mode
+        container.classList.remove('reorder-mode');
+        
+        // Hide drag handles and remove reorderable class
+        document.querySelectorAll('.ceremony-field-item').forEach(item => {
+            item.classList.remove('reorderable');
+            const handle = item.querySelector('.drag-handle');
+            if (handle) handle.style.display = 'none';
+        });
+        
+        // Reload to restore original order
+        location.reload();
+    }
+    
+    function saveFieldOrder() {
+        const container = document.getElementById('ceremony-fields-container');
+        const fieldItems = container.querySelectorAll('.ceremony-field-item');
+        const fieldOrder = [];
+        
+        fieldItems.forEach(item => {
+            const fieldName = item.getAttribute('data-field-name');
+            if (fieldName) fieldOrder.push(fieldName);
+        });
+        
+        // Send to server
+        fetch(`/projects/{{ project.pk }}/update-field-order/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                field_order: fieldOrder
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('Field order saved successfully', 'success');
+                // Clean up reorder mode
+                cancelReordering();
+            } else {
+                showMessage('Error saving field order: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('Network error: ' + error.message, 'error');
+        });
+    }
 });
 </script>
+
+<!-- Custom Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="confirmationModalLabel">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                    Confirm Action
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmationMessage" class="mb-0"></p>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmButton">
+                    <i class="bi bi-check"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Client Data Modal -->
+<div class="modal fade" id="changeClientModal" tabindex="-1" aria-labelledby="changeClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="changeClientModalLabel">
+                    <i class="bi bi-person-gear text-success me-2"></i>
+                    Change Client Data
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changeClientForm">
+                    <div class="mb-3">
+                        <label for="clientName" class="form-label">Client Name</label>
+                        <input type="text" class="form-control bg-secondary text-white border-secondary" id="clientName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="clientEmail" class="form-label">Client Email</label>
+                        <input type="email" class="form-control bg-secondary text-white border-secondary" id="clientEmail" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="saveClientDataBtn">
+                    <i class="bi bi-check"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
