@@ -13,10 +13,10 @@
         </p>
         {% if is_admin %}
         <div class="mt-2">
-            <button class="btn btn-light btn-sm js-send-credentials" data-project-id="{{ project.pk }}" style="background-color: rgba(85, 215, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <button class="btn btn-light btn-sm js-send-credentials" data-project-id="{{ project.slug }}" style="background-color: rgba(85, 215, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);">
                 <i class="bi bi-envelope-at"></i> Send credentials email
             </button>
-            <button class="btn btn-light btn-sm js-change-client" data-project-id="{{ project.pk }}" style="background-color: rgba(85, 255, 105, 0.5); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <button class="btn btn-light btn-sm js-change-client" data-project-id="{{ project.slug }}" style="background-color: rgba(85, 255, 105, 0.5); border: 1px solid rgba(255, 255, 255, 0.3);">
                 <i class="bi bi-person-gear"></i> Change client data
             </button>
         </div>
@@ -25,12 +25,12 @@
     <div class="col-auto">
         {% if is_admin %}
         <!-- Always show notify button, but style differently based on changes -->
-        <button class="btn {% if project.has_unsent_changes %}btn-warning{% else %}btn-secondary{% endif %} js-notify" data-project-id="{{ project.pk }}">
+        <button class="btn {% if project.has_unsent_changes %}btn-warning{% else %}btn-secondary{% endif %} js-notify" data-project-id="{{ project.slug }}">
             <i class="bi bi-envelope"></i> Notify Client
         </button>
         <!-- Show clear button only when there are changes, with less contrast -->
         {% if project.has_unsent_changes %}
-        <button class="btn btn-outline-secondary opacity-75 js-clear-notify" data-project-id="{{ project.pk }}">
+        <button class="btn btn-outline-secondary opacity-75 js-clear-notify" data-project-id="{{ project.slug }}">
             <i class="bi bi-bell-slash"></i> Clear notification
         </button>
         {% else %}
@@ -38,10 +38,10 @@
             <i class="bi bi-bell-slash"></i> Clear notification
         </button>
         {% endif %}
-        <button class="btn btn-warning btn-sm me-2 js-archive-project" data-project-id="{{ project.pk }}" data-url="{% url 'archive_project' project.pk %}">
+        <button class="btn btn-warning btn-sm me-2 js-archive-project" data-project-id="{{ project.slug }}" data-url="{% url 'archive_project' project.slug %}">
             <i class="bi bi-archive"></i> Archive
         </button>
-        <button class="btn btn-danger btn-sm js-delete-project" data-project-id="{{ project.pk }}" data-url="{% url 'delete_project' project.pk %}">
+        <button class="btn btn-danger btn-sm js-delete-project" data-project-id="{{ project.slug }}" data-url="{% url 'delete_project' project.slug %}">
             <i class="bi bi-trash"></i> Delete
         </button>
         {% endif %}
@@ -553,7 +553,7 @@ function saveSection(section) {
 }
 
 function updateField(fieldName, fieldValue) {
-    return fetch(`/projects/{{ project.pk }}/update-field/`, {
+    return fetch(`/projects/{{ project.slug }}/update-field/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
@@ -1076,7 +1076,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Send to server
-        fetch(`/projects/{{ project.pk }}/update-field-order/`, {
+        fetch(`/projects/{{ project.slug }}/update-field-order/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',

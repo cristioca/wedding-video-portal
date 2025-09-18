@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.utils.text import slugify
+import re
 
 
 class User(AbstractUser):
@@ -41,6 +43,7 @@ class Project(models.Model):
     
     # Basic fields
     name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
     client_name = models.CharField(max_length=255, blank=True, null=True)
     client_email = models.EmailField(blank=True, null=True)
@@ -83,6 +86,39 @@ class Project(models.Model):
     
     def __str__(self):
         return f"{self.name} - {self.user.username}"
+    
+    def generate_slug(self):
+        """Generate unique slug based on event date, type, and creation time"""
+        # Format: 2026-05-29-nunta(20250915-t-093405)
+        event_date_str = self.event_date.strftime('%Y-%m-%d')
+        creation_date_str = self.created_at.strftime('%Y%m%d-t-%H%M%S')
+        
+        # Convert type to lowercase and handle Romanian characters
+        type_slug = self.type.lower()
+        
+        # Create the slug
+        slug_base = f"{event_date_str}-{type_slug}({creation_date_str})"
+        
+        # Ensure uniqueness by adding a counter if needed
+        slug = slug_base
+        counter = 1
+        while Project.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            slug = f"{slug_base}-{counter}"
+            counter += 1
+        
+        return slug
+    
+    def save(self, *args, **kwargs):
+        """Override save to generate slug if not provided"""
+        if not self.slug:
+            # Need to save first to get created_at timestamp
+            if not self.pk:
+                super().save(*args, **kwargs)
+            self.slug = self.generate_slug()
+            # Save again with the slug
+            super().save(update_fields=['slug'])
+        else:
+            super().save(*args, **kwargs)
     
     def get_ceremony_fields_ordered(self):
         """Return ceremony fields in custom order"""

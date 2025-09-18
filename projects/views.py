@@ -138,9 +138,9 @@ def dashboard(request):
 
 
 @login_required
-def project_detail(request, pk):
+def project_detail(request, slug):
     """Project detail view"""
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     
     # Check permissions
     if not request.user.is_admin() and project.user != request.user:
@@ -267,7 +267,7 @@ def create_project(request):
                 project.user = client_user
             project.save()
             messages.success(request, f'Project "{project.name}" created successfully.')
-            return redirect('project_detail', pk=project.pk)
+            return redirect('project_detail', slug=project.slug)
     else:
         form = ProjectForm()
     
@@ -275,13 +275,13 @@ def create_project(request):
 
 
 @login_required
-def archive_project(request, pk):
-    """Archive project - admin only"""
+def archive_project(request, slug):
+    """Archive a project - admin only"""
     if not request.user.is_admin():
         messages.error(request, 'Only administrators can archive projects.')
         return redirect('dashboard')
     
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     project.is_archived = True
     project.save()
     
@@ -290,13 +290,13 @@ def archive_project(request, pk):
 
 
 @login_required
-def delete_project(request, pk):
+def delete_project(request, slug):
     """Delete project permanently - admin only"""
     if not request.user.is_admin():
         messages.error(request, 'Only administrators can delete projects.')
         return redirect('dashboard')
     
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     project_name = project.name
     project.delete()
     
@@ -347,14 +347,14 @@ def download_file(request, file_id):
 
 
 @login_required
-def notify_client(request, pk):
+def notify_client(request, slug):
     """Send notification email to client - admin only"""
     if not request.user.is_admin():
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     
     # Parse request body to check for force parameter
     force_send = False
@@ -410,12 +410,12 @@ def notify_client(request, pk):
 
 
 @login_required
-def update_project_field(request, pk):
+def update_project_field(request, slug):
     """Update a single project field via AJAX"""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     
     # Check permissions
     if not request.user.is_admin() and project.user != request.user:
@@ -565,18 +565,18 @@ def approve_modification(request, mod_id):
         
         messages.info(request, 'Modification rejected.')
     
-    return redirect('project_detail', pk=modification.project.pk)
+    return redirect('project_detail', slug=modification.project.slug)
 
 
 @login_required
-def clear_notification(request, pk):
+def clear_notification(request, slug):
     """Clear unnotified changes flag for a project - admin only"""
     if not request.user.is_admin():
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     project.has_unsent_changes = False
     project.admin_notified_of_changes = False
     project.save()
@@ -584,14 +584,14 @@ def clear_notification(request, pk):
 
 
 @login_required
-def send_credentials(request, pk):
+def send_credentials(request, slug):
     """Send login credentials to client - admin only"""
     if not request.user.is_admin():
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     client_user = project.user
     
     if not project.client_email:
@@ -631,12 +631,12 @@ def send_credentials(request, pk):
 
 
 @login_required
-def change_client_data(request, pk):
+def change_client_data(request, slug):
     """Change client name and email for a project - admin only"""
     if not request.user.is_admin():
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     
     if request.method == 'POST':
         try:
@@ -681,9 +681,9 @@ def change_client_data(request, pk):
 
 @login_required
 @require_http_methods(['POST'])
-def update_field_order(request, pk):
+def update_field_order(request, slug):
     """Update the order of ceremony fields for a project"""
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, slug=slug)
     
     # Check permissions
     if not request.user.is_admin() and project.user != request.user:
