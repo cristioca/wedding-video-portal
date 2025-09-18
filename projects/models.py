@@ -76,6 +76,7 @@ class Project(models.Model):
     PROJECT_TYPE_CHOICES = [
         ('NUNTA', 'Nunta'),
         ('BOTEZ', 'Botez'),
+        ('ALTELE', 'Altele'),
     ]
     
     STATUS_CHOICES = [
@@ -115,6 +116,59 @@ class Project(models.Model):
     restaurant = models.TextField(blank=True, null=True)
     details_extra = models.TextField(blank=True, null=True)
     editing_preferences = models.TextField(blank=True, null=True)
+    
+    # Main Details (replaces ceremony details for all types)
+    main_details = models.TextField(blank=True, null=True, help_text="Main event details")
+    
+    # Package section fields
+    PACKAGE_TYPE_CHOICES = [
+        ('Clasic', 'Clasic'),
+        ('Highlights', 'Highlights'),
+        ('Duo', 'Duo'),
+        ('Cinema', 'Cinema'),
+        ('Creative', 'Creative'),
+        ('Botez', 'Botez'),
+        ('Custom', 'Custom'),
+    ]
+    
+    MOVIE_DURATION_CHOICES = [
+        ('30min', '30 min'),
+        ('1h', '1 h'),
+        ('1h30min', '1h30min'),
+        ('2h-3h', '2h-3h'),
+        ('3h+', '3h+'),
+        ('Other', 'Other'),
+    ]
+    
+    # Package fields
+    package_type = models.CharField(max_length=20, choices=PACKAGE_TYPE_CHOICES, blank=True, null=True)
+    package_4k = models.BooleanField(default=True)
+    package_cameras = models.IntegerField(default=1, choices=[(1, '1'), (2, '2'), (3, '3')])
+    
+    # Montages checkboxes
+    montage_highlights = models.BooleanField(default=False)
+    montage_movie = models.BooleanField(default=False)
+    montage_movie_duration = models.CharField(max_length=20, choices=MOVIE_DURATION_CHOICES, blank=True, null=True)
+    montage_movie_other = models.CharField(max_length=100, blank=True, null=True)
+    montage_bonus_primary = models.BooleanField(default=False)
+    montage_bonus_full = models.BooleanField(default=False)
+    
+    # Equipment details checkboxes
+    equipment_audio_recorder = models.BooleanField(default=False)
+    equipment_stabilizer = models.BooleanField(default=False)
+    equipment_external_light = models.BooleanField(default=False)
+    
+    # Team numbers
+    team_videographer = models.IntegerField(default=1)
+    team_operator = models.IntegerField(default=0)
+    team_assistant = models.IntegerField(default=0)
+    
+    # Delivery medium checkboxes
+    delivery_online = models.BooleanField(default=True)
+    delivery_usb = models.BooleanField(default=False)
+    
+    # Event presence
+    event_presence = models.TextField(blank=True, null=True)
     
     # Field ordering configuration
     ceremony_field_order = models.JSONField(
@@ -217,7 +271,16 @@ class Project(models.Model):
             return False
     
     def save(self, *args, **kwargs):
-        """Override save to generate slug if not provided"""
+        """Override save to generate slug and update project name based on video title"""
+        
+        # Auto-update project name based on video title
+        if self.title_video and self.title_video.strip():
+            # Format: "Type - Video Title" (e.g., "Nunta - Ioana si Ion")
+            type_display = dict(self.PROJECT_TYPE_CHOICES).get(self.type, self.type)
+            new_name = f"{type_display} - {self.title_video.strip()}"
+            if self.name != new_name:
+                self.name = new_name
+        
         if not self.slug:
             # Need to save first to get created_at timestamp
             if not self.pk:
@@ -229,7 +292,14 @@ class Project(models.Model):
             super().save(*args, **kwargs)
     
     def get_ceremony_fields_ordered(self):
-        """Return ceremony fields in custom order"""
+        """Return main details field for all project types"""
+        # For ALTELE type, only show Main Details
+        if self.type == 'ALTELE':
+            return [
+                {'field': 'main_details', 'label': 'Main Details', 'rows': 8}
+            ]
+        
+        # For NUNTA and BOTEZ, show traditional ceremony fields
         default_order = [
             {'field': 'prep', 'label': 'Preparation', 'rows': 2},
             {'field': 'church', 'label': 'Church', 'rows': 2},
@@ -263,6 +333,29 @@ class Project(models.Model):
                 ordered_fields.append(field_info)
         
         return ordered_fields
+    
+    def get_package_fields(self):
+        """Return Package section fields for client view"""
+        return {
+            'package_type': {'label': 'Package Type', 'type': 'select', 'choices': self.PACKAGE_TYPE_CHOICES},
+            'package_4k': {'label': '4K', 'type': 'checkbox'},
+            'package_cameras': {'label': 'No of cameras', 'type': 'radio', 'choices': [(1, '1'), (2, '2'), (3, '3')]},
+            'montage_highlights': {'label': 'Highlights clip', 'type': 'checkbox'},
+            'montage_movie': {'label': 'Movie', 'type': 'checkbox'},
+            'montage_movie_duration': {'label': 'Movie Duration', 'type': 'select', 'choices': self.MOVIE_DURATION_CHOICES},
+            'montage_movie_other': {'label': 'Other Duration', 'type': 'text'},
+            'montage_bonus_primary': {'label': 'Primary edit (aprox 4 h)', 'type': 'checkbox'},
+            'montage_bonus_full': {'label': 'Full Movie', 'type': 'checkbox'},
+            'equipment_audio_recorder': {'label': 'External audio recorder(s)', 'type': 'checkbox'},
+            'equipment_stabilizer': {'label': 'Stabilizer', 'type': 'checkbox'},
+            'equipment_external_light': {'label': 'External light', 'type': 'checkbox'},
+            'team_videographer': {'label': 'Videographer', 'type': 'number'},
+            'team_operator': {'label': 'Operator', 'type': 'number'},
+            'team_assistant': {'label': 'Assistant', 'type': 'number'},
+            'delivery_online': {'label': 'Online', 'type': 'checkbox'},
+            'delivery_usb': {'label': 'USB memory stick', 'type': 'checkbox'},
+            'event_presence': {'label': 'Event presence', 'type': 'textarea'},
+        }
 
 
 class ProjectModification(models.Model):

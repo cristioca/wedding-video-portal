@@ -492,13 +492,9 @@ def update_project_field(request, slug):
 
             setattr(project, field_name, field_value)
             
-            # If title_video is updated, also update the project name
-            if field_name == 'title_video' and field_value:
-                project.name = field_value
-            
             # Mark that there are changes not yet notified to the client
             project.has_unsent_changes = True
-            project.save()
+            project.save()  # The save method will auto-update project name if title_video changed
             
             # Create auto-applied modification record
             ProjectModification.objects.create(

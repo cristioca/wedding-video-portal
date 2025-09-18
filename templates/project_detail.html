@@ -334,6 +334,274 @@
     </div>
     
     <div class="col-lg-4">
+        <!-- Package Section - Admin can edit, Client can view -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-box-seam"></i> Package
+                {% if is_admin %}
+                <span class="badge bg-primary ms-2">Admin Editable</span>
+                {% else %}
+                <span class="badge bg-secondary ms-2">View Only</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if is_admin %}
+                <!-- Admin Form - Editable -->
+                <form method="post" id="package-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="update_package" value="1">
+                    
+                    <!-- Package Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Package Type</label>
+                        <select name="package_type" class="form-control" data-field="package_type">
+                            <option value="">Select Package</option>
+                            <option value="Clasic" {% if project.package_type == 'Clasic' %}selected{% endif %}>Clasic</option>
+                            <option value="Highlights" {% if project.package_type == 'Highlights' %}selected{% endif %}>Highlights</option>
+                            <option value="Duo" {% if project.package_type == 'Duo' %}selected{% endif %}>Duo</option>
+                            <option value="Cinema" {% if project.package_type == 'Cinema' %}selected{% endif %}>Cinema</option>
+                            <option value="Creative" {% if project.package_type == 'Creative' %}selected{% endif %}>Creative</option>
+                            <option value="Botez" {% if project.package_type == 'Botez' %}selected{% endif %}>Botez</option>
+                            <option value="Custom" {% if project.package_type == 'Custom' %}selected{% endif %}>Custom</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 4K Checkbox -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="package_4k" class="form-check-input" data-field="package_4k" 
+                                   {% if project.package_4k %}checked{% endif %}>
+                            <label class="form-check-label">4K</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Number of Cameras -->
+                    <div class="mb-3">
+                        <label class="form-label">No of cameras:</label>
+                        <div class="form-check">
+                            <input type="radio" name="package_cameras" value="1" class="form-check-input" data-field="package_cameras"
+                                   {% if project.package_cameras == 1 %}checked{% endif %}>
+                            <label class="form-check-label">1</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="package_cameras" value="2" class="form-check-input" data-field="package_cameras"
+                                   {% if project.package_cameras == 2 %}checked{% endif %}>
+                            <label class="form-check-label">2</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="package_cameras" value="3" class="form-check-input" data-field="package_cameras"
+                                   {% if project.package_cameras == 3 %}checked{% endif %}>
+                            <label class="form-check-label">3</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Montages -->
+                    <div class="mb-3">
+                        <label class="form-label">Montages:</label>
+                        <div class="form-check">
+                            <input type="checkbox" name="montage_highlights" class="form-check-input" data-field="montage_highlights"
+                                   {% if project.montage_highlights %}checked{% endif %}>
+                            <label class="form-check-label">Highlights clip</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="montage_movie" class="form-check-input" data-field="montage_movie"
+                                   {% if project.montage_movie %}checked{% endif %}>
+                            <label class="form-check-label">Movie</label>
+                        </div>
+                        <div class="ms-3 mb-2" id="movie-duration-section" style="{% if not project.montage_movie %}display: none;{% endif %}">
+                            <select name="montage_movie_duration" class="form-control form-control-sm" data-field="montage_movie_duration">
+                                <option value="">Select Duration</option>
+                                <option value="30min" {% if project.montage_movie_duration == '30min' %}selected{% endif %}>30 min</option>
+                                <option value="1h" {% if project.montage_movie_duration == '1h' %}selected{% endif %}>1 h</option>
+                                <option value="1h30min" {% if project.montage_movie_duration == '1h30min' %}selected{% endif %}>1h30min</option>
+                                <option value="2h-3h" {% if project.montage_movie_duration == '2h-3h' %}selected{% endif %}>2h-3h</option>
+                                <option value="3h+" {% if project.montage_movie_duration == '3h+' %}selected{% endif %}>3h+</option>
+                                <option value="Other" {% if project.montage_movie_duration == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                            <input type="text" name="montage_movie_other" class="form-control form-control-sm mt-1" 
+                                   placeholder="Specify other duration" data-field="montage_movie_other"
+                                   value="{{ project.montage_movie_other|default:'' }}"
+                                   style="{% if project.montage_movie_duration != 'Other' %}display: none;{% endif %}">
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="montage_bonus_primary" class="form-check-input" data-field="montage_bonus_primary"
+                                   {% if project.montage_bonus_primary %}checked{% endif %}>
+                            <label class="form-check-label">Primary edit (aprox 4 h)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="montage_bonus_full" class="form-check-input" data-field="montage_bonus_full"
+                                   {% if project.montage_bonus_full %}checked{% endif %}>
+                            <label class="form-check-label">Full Movie</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Equipment Details -->
+                    <div class="mb-3">
+                        <label class="form-label">Equipment details:</label>
+                        <div class="form-check">
+                            <input type="checkbox" name="equipment_audio_recorder" class="form-check-input" data-field="equipment_audio_recorder"
+                                   {% if project.equipment_audio_recorder %}checked{% endif %}>
+                            <label class="form-check-label">External audio recorder(s)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="equipment_stabilizer" class="form-check-input" data-field="equipment_stabilizer"
+                                   {% if project.equipment_stabilizer %}checked{% endif %}>
+                            <label class="form-check-label">Stabilizer</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="equipment_external_light" class="form-check-input" data-field="equipment_external_light"
+                                   {% if project.equipment_external_light %}checked{% endif %}>
+                            <label class="form-check-label">External light</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Team -->
+                    <div class="mb-3">
+                        <label class="form-label">Team:</label>
+                        <div class="row">
+                            <div class="col-4">
+                                <label class="form-label small">Videographer</label>
+                                <input type="number" name="team_videographer" class="form-control form-control-sm" 
+                                       min="0" value="{{ project.team_videographer }}" data-field="team_videographer">
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label small">Operator</label>
+                                <input type="number" name="team_operator" class="form-control form-control-sm" 
+                                       min="0" value="{{ project.team_operator }}" data-field="team_operator">
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label small">Assistant</label>
+                                <input type="number" name="team_assistant" class="form-control form-control-sm" 
+                                       min="0" value="{{ project.team_assistant }}" data-field="team_assistant">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Medium -->
+                    <div class="mb-3">
+                        <label class="form-label">Delivery medium:</label>
+                        <div class="form-check">
+                            <input type="checkbox" name="delivery_online" class="form-check-input" data-field="delivery_online"
+                                   {% if project.delivery_online %}checked{% endif %}>
+                            <label class="form-check-label">Online</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="delivery_usb" class="form-check-input" data-field="delivery_usb"
+                                   {% if project.delivery_usb %}checked{% endif %}>
+                            <label class="form-check-label">USB memory stick</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Event Presence -->
+                    <div class="mb-3">
+                        <label class="form-label">Event presence</label>
+                        <textarea name="event_presence" class="form-control" rows="3" data-field="event_presence">{{ project.event_presence|default:'' }}</textarea>
+                    </div>
+                </form>
+                
+                {% else %}
+                <!-- Client View - Read Only -->
+                <div class="package-readonly">
+                    <!-- Package Type -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Package Type</label>
+                        <p class="form-control-plaintext">{{ project.package_type|default:"Not specified" }}</p>
+                    </div>
+                    
+                    <!-- 4K -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">4K</label>
+                        <p class="form-control-plaintext">
+                            {% if project.package_4k %}
+                            <i class="bi bi-check-circle text-success"></i> Yes
+                            {% else %}
+                            <i class="bi bi-x-circle text-danger"></i> No
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <!-- Number of Cameras -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">No of cameras</label>
+                        <p class="form-control-plaintext">{{ project.package_cameras|default:"Not specified" }}</p>
+                    </div>
+                    
+                    <!-- Montages -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Montages</label>
+                        <div class="form-control-plaintext">
+                            {% if project.montage_highlights %}<i class="bi bi-check text-success"></i> Highlights clip<br>{% endif %}
+                            {% if project.montage_movie %}
+                                <i class="bi bi-check text-success"></i> Movie
+                                {% if project.montage_movie_duration %}
+                                    ({{ project.get_montage_movie_duration_display }}
+                                    {% if project.montage_movie_duration == 'Other' and project.montage_movie_other %}: {{ project.montage_movie_other }}{% endif %})
+                                {% endif %}<br>
+                            {% endif %}
+                            {% if project.montage_bonus_primary %}<i class="bi bi-check text-success"></i> Primary edit (aprox 4 h)<br>{% endif %}
+                            {% if project.montage_bonus_full %}<i class="bi bi-check text-success"></i> Full Movie<br>{% endif %}
+                            {% if not project.montage_highlights and not project.montage_movie and not project.montage_bonus_primary and not project.montage_bonus_full %}
+                                <span class="text-muted">No montages selected</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Equipment Details -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Equipment details</label>
+                        <div class="form-control-plaintext">
+                            {% if project.equipment_audio_recorder %}<i class="bi bi-check text-success"></i> External audio recorder(s)<br>{% endif %}
+                            {% if project.equipment_stabilizer %}<i class="bi bi-check text-success"></i> Stabilizer<br>{% endif %}
+                            {% if project.equipment_external_light %}<i class="bi bi-check text-success"></i> External light<br>{% endif %}
+                            {% if not project.equipment_audio_recorder and not project.equipment_stabilizer and not project.equipment_external_light %}
+                                <span class="text-muted">No additional equipment</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Team -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Team</label>
+                        <div class="row">
+                            <div class="col-4">
+                                <small class="text-muted">Videographer</small>
+                                <p class="form-control-plaintext">{{ project.team_videographer }}</p>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Operator</small>
+                                <p class="form-control-plaintext">{{ project.team_operator }}</p>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Assistant</small>
+                                <p class="form-control-plaintext">{{ project.team_assistant }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Medium -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Delivery medium</label>
+                        <div class="form-control-plaintext">
+                            {% if project.delivery_online %}<i class="bi bi-check text-success"></i> Online<br>{% endif %}
+                            {% if project.delivery_usb %}<i class="bi bi-check text-success"></i> USB memory stick<br>{% endif %}
+                            {% if not project.delivery_online and not project.delivery_usb %}
+                                <span class="text-muted">No delivery method selected</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Event Presence -->
+                    {% if project.event_presence %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Event presence</label>
+                        <p class="form-control-plaintext">{{ project.event_presence }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
         <div class="card mb-4">
             <div class="card-header">
                 <i class="bi bi-file-earmark"></i> Files
@@ -1098,6 +1366,64 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             showMessage('Network error: ' + error.message, 'error');
+        });
+    }
+    
+    // Package form handlers (Admin only)
+    const packageForm = document.getElementById('package-form');
+    const isAdmin = {% if is_admin %}true{% else %}false{% endif %};
+    if (packageForm && isAdmin) {
+        // Handle Movie checkbox to show/hide duration dropdown
+        const movieCheckbox = document.querySelector('input[name="montage_movie"]');
+        const durationSection = document.getElementById('movie-duration-section');
+        const durationSelect = document.querySelector('select[name="montage_movie_duration"]');
+        const otherInput = document.querySelector('input[name="montage_movie_other"]');
+        
+        if (movieCheckbox && durationSection) {
+            movieCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    durationSection.style.display = 'block';
+                } else {
+                    durationSection.style.display = 'none';
+                    durationSelect.value = '';
+                    otherInput.style.display = 'none';
+                    otherInput.value = '';
+                }
+            });
+        }
+        
+        // Handle duration dropdown to show/hide "Other" input
+        if (durationSelect && otherInput) {
+            durationSelect.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    otherInput.style.display = 'block';
+                } else {
+                    otherInput.style.display = 'none';
+                    otherInput.value = '';
+                }
+            });
+        }
+        
+        // Handle all package field changes with AJAX
+        packageForm.addEventListener('change', function(e) {
+            const field = e.target;
+            if (field.hasAttribute('data-field')) {
+                const fieldName = field.getAttribute('data-field');
+                let fieldValue;
+                
+                if (field.type === 'checkbox') {
+                    fieldValue = field.checked;
+                } else if (field.type === 'radio') {
+                    fieldValue = field.checked ? field.value : null;
+                    // For radio buttons, only proceed if this one is checked
+                    if (!field.checked) return;
+                } else {
+                    fieldValue = field.value;
+                }
+                
+                // Send AJAX request to update field
+                updateProjectField(fieldName, fieldValue);
+            }
         });
     }
 });

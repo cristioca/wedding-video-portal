@@ -83,8 +83,15 @@ class ProjectDetailForm(forms.ModelForm):
         fields = [
             'name', 'client_name', 'client_email', 'type', 'status', 'edit_status',
             'event_date', 'city', 'title_video', 'civil_union_details',
-            'prep', 'church', 'session', 'restaurant',
-            'details_extra', 'editing_preferences', 'notes'
+            'prep', 'church', 'session', 'restaurant', 'main_details',
+            'details_extra', 'editing_preferences', 'notes',
+            # Package fields
+            'package_type', 'package_4k', 'package_cameras',
+            'montage_highlights', 'montage_movie', 'montage_movie_duration', 'montage_movie_other',
+            'montage_bonus_primary', 'montage_bonus_full',
+            'equipment_audio_recorder', 'equipment_stabilizer', 'equipment_external_light',
+            'team_videographer', 'team_operator', 'team_assistant',
+            'delivery_online', 'delivery_usb', 'event_presence'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -106,6 +113,26 @@ class ProjectDetailForm(forms.ModelForm):
             'details_extra': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'editing_preferences': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'main_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 8}),
+            # Package widgets
+            'package_type': forms.Select(attrs={'class': 'form-control'}),
+            'package_4k': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'package_cameras': forms.RadioSelect(attrs={'class': 'form-check-input'}),
+            'montage_highlights': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'montage_movie': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'montage_movie_duration': forms.Select(attrs={'class': 'form-control'}),
+            'montage_movie_other': forms.TextInput(attrs={'class': 'form-control'}),
+            'montage_bonus_primary': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'montage_bonus_full': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'equipment_audio_recorder': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'equipment_stabilizer': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'equipment_external_light': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'team_videographer': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'team_operator': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'team_assistant': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'delivery_online': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'delivery_usb': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'event_presence': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
     
     def __init__(self, *args, **kwargs):
