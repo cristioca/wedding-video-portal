@@ -61,7 +61,7 @@
                     <h6>{{ mod.field_name|title }}</h6>
                     <p class="mb-1"><strong>Old:</strong> {{ mod.old_value|default:"(empty)" }}</p>
                     <p class="mb-1"><strong>New:</strong> {{ mod.new_value|default:"(empty)" }}</p>
-                    <small class="text-muted">By {{ mod.created_by.username }} - {{ mod.created_at|timesince }} ago</small>
+                    <small class="text-muted">By {{ mod.created_by.get_full_name|default:mod.created_by.email }} - {{ mod.created_at|timesince }} ago</small>
                 </div>
                 <div class="col-md-4 text-end">
                     <form method="post" action="{% url 'approve_modification' mod.pk %}" class="d-inline">

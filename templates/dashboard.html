@@ -38,7 +38,7 @@
                     <small>{{ mod.created_at|timesince }} ago</small>
                 </div>
                 <p class="mb-1">Field: {{ mod.field_name|title }}</p>
-                <small>By: {{ mod.created_by.username }}</small>
+                <small>By: {{ mod.created_by.get_full_name|default:mod.created_by.email }}</small>
             </a>
             {% endfor %}
         </div>

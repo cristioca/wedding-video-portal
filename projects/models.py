@@ -1,23 +1,74 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
 from django.utils.text import slugify
 import re
 
 
+class CustomUserManager(BaseUserManager):
+    """Custom user manager for email-based authentication"""
+    
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+    
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', 'ADMIN')
+        
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+        
+        return self.create_user(email, password, **extra_fields)
+
+
 class User(AbstractUser):
-    """Custom User model with role field"""
+    """Custom User model with role field and optional username"""
     ROLE_CHOICES = [
         ('ADMIN', 'Admin'),
         ('CLIENT', 'Client'),
     ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='CLIENT')
     
+    # Make username optional and use email as primary identifier
+    username = models.CharField(max_length=150, blank=True, null=True, unique=False)
+    email = models.EmailField(unique=True)
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name']  # Remove username from required fields
+    
+    objects = CustomUserManager()
+    
     def is_admin(self):
         return self.role == 'ADMIN'
     
     def is_client(self):
         return self.role == 'CLIENT'
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate username from email if not provided"""
+        if not self.username:
+            # Generate username from email (before @ symbol)
+            email_prefix = self.email.split('@')[0] if self.email else 'user'
+            base_username = email_prefix
+            counter = 1
+            
+            # Ensure uniqueness
+            while User.objects.filter(username=base_username).exclude(pk=self.pk).exists():
+                base_username = f"{email_prefix}{counter}"
+                counter += 1
+            
+            self.username = base_username
+        
+        super().save(*args, **kwargs)
 
 
 class Project(models.Model):
@@ -74,6 +125,7 @@ class Project(models.Model):
     
     # Notification tracking
     admin_notified_of_changes = models.BooleanField(default=False)
+    last_admin_notification_date = models.DateTimeField(blank=True, null=True)
     last_client_notification_date = models.DateTimeField(blank=True, null=True)
     has_unsent_changes = models.BooleanField(default=False)
     
@@ -107,6 +159,62 @@ class Project(models.Model):
             counter += 1
         
         return slug
+    
+    def should_notify_admin(self):
+        """Check if admin should be notified (respecting 1-hour cooldown)"""
+        if not self.last_admin_notification_date:
+            return True
+        
+        from django.utils import timezone
+        time_since_last = timezone.now() - self.last_admin_notification_date
+        return time_since_last.total_seconds() >= 3600  # 1 hour cooldown
+    
+    def notify_admin_of_changes(self, modified_by_user):
+        """Send email notification to admin about client changes"""
+        if not self.should_notify_admin():
+            return False
+            
+        from django.core.mail import send_mail
+        from django.conf import settings
+        from django.utils import timezone
+        
+        # Get all admin users
+        admin_users = User.objects.filter(role='ADMIN')
+        if not admin_users.exists():
+            return False
+        
+        admin_emails = [admin.email for admin in admin_users if admin.email]
+        if not admin_emails:
+            return False
+        
+        try:
+            send_mail(
+                subject=f'Client Modified Project: {self.name}',
+                message=f'''
+                A client has made changes to project "{self.name}".
+                
+                Modified by: {modified_by_user.get_full_name() or modified_by_user.email}
+                Project: {self.name}
+                Event Date: {self.event_date.strftime('%B %d, %Y')}
+                
+                Please review the changes in the admin panel.
+                
+                Best regards,
+                Wedding Video Portal
+                ''',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=admin_emails,
+                fail_silently=False,
+            )
+            
+            self.last_admin_notification_date = timezone.now()
+            self.admin_notified_of_changes = True
+            self.save(update_fields=['last_admin_notification_date', 'admin_notified_of_changes'])
+            return True
+            
+        except Exception as e:
+            print(f"Failed to send admin notification: {e}")
+            return False
     
     def save(self, *args, **kwargs):
         """Override save to generate slug if not provided"""

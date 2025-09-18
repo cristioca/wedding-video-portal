@@ -31,15 +31,15 @@ def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
+            email = form.cleaned_data['username']  # Field is named 'username' but contains email
             password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
+            user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
+                messages.success(request, f'Welcome back, {user.get_full_name() or user.email}!')
                 return redirect('dashboard')
             else:
-                messages.error(request, 'Invalid username or password.')
+                messages.error(request, 'Invalid email or password.')
     else:
         form = LoginForm()
     
@@ -167,14 +167,18 @@ def project_detail(request, slug):
                     
                     if form.changed_data:
                         project.admin_notified_of_changes = True
-                        messages.info(request, 'Your changes have been submitted for admin approval.')
+                        # Send email notification to admin
+                        if project.notify_admin_of_changes(request.user):
+                            messages.info(request, 'Your changes have been submitted for admin approval and administrators have been notified.')
+                        else:
+                            messages.info(request, 'Your changes have been submitted for admin approval.')
                 
                 # Admin changes are applied immediately
                 if request.user.is_admin():
                     form.save()
                     messages.success(request, 'Project updated successfully.')
                 
-                return redirect('project_detail', pk=project.pk)
+                return redirect('project_detail', slug=project.slug)
         
         elif 'upload_file' in request.POST:
             file_form = FileUploadForm(request.POST, request.FILES)
@@ -236,17 +240,9 @@ def create_project(request):
                         client_user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
                         client_user.save()
                 except User.DoesNotExist:
-                    # Create new client user with temporary username
-                    username = client_email.split('@')[0]
-                    counter = 1
-                    original_username = username
-                    while User.objects.filter(username=username).exists():
-                        username = f"{original_username}{counter}"
-                        counter += 1
-                    
+                    # Create new client user (username will be auto-generated from email)
                     name_parts = client_name.split() if client_name else ['', '']
                     client_user = User.objects.create_user(
-                        username=username,
                         email=client_email,
                         first_name=name_parts[0] if len(name_parts) > 0 else '',
                         last_name=' '.join(name_parts[1:]) if len(name_parts) > 1 else '',
@@ -255,16 +251,9 @@ def create_project(request):
                     )
                 project.user = client_user
             else:
-                # Create a default client user if no email provided
-                client_user = User.objects.create_user(
-                    username=f"client_{timezone.now().strftime('%Y%m%d_%H%M%S')}",
-                    email='',
-                    first_name=client_name.split()[0] if client_name else 'Client',
-                    last_name=' '.join(client_name.split()[1:]) if client_name and len(client_name.split()) > 1 else '',
-                    role='CLIENT',
-                    password='temp_password_needs_reset'
-                )
-                project.user = client_user
+                # Email is required for projects now
+                messages.error(request, 'Client email is required for creating projects.')
+                return render(request, 'project_form.html', {'form': form, 'title': 'Create Project'})
             project.save()
             messages.success(request, f'Project "{project.name}" created successfully.')
             return redirect('project_detail', slug=project.slug)
@@ -457,6 +446,9 @@ def update_project_field(request, slug):
             project.admin_notified_of_changes = True
             project.has_unsent_changes = True
             project.save()
+            
+            # Send email notification to admin
+            project.notify_admin_of_changes(request.user)
             return JsonResponse({
                 'success': True, 
                 'message': 'Change submitted for admin approval',
@@ -607,15 +599,16 @@ def send_credentials(request, slug):
         send_mail(
             subject=f'Login Credentials for Wedding Video Portal - {project.name}',
             message=f'''
-            Dear {project.client_name or client_user.get_full_name() or client_user.username},
+            Dear {project.client_name or client_user.get_full_name() or 'Client'},
             
             Your login credentials for the Wedding Video Portal have been created for project "{project.name}".
             
             Portal URL: {request.build_absolute_uri('/dashboard/')}
-            Username: {client_user.username}
+            Email: {client_user.email}
             Password: {password}
             
-            Please log in and change your password after your first login.
+            Please log in using your email address and the password above. 
+            We recommend changing your password after your first login.
             
             Best regards,
             Wedding Video Portal Team
