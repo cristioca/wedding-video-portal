@@ -232,15 +232,25 @@ def create_project(request):
             
             if client_email:
                 try:
+                    # Reuse existing user account for the same email
                     client_user = User.objects.get(email=client_email)
-                    # Update name if different
-                    if client_name and client_user.first_name != client_name.split()[0]:
+                    # Update name if provided and different
+                    if client_name:
                         name_parts = client_name.split()
-                        client_user.first_name = name_parts[0] if len(name_parts) > 0 else ''
-                        client_user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
-                        client_user.save()
+                        if name_parts and client_user.first_name != name_parts[0]:
+                            client_user.first_name = name_parts[0] if len(name_parts) > 0 else ''
+                            client_user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+                            client_user.save()
+                            
+                            # Update client_name in ALL projects for this user
+                            User.objects.filter(email=client_email).update(
+                                first_name=client_user.first_name,
+                                last_name=client_user.last_name
+                            )
+                            Project.objects.filter(user=client_user).update(client_name=client_name)
+                            
                 except User.DoesNotExist:
-                    # Create new client user (username will be auto-generated from email)
+                    # Create new client user
                     name_parts = client_name.split() if client_name else ['', '']
                     client_user = User.objects.create_user(
                         email=client_email,
@@ -249,7 +259,11 @@ def create_project(request):
                         role='CLIENT',
                         password='temp_password_needs_reset'
                     )
+                
                 project.user = client_user
+                # Store client data in project for consistency
+                project.client_email = client_email
+                project.client_name = client_name
             else:
                 # Email is required for projects now
                 messages.error(request, 'Client email is required for creating projects.')
@@ -640,18 +654,53 @@ def change_client_data(request, slug):
             if not new_name or not new_email:
                 return JsonResponse({'error': 'Both name and email are required'}, status=400)
             
-            # Update project fields
-            project.client_name = new_name
-            project.client_email = new_email
+            old_email = project.client_email
+            old_name = project.client_name
             
-            # Update user fields
-            name_parts = new_name.split() if new_name else ['', '']
-            project.user.first_name = name_parts[0] if len(name_parts) > 0 else ''
-            project.user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
-            project.user.email = new_email
-            project.user.save()
+            # If email is changing, move project to different user account
+            if new_email != old_email:
+                try:
+                    # Find or create user for new email
+                    new_user = User.objects.get(email=new_email)
+                    # Update the user's name if provided
+                    if new_name:
+                        name_parts = new_name.split()
+                        new_user.first_name = name_parts[0] if len(name_parts) > 0 else ''
+                        new_user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+                        new_user.save()
+                        # Update name in ALL projects for this user
+                        Project.objects.filter(user=new_user).update(client_name=new_name)
+                        
+                except User.DoesNotExist:
+                    # Create new user for the new email
+                    name_parts = new_name.split() if new_name else ['', '']
+                    new_user = User.objects.create_user(
+                        email=new_email,
+                        first_name=name_parts[0] if len(name_parts) > 0 else '',
+                        last_name=' '.join(name_parts[1:]) if len(name_parts) > 1 else '',
+                        role='CLIENT',
+                        password='temp_password_needs_reset'
+                    )
+                
+                # Move project to new user
+                project.user = new_user
+                project.client_email = new_email
+                project.client_name = new_name
+                project.save()
+                
+            elif new_name != old_name:
+                # Only name is changing - update all projects for this user
+                name_parts = new_name.split()
+                project.user.first_name = name_parts[0] if len(name_parts) > 0 else ''
+                project.user.last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+                project.user.save()
+                
+                # Update client_name in ALL projects for this user
+                Project.objects.filter(user=project.user).update(client_name=new_name)
             
-            project.save()
+            else:
+                # No changes needed
+                pass
             
             return JsonResponse({
                 'success': True, 

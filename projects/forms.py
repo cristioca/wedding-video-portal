@@ -115,6 +115,11 @@ class ProjectDetailForm(forms.ModelForm):
         if self.instance and self.instance.pk:
             self.fields['client_name'].initial = self.instance.client_name
             self.fields['client_email'].initial = self.instance.client_email
+            
+            # Remove civil_union_details field for Botez projects
+            if self.instance.type == 'BOTEZ':
+                if 'civil_union_details' in self.fields:
+                    del self.fields['civil_union_details']
 
 
 class FileUploadForm(forms.ModelForm):

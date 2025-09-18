@@ -231,12 +231,15 @@ class Project(models.Model):
     def get_ceremony_fields_ordered(self):
         """Return ceremony fields in custom order"""
         default_order = [
-            {'field': 'civil_union_details', 'label': 'Civil Union Details', 'rows': 3},
             {'field': 'prep', 'label': 'Preparation', 'rows': 2},
             {'field': 'church', 'label': 'Church', 'rows': 2},
             {'field': 'session', 'label': 'Photo Session', 'rows': 2},
             {'field': 'restaurant', 'label': 'Restaurant', 'rows': 2}
         ]
+        
+        # Add Civil Union Details only for wedding projects (NUNTA)
+        if self.type == 'NUNTA':
+            default_order.insert(0, {'field': 'civil_union_details', 'label': 'Civil Union Details', 'rows': 3})
         
         if not self.ceremony_field_order:
             return default_order
