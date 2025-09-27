@@ -86,9 +86,9 @@ class ProjectDetailForm(forms.ModelForm):
             'prep', 'church', 'session', 'restaurant', 'main_details',
             'details_extra', 'editing_preferences', 'notes',
             # Package fields
-            'package_type', 'package_4k', 'package_cameras',
+            'package_type', 'package_4k', 'package_fullhd', 'package_cameras',
             'montage_highlights', 'montage_movie', 'montage_movie_duration', 'montage_movie_other',
-            'montage_bonus_primary', 'montage_bonus_full',
+            'montage_bonus_primary', 'montage_bonus_full', 'montage_cinema_duration',
             'equipment_audio_recorder', 'equipment_stabilizer', 'equipment_external_light',
             'team_videographer', 'team_operator', 'team_assistant',
             'delivery_online', 'delivery_usb', 'event_presence'
@@ -117,6 +117,7 @@ class ProjectDetailForm(forms.ModelForm):
             # Package widgets
             'package_type': forms.Select(attrs={'class': 'form-control'}),
             'package_4k': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'package_fullhd': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'package_cameras': forms.RadioSelect(attrs={'class': 'form-check-input'}),
             'montage_highlights': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'montage_movie': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
@@ -124,6 +125,7 @@ class ProjectDetailForm(forms.ModelForm):
             'montage_movie_other': forms.TextInput(attrs={'class': 'form-control'}),
             'montage_bonus_primary': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'montage_bonus_full': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'montage_cinema_duration': forms.Select(attrs={'class': 'form-control'}),
             'equipment_audio_recorder': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'equipment_stabilizer': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'equipment_external_light': forms.CheckboxInput(attrs={'class': 'form-check-input'}),

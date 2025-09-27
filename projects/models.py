@@ -136,22 +136,24 @@ class Project(models.Model):
         ('1h', '1 h'),
         ('1h30min', '1h30min'),
         ('2h-3h', '2h-3h'),
-        ('3h+', '3h+'),
+        ('3h-4h', '3h-4h'),
         ('Other', 'Other'),
     ]
     
     # Package fields
     package_type = models.CharField(max_length=20, choices=PACKAGE_TYPE_CHOICES, blank=True, null=True)
     package_4k = models.BooleanField(default=True)
+    package_fullhd = models.BooleanField(default=False)
     package_cameras = models.IntegerField(default=1, choices=[(1, '1'), (2, '2'), (3, '3')])
     
-    # Montages checkboxes
+    # Montages
     montage_highlights = models.BooleanField(default=False)
     montage_movie = models.BooleanField(default=False)
     montage_movie_duration = models.CharField(max_length=20, choices=MOVIE_DURATION_CHOICES, blank=True, null=True)
     montage_movie_other = models.CharField(max_length=100, blank=True, null=True)
     montage_bonus_primary = models.BooleanField(default=False)
     montage_bonus_full = models.BooleanField(default=False)
+    montage_cinema_duration = models.CharField(max_length=20, choices=[('1h', '1 hour'), ('1h30min', '1h30min')], default='1h30min', blank=True, null=True)
     
     # Equipment details checkboxes
     equipment_audio_recorder = models.BooleanField(default=False)

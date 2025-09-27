@@ -198,6 +198,73 @@ def project_detail(request, slug):
     modifications = project.modifications.filter(status='PENDING') if request.user.is_admin() else None
     ceremony_fields = project.get_ceremony_fields_ordered()
     
+    # Package presets for client-side use
+    package_presets = {
+        'Clasic': {
+            'package_type': 'Clasic',
+            'package_4k': True, 'package_fullhd': False, 'package_cameras': 1,
+            'montage_highlights': True, 'montage_movie': True, 'montage_bonus_primary': False, 'montage_bonus_full': False,
+            'montage_movie_duration': '2h-3h', 'montage_cinema_duration': '1h30min',
+            'equipment_audio_recorder': True, 'equipment_stabilizer': True, 'equipment_external_light': False,
+            'team_videographer': 1, 'team_operator': 0, 'team_assistant': 0,
+            'delivery_online': True, 'delivery_usb': False
+        },
+        'Highlights': {
+            'package_type': 'Highlights',
+            'package_4k': True, 'package_fullhd': False, 'package_cameras': 2,
+            'montage_highlights': True, 'montage_movie': False, 'montage_bonus_primary': False, 'montage_bonus_full': True,
+            'montage_movie_duration': '', 'montage_cinema_duration': '1h',
+            'equipment_audio_recorder': True, 'equipment_stabilizer': True, 'equipment_external_light': True,
+            'team_videographer': 1, 'team_operator': 0, 'team_assistant': 1,
+            'delivery_online': True, 'delivery_usb': False
+        },
+        'Duo': {
+            'package_type': 'Duo',
+            'package_4k': True, 'package_fullhd': False, 'package_cameras': 2,
+            'montage_highlights': True, 'montage_movie': True, 'montage_bonus_primary': False, 'montage_bonus_full': False,
+            'montage_movie_duration': '3h-4h', 'montage_cinema_duration': '1h30min',
+            'equipment_audio_recorder': True, 'equipment_stabilizer': True, 'equipment_external_light': False,
+            'team_videographer': 1, 'team_operator': 1, 'team_assistant': 0,
+            'delivery_online': True, 'delivery_usb': False
+        },
+        'Cinema': {
+            'package_type': 'Cinema',
+            'package_4k': True, 'package_fullhd': False, 'package_cameras': 2,
+            'montage_highlights': True, 'montage_movie': False, 'montage_bonus_primary': True, 'montage_bonus_full': True,
+            'montage_movie_duration': '', 'montage_cinema_duration': '1h30min',
+            'equipment_audio_recorder': True, 'equipment_stabilizer': True, 'equipment_external_light': True,
+            'team_videographer': 2, 'team_operator': 0, 'team_assistant': 0,
+            'delivery_online': True, 'delivery_usb': False
+        },
+        'Creative': {
+            'package_type': 'Creative',
+            'package_4k': True, 'package_fullhd': False, 'package_cameras': 3,
+            'montage_highlights': True, 'montage_movie': True, 'montage_bonus_primary': False, 'montage_bonus_full': True,
+            'montage_movie_duration': '3h-4h', 'montage_cinema_duration': '1h30min',
+            'equipment_audio_recorder': True, 'equipment_stabilizer': True, 'equipment_external_light': True,
+            'team_videographer': 2, 'team_operator': 1, 'team_assistant': 0,
+            'delivery_online': True, 'delivery_usb': True
+        },
+        'Botez': {
+            'package_type': 'Botez',
+            'package_4k': True, 'package_fullhd': False, 'package_cameras': 1,
+            'montage_highlights': True, 'montage_movie': True, 'montage_bonus_primary': False, 'montage_bonus_full': False,
+            'montage_movie_duration': '2h-3h', 'montage_cinema_duration': '1h30min',
+            'equipment_audio_recorder': True, 'equipment_stabilizer': True, 'equipment_external_light': False,
+            'team_videographer': 1, 'team_operator': 0, 'team_assistant': 0,
+            'delivery_online': True, 'delivery_usb': False
+        },
+        'Custom': {
+            'package_type': 'Custom',
+            'package_4k': True, 'package_fullhd': False, 'package_cameras': 1,
+            'montage_highlights': False, 'montage_movie': False, 'montage_bonus_primary': False, 'montage_bonus_full': False,
+            'montage_movie_duration': '', 'montage_cinema_duration': '1h30min',
+            'equipment_audio_recorder': False, 'equipment_stabilizer': False, 'equipment_external_light': False,
+            'team_videographer': 1, 'team_operator': 0, 'team_assistant': 0,
+            'delivery_online': True, 'delivery_usb': False
+        }
+    }
+    
     context = {
         'project': project,
         'form': form,
@@ -206,6 +273,7 @@ def project_detail(request, slug):
         'modifications': modifications,
         'is_admin': request.user.is_admin(),
         'ceremony_fields': ceremony_fields,
+        'package_presets': json.dumps(package_presets),
     }
     
     return render(request, 'project_detail.html', context)
@@ -441,10 +509,26 @@ def update_project_field(request, slug):
         
         # Handle different field types
         field = project._meta.get_field(field_name)
-        if hasattr(field, 'choices') and field.choices:
+        
+        # Handle boolean fields
+        if field.__class__.__name__ == 'BooleanField':
+            if isinstance(field_value, str):
+                field_value = field_value.lower() in ('true', '1', 'yes', 'on')
+            elif not isinstance(field_value, bool):
+                field_value = bool(field_value)
+        
+        # Handle integer fields
+        elif field.__class__.__name__ == 'IntegerField':
+            try:
+                field_value = int(field_value) if field_value != '' else 0
+            except (ValueError, TypeError):
+                return JsonResponse({'error': f'Invalid integer value for {field_name}'}, status=400)
+        
+        # Handle choice fields
+        elif hasattr(field, 'choices') and field.choices:
             # Validate choice field
             valid_choices = [choice[0] for choice in field.choices]
-            if field_value not in valid_choices:
+            if field_value not in valid_choices and field_value != '':
                 return JsonResponse({'error': 'Invalid choice'}, status=400)
         
         # Track modifications if client is editing
@@ -515,6 +599,116 @@ def update_project_field(request, slug):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def batch_update_project(request, slug):
+    """Update multiple project fields in a single request (for package presets)"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    project = get_object_or_404(Project, slug=slug)
+    
+    # Check permissions
+    if not request.user.is_admin() and project.user != request.user:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    try:
+        updates = json.loads(request.body)
+        print(f"📦 BATCH UPDATE REQUEST for {slug}: {updates}")
+        
+        if not isinstance(updates, dict):
+            return JsonResponse({'error': 'Updates must be a dictionary'}, status=400)
+        
+        updated_fields = []
+        
+        for field_name, field_value in updates.items():
+            # Validate field exists on model
+            if not hasattr(project, field_name):
+                continue  # Skip invalid fields
+            
+            try:
+                field = project._meta.get_field(field_name)
+                
+                # Handle boolean fields
+                if field.__class__.__name__ == 'BooleanField':
+                    if isinstance(field_value, str):
+                        field_value = field_value.lower() in ('true', '1', 'yes', 'on')
+                    elif not isinstance(field_value, bool):
+                        field_value = bool(field_value)
+                
+                # Handle integer fields
+                elif field.__class__.__name__ == 'IntegerField':
+                    try:
+                        field_value = int(field_value) if field_value != '' else 0
+                    except (ValueError, TypeError):
+                        continue  # Skip invalid values
+                
+                # Handle choice fields
+                elif hasattr(field, 'choices') and field.choices:
+                    valid_choices = [choice[0] for choice in field.choices]
+                    if field_value not in valid_choices and field_value != '':
+                        continue  # Skip invalid choices
+                
+                # Set the field value
+                setattr(project, field_name, field_value)
+                updated_fields.append(field_name)
+                
+            except Exception:
+                continue  # Skip fields that cause errors
+        
+        # Save all changes at once
+        print(f"💾 SAVING {len(updated_fields)} fields: {updated_fields}")
+        project.has_unsent_changes = True
+        
+        try:
+            project.save()
+            print(f"✅ PROJECT SAVED SUCCESSFULLY")
+        except Exception as save_error:
+            print(f"❌ DATABASE SAVE ERROR: {save_error}")
+            return JsonResponse({'error': f'Database error: {str(save_error)}'}, status=500)
+        
+        # Track modifications if client is editing
+        if request.user.is_client() and updated_fields:
+            try:
+                for field_name in updated_fields:
+                    ProjectModification.objects.create(
+                        project=project,
+                        field_name=field_name,
+                        old_value='',
+                        new_value=str(getattr(project, field_name)),
+                        created_by=request.user,
+                        status='PENDING'
+                    )
+                print(f"📝 CREATED {len(updated_fields)} MODIFICATION RECORDS")
+            except Exception as mod_error:
+                print(f"⚠️ MODIFICATION TRACKING ERROR: {mod_error}")
+                # Don't fail the whole request for tracking errors
+        
+        # Notify admin if client made changes
+        if request.user.is_client() and updated_fields and project.should_notify_admin():
+            try:
+                project.notify_admin_of_changes()
+                print(f"📧 ADMIN NOTIFICATION SENT")
+            except Exception as notify_error:
+                print(f"⚠️ NOTIFICATION ERROR: {notify_error}")
+                # Don't fail the whole request for notification errors
+        
+        print(f"🎉 BATCH UPDATE COMPLETED SUCCESSFULLY")
+        return JsonResponse({
+            'success': True,
+            'updated_fields': updated_fields,
+            'pending_approval': request.user.is_client()
+        })
+        
+    except json.JSONDecodeError as json_error:
+        print(f"❌ JSON DECODE ERROR: {json_error}")
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        print(f"❌ BATCH UPDATE ERROR: {e}")
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
 
 

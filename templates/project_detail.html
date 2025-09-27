@@ -342,7 +342,7 @@
                     {% if is_admin %}
                     <span class="badge bg-primary ms-2">Admin Editable</span>
                     {% else %}
-                    <span class="badge bg-secondary ms-2">View Only</span>
+                    <span class="badge bg-secondary ms-2">Client View</span>
                     {% endif %}
                 </div>
                 {% if is_admin %}
@@ -353,6 +353,7 @@
             </div>
             <div class="card-body">
                 {% if is_admin %}
+                <!-- Admin View - Editable Package Section -->
                 <!-- Package Type -->
                 <div class="mb-3">
                     <label class="form-label">Package Type</label>
@@ -373,23 +374,28 @@
                     </div>
                 </div>
 
-                <!-- 4K -->
+                <!-- Size Format -->
                 <div class="mb-3">
-                    <label class="form-label">4K</label>
+                    <label class="form-label">Size Format</label>
                     <div class="view-mode">
-                        <p class="form-control-plaintext">
-                            {% if project.package_4k %}
-                            <i class="bi bi-check-circle text-success"></i> Yes
-                            {% else %}
-                            <i class="bi bi-x-circle text-danger"></i> No
+                        <div class="form-control-plaintext">
+                            {% if project.package_4k %}<i class="bi bi-check text-success"></i> 4K<br>{% endif %}
+                            {% if project.package_fullhd %}<i class="bi bi-check text-success"></i> FullHD<br>{% endif %}
+                            {% if not project.package_4k and not project.package_fullhd %}
+                                <span class="text-muted">No format selected</span>
                             {% endif %}
-                        </p>
+                        </div>
                     </div>
                     <div class="edit-mode" style="display: none;">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" data-field="package_4k" 
                                    {% if project.package_4k %}checked{% endif %}>
                             <label class="form-check-label">4K</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" data-field="package_fullhd" 
+                                   {% if project.package_fullhd %}checked{% endif %}>
+                            <label class="form-check-label">FullHD</label>
                         </div>
                     </div>
                 </div>
@@ -424,31 +430,60 @@
                     <label class="form-label">Montages</label>
                     <div class="view-mode">
                         <div class="form-control-plaintext">
+                            <!-- 1. Highlights clip -->
                             {% if project.montage_highlights %}<i class="bi bi-check text-success"></i> Highlights clip<br>{% endif %}
+                            
+                            <!-- 2. Cinema style movie -->
+                            {% if project.montage_bonus_full %}
+                                <i class="bi bi-check text-success"></i> Cinema style movie
+                                {% if project.montage_cinema_duration %}
+                                    ({{ project.get_montage_cinema_duration_display }})
+                                {% endif %}<br>
+                            {% endif %}
+                            
+                            <!-- 3. Full length movie -->
                             {% if project.montage_movie %}
-                                <i class="bi bi-check text-success"></i> Movie
+                                <i class="bi bi-check text-success"></i> Full length movie
                                 {% if project.montage_movie_duration %}
                                     ({{ project.get_montage_movie_duration_display }}
                                     {% if project.montage_movie_duration == 'Other' and project.montage_movie_other %}: {{ project.montage_movie_other }}{% endif %})
                                 {% endif %}<br>
                             {% endif %}
+                            
+                            <!-- 4. Primary edit -->
                             {% if project.montage_bonus_primary %}<i class="bi bi-check text-success"></i> Primary edit (aprox 4 h)<br>{% endif %}
-                            {% if project.montage_bonus_full %}<i class="bi bi-check text-success"></i> Full Movie<br>{% endif %}
+                            
                             {% if not project.montage_highlights and not project.montage_movie and not project.montage_bonus_primary and not project.montage_bonus_full %}
                                 <span class="text-muted">No montages selected</span>
                             {% endif %}
                         </div>
                     </div>
                     <div class="edit-mode" style="display: none;">
+                        <!-- 1. Highlights clip -->
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" data-field="montage_highlights"
                                    {% if project.montage_highlights %}checked{% endif %}>
                             <label class="form-check-label">Highlights clip</label>
                         </div>
+                        
+                        <!-- 2. Cinema style movie -->
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" data-field="montage_bonus_full"
+                                   {% if project.montage_bonus_full %}checked{% endif %}>
+                            <label class="form-check-label">Cinema style movie</label>
+                        </div>
+                        <div class="ms-3 mb-2" id="cinema-duration-section" style="{% if not project.montage_bonus_full %}display: none;{% endif %}">
+                            <select class="form-control form-control-sm" data-field="montage_cinema_duration">
+                                <option value="1h" {% if project.montage_cinema_duration == '1h' %}selected{% endif %}>1 hour</option>
+                                <option value="1h30min" {% if project.montage_cinema_duration == '1h30min' or not project.montage_cinema_duration %}selected{% endif %}>1h30min</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 3. Full length movie -->
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" data-field="montage_movie"
                                    {% if project.montage_movie %}checked{% endif %}>
-                            <label class="form-check-label">Movie</label>
+                            <label class="form-check-label">Full length movie</label>
                         </div>
                         <div class="ms-3 mb-2" id="movie-duration-section" style="{% if not project.montage_movie %}display: none;{% endif %}">
                             <select class="form-control form-control-sm" data-field="montage_movie_duration">
@@ -457,7 +492,7 @@
                                 <option value="1h" {% if project.montage_movie_duration == '1h' %}selected{% endif %}>1 h</option>
                                 <option value="1h30min" {% if project.montage_movie_duration == '1h30min' %}selected{% endif %}>1h30min</option>
                                 <option value="2h-3h" {% if project.montage_movie_duration == '2h-3h' %}selected{% endif %}>2h-3h</option>
-                                <option value="3h+" {% if project.montage_movie_duration == '3h+' %}selected{% endif %}>3h+</option>
+                                <option value="3h-4h" {% if project.montage_movie_duration == '3h-4h' %}selected{% endif %}>3h-4h</option>
                                 <option value="Other" {% if project.montage_movie_duration == 'Other' %}selected{% endif %}>Other</option>
                             </select>
                             <input type="text" class="form-control form-control-sm mt-1" 
@@ -465,15 +500,12 @@
                                    value="{{ project.montage_movie_other|default:'' }}"
                                    style="{% if project.montage_movie_duration != 'Other' %}display: none;{% endif %}">
                         </div>
+                        
+                        <!-- 4. Primary edit -->
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" data-field="montage_bonus_primary"
                                    {% if project.montage_bonus_primary %}checked{% endif %}>
                             <label class="form-check-label">Primary edit (aprox 4 h)</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" data-field="montage_bonus_full"
-                                   {% if project.montage_bonus_full %}checked{% endif %}>
-                            <label class="form-check-label">Full Movie</label>
                         </div>
                     </div>
                 </div>
@@ -610,16 +642,16 @@
                         <p class="form-control-plaintext">{{ project.package_type|default:"Not specified" }}</p>
                     </div>
                     
-                    <!-- 4K -->
+                    <!-- Size Format -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold">4K</label>
-                        <p class="form-control-plaintext">
-                            {% if project.package_4k %}
-                            <i class="bi bi-check-circle text-success"></i> Yes
-                            {% else %}
-                            <i class="bi bi-x-circle text-danger"></i> No
+                        <label class="form-label fw-bold">Size Format</label>
+                        <div class="form-control-plaintext">
+                            {% if project.package_4k %}<i class="bi bi-check text-success"></i> 4K<br>{% endif %}
+                            {% if project.package_fullhd %}<i class="bi bi-check text-success"></i> FullHD<br>{% endif %}
+                            {% if not project.package_4k and not project.package_fullhd %}
+                                <span class="text-muted">No format selected</span>
                             {% endif %}
-                        </p>
+                        </div>
                     </div>
                     
                     <!-- Number of Cameras -->
@@ -634,14 +666,14 @@
                         <div class="form-control-plaintext">
                             {% if project.montage_highlights %}<i class="bi bi-check text-success"></i> Highlights clip<br>{% endif %}
                             {% if project.montage_movie %}
-                                <i class="bi bi-check text-success"></i> Movie
+                                <i class="bi bi-check text-success"></i> Full length movie
                                 {% if project.montage_movie_duration %}
                                     ({{ project.get_montage_movie_duration_display }}
                                     {% if project.montage_movie_duration == 'Other' and project.montage_movie_other %}: {{ project.montage_movie_other }}{% endif %})
                                 {% endif %}<br>
                             {% endif %}
                             {% if project.montage_bonus_primary %}<i class="bi bi-check text-success"></i> Primary edit (aprox 4 h)<br>{% endif %}
-                            {% if project.montage_bonus_full %}<i class="bi bi-check text-success"></i> Full Movie<br>{% endif %}
+                            {% if project.montage_bonus_full %}<i class="bi bi-check text-success"></i> Cinema style movie<br>{% endif %}
                             {% if not project.montage_highlights and not project.montage_movie and not project.montage_bonus_primary and not project.montage_bonus_full %}
                                 <span class="text-muted">No montages selected</span>
                             {% endif %}
@@ -805,23 +837,64 @@
 let originalValues = {};
 
 function toggleEdit(section) {
-    console.log('toggleEdit called for section:', section);
     const sectionElement = document.querySelector(`[data-section="${section}"]`);
-    console.log('sectionElement found:', sectionElement);
     const viewModes = sectionElement.querySelectorAll('.view-mode');
     const editModes = sectionElement.querySelectorAll('.edit-mode');
     const editBtn = sectionElement.querySelector('.edit-btn');
     const editActions = sectionElement.querySelector('.edit-actions');
-    console.log('viewModes:', viewModes.length, 'editModes:', editModes.length, 'editActions:', editActions);
     
     // Store original values
     originalValues[section] = {};
-    editModes.forEach(editMode => {
-        const field = editMode.querySelector('[data-field]');
-        if (field) {
-            const fieldName = field.getAttribute('data-field');
-            originalValues[section][fieldName] = field.value;
+    const allFields = sectionElement.querySelectorAll('.edit-mode [data-field]');
+    allFields.forEach(field => {
+        const fieldName = field.getAttribute('data-field');
+        let fieldValue;
+        
+        // Handle different field types
+        if (field.type === 'checkbox') {
+            fieldValue = field.checked;
+        } else if (field.type === 'radio') {
+            // For radio buttons, we need to find the checked one in the group
+            const radioGroup = sectionElement.querySelectorAll(`input[type="radio"][data-field="${fieldName}"]`);
+            fieldValue = '';
+            radioGroup.forEach(radio => {
+                if (radio.checked) {
+                    fieldValue = radio.value;
+                }
+            });
+        } else {
+            fieldValue = field.value;
         }
+        
+        // Store the original value (always store, even if empty)
+        originalValues[section][fieldName] = fieldValue;
+        console.log(`📝 Stored original ${fieldName}: "${fieldValue}" (${typeof fieldValue})`);
+    });
+    
+    // Also handle hidden fields that might not be visible but need to be tracked
+    const hiddenFields = sectionElement.querySelectorAll('.edit-mode [data-field]');
+    hiddenFields.forEach(field => {
+        const fieldName = field.getAttribute('data-field');
+        // Skip if already processed
+        if (originalValues[section][fieldName] !== undefined) return;
+        
+        let fieldValue;
+        if (field.type === 'checkbox') {
+            fieldValue = field.checked;
+        } else if (field.type === 'radio') {
+            const radioGroup = sectionElement.querySelectorAll(`input[type="radio"][data-field="${fieldName}"]`);
+            fieldValue = '';
+            radioGroup.forEach(radio => {
+                if (radio.checked) {
+                    fieldValue = radio.value;
+                }
+            });
+        } else {
+            fieldValue = field.value;
+        }
+        
+        originalValues[section][fieldName] = fieldValue;
+        console.log(`Stored hidden original ${fieldName}: "${fieldValue}"`);
     });
     
     // Toggle visibility
@@ -842,12 +915,19 @@ function cancelEdit(section) {
     
     // Restore original values
     if (originalValues[section]) {
-        editModes.forEach(editMode => {
-            const field = editMode.querySelector('[data-field]');
-            if (field) {
-                const fieldName = field.getAttribute('data-field');
-                if (originalValues[section][fieldName] !== undefined) {
-                    field.value = originalValues[section][fieldName];
+        const allFields = sectionElement.querySelectorAll('.edit-mode [data-field]');
+        allFields.forEach(field => {
+            const fieldName = field.getAttribute('data-field');
+            const originalValue = originalValues[section][fieldName];
+            
+            if (originalValue !== undefined) {
+                // Handle different field types
+                if (field.type === 'checkbox') {
+                    field.checked = originalValue;
+                } else if (field.type === 'radio') {
+                    field.checked = (field.value === originalValue);
+                } else {
+                    field.value = originalValue;
                 }
             }
         });
@@ -863,6 +943,8 @@ function cancelEdit(section) {
 }
 
 function saveSection(section) {
+    console.log(`💾 STARTING SAVE for section: ${section}`);
+    
     const sectionElement = document.querySelector(`[data-section="${section}"]`);
     const editModes = sectionElement.querySelectorAll('.edit-mode');
     const saveBtn = sectionElement.querySelector('.edit-actions .btn-success');
@@ -871,42 +953,118 @@ function saveSection(section) {
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
     
-    // Collect all field changes in this section
-    const promises = [];
-    editModes.forEach(editMode => {
-        const field = editMode.querySelector('[data-field]');
-        if (field) {
-            const fieldName = field.getAttribute('data-field');
-            const fieldValue = field.value;
-            
-            // Only save if value changed
-            if (originalValues[section] && originalValues[section][fieldName] !== fieldValue) {
-                promises.push(updateField(fieldName, fieldValue));
+    // Debug: Show all current field values
+    console.log(`📊 CURRENT FIELD VALUES for ${section}:`);
+    const allFieldsDebug = sectionElement.querySelectorAll('.edit-mode [data-field]');
+    allFieldsDebug.forEach(field => {
+        const fieldName = field.getAttribute('data-field');
+        let currentValue;
+        if (field.type === 'checkbox') {
+            currentValue = field.checked;
+        } else if (field.type === 'radio') {
+            if (field.checked) currentValue = field.value;
+            else return; // Skip unchecked radios for debug
+        } else {
+            currentValue = field.value;
+        }
+        console.log(`  ${fieldName}: ${currentValue} (${typeof currentValue})`);
+    });
+    
+    // Collect all field changes in this section for BATCH UPDATE
+    const changedFields = {};
+    const allFields = sectionElement.querySelectorAll('.edit-mode [data-field]');
+    
+    allFields.forEach(field => {
+        const fieldName = field.getAttribute('data-field');
+        let fieldValue;
+        
+        // Handle different field types
+        if (field.type === 'checkbox') {
+            fieldValue = field.checked;
+        } else if (field.type === 'radio') {
+            // For radio buttons, find the checked one in the group
+            const radioGroup = sectionElement.querySelectorAll(`input[type="radio"][data-field="${fieldName}"]`);
+            fieldValue = '';
+            radioGroup.forEach(radio => {
+                if (radio.checked) {
+                    fieldValue = radio.value;
+                }
+            });
+            // Skip processing if this isn't the checked radio (avoid duplicates)
+            if (!field.checked) {
+                return;
             }
+        } else {
+            // Handle text inputs, textareas, selects
+            fieldValue = field.value;
+        }
+        
+        // Only include if value changed
+        const originalValue = originalValues[section] && originalValues[section][fieldName];
+        
+        // Special debugging for package_type
+        if (fieldName === 'package_type') {
+            console.log(`🔍 PACKAGE_TYPE DEBUG: Original="${originalValue}", Current="${fieldValue}", Section="${section}"`);
+            console.log('🔍 All original values for section:', originalValues[section]);
+        }
+        
+        if (originalValue !== fieldValue) {
+            console.log(`🔄 Field ${fieldName}: "${originalValue}" → "${fieldValue}"`);
+            changedFields[fieldName] = fieldValue;
+        } else {
+            console.log(`⏭️ Field ${fieldName}: No change (${fieldValue})`);
         }
     });
     
-    if (promises.length === 0) {
+    if (Object.keys(changedFields).length === 0) {
         // No changes made
+        console.log('📝 No changes detected, canceling edit mode');
         cancelEdit(section);
         return;
     }
     
-    // Wait for all field updates to complete
-    Promise.all(promises)
-        .then(results => {
-            const hasErrors = results.some(result => !result.success);
-            if (hasErrors) {
-                const errors = results.filter(r => !r.success).map(r => r.error);
-                showMessage('Some fields could not be saved: ' + errors.join(', '), 'error');
+    console.log(`📦 BATCH UPDATE: Sending ${Object.keys(changedFields).length} fields in single request:`, changedFields);
+    
+    // Send all changes in a single batch update request
+    const batchUpdatePromise = fetch(`/projects/{{ project.slug }}/batch-update/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(changedFields)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(`📥 BATCH UPDATE RESPONSE:`, data);
+        if (data.success) {
+            return { success: true, pending_approval: data.pending_approval };
+        } else {
+            return { success: false, error: data.error || 'Batch update failed' };
+        }
+    })
+    .catch(error => {
+        console.error('❌ BATCH UPDATE ERROR:', error);
+        return { success: false, error: 'Network error: ' + error.message };
+    });
+    
+    // Wait for batch update to complete
+    batchUpdatePromise
+        .then(result => {
+            console.log(`💾 BATCH SAVE RESULT for ${section}:`, result);
+            
+            if (!result.success) {
+                console.log('❌ BATCH SAVE ERROR:', result.error);
+                showMessage('Error saving changes: ' + result.error, 'error');
             } else {
+                console.log(`✅ ALL ${Object.keys(changedFields).length} FIELDS SAVED SUCCESSFULLY for ${section}`);
+                
                 // Update view mode with new values
                 updateViewMode(section);
                 cancelEdit(section);
                 
                 // Show success message
-                const hasApprovalPending = results.some(r => r.pending_approval);
-                if (hasApprovalPending) {
+                if (result.pending_approval) {
                     showMessage('Changes submitted for admin approval', 'info');
                 } else {
                     showMessage('Changes saved successfully', 'success');
@@ -926,6 +1084,11 @@ function saveSection(section) {
 }
 
 function updateField(fieldName, fieldValue) {
+    // Special debugging for package_type
+    if (fieldName === 'package_type') {
+        console.log(`🚀 SENDING TO SERVER: ${fieldName} = "${fieldValue}"`);
+    }
+    
     return fetch(`/projects/{{ project.slug }}/update-field/`, {
         method: 'POST',
         headers: {
@@ -939,6 +1102,11 @@ function updateField(fieldName, fieldValue) {
     })
     .then(response => response.json())
     .then(data => {
+        // Special debugging for package_type
+        if (fieldName === 'package_type') {
+            console.log(`📥 SERVER RESPONSE for ${fieldName}:`, data);
+        }
+        
         if (data.success) {
             return { success: true, pending_approval: data.pending_approval };
         } else {
@@ -1329,21 +1497,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Inline editing handlers
-    console.log('Setting up edit button handlers...');
-    
-    // Debug: Check if Package section exists
-    const packageSection = document.querySelector('[data-section="package"]');
-    console.log('Package section found:', packageSection);
-    const packageEditBtn = document.querySelector('[data-section="package"] .edit-btn');
-    console.log('Package edit button found:', packageEditBtn);
-    
-    const editButtons = document.querySelectorAll('.edit-btn');
-    console.log('Found edit buttons:', editButtons.length);
-    editButtons.forEach((btn, index) => {
-        console.log(`Edit button ${index}:`, btn, 'data-section:', btn.getAttribute('data-section'));
+    document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const section = this.getAttribute('data-section');
-            console.log('Edit button clicked for section:', section);
             if (section) toggleEdit(section);
         });
     });
@@ -1486,8 +1642,342 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Package section movie duration handling (will be handled by inline editing system)
-    // Movie duration interactions will be handled when the section is in edit mode    
+    // Movie duration dropdown handling
+    const movieCheckbox = document.querySelector('input[data-field="montage_movie"]');
+    const durationSection = document.getElementById('movie-duration-section');
+    const durationSelect = document.querySelector('select[data-field="montage_movie_duration"]');
+    const otherInput = document.querySelector('input[data-field="montage_movie_other"]');
+    
+    if (movieCheckbox && durationSection) {
+        movieCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                durationSection.style.display = 'block';
+            } else {
+                durationSection.style.display = 'none';
+                // Clear duration fields when movie is unchecked
+                if (durationSelect) {
+                    durationSelect.value = '';
+                    // Send update to clear duration
+                    updateField('montage_movie_duration', '');
+                }
+                if (otherInput) {
+                    otherInput.style.display = 'none';
+                    otherInput.value = '';
+                    // Send update to clear other duration
+                    updateField('montage_movie_other', '');
+                }
+            }
+            // Send the checkbox update
+            updateField('montage_movie', this.checked);
+        });
+    }
+    
+    if (durationSelect && otherInput) {
+        durationSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherInput.style.display = 'block';
+            } else {
+                otherInput.style.display = 'none';
+                otherInput.value = '';
+                // Clear other duration when not "Other"
+                updateField('montage_movie_other', '');
+            }
+            // Send the duration update
+            updateField('montage_movie_duration', this.value);
+        });
+    }
+    
+    if (otherInput) {
+        otherInput.addEventListener('change', function() {
+            // Send the other duration update
+            updateField('montage_movie_other', this.value);
+        });
+    }
+    
+    // Enhanced real-time update listeners for package fields
+    function setupPackageFieldListeners() {
+        console.log('Setting up package field listeners...');
+        
+        // Package type dropdown
+        const packageTypeField = document.querySelector('select[data-field="package_type"]');
+        if (packageTypeField) {
+            packageTypeField.addEventListener('change', function() {
+                console.log(`📦 Package type changed to: ${this.value}`);
+                // Apply preset instantly if a valid type is selected (no server call)
+                if (this.value && packagePresets[this.value]) {
+                    console.log(`🎯 Applying preset for: ${this.value}`);
+                    applyPackagePreset(this.value);
+                } else {
+                    console.log(`⚠️ No preset found for: ${this.value}`);
+                }
+                // Note: Server save will happen when user clicks "Save" button
+            });
+        }
+        
+        // Size format checkboxes
+        const package4kField = document.querySelector('input[data-field="package_4k"]');
+        if (package4kField) {
+            package4kField.addEventListener('change', function() {
+                console.log('4K changed to:', this.checked);
+                updateFieldWithFeedback('package_4k', this.checked);
+            });
+        }
+        
+        const packageFullhdField = document.querySelector('input[data-field="package_fullhd"]');
+        if (packageFullhdField) {
+            packageFullhdField.addEventListener('change', function() {
+                console.log('FullHD changed to:', this.checked);
+                updateFieldWithFeedback('package_fullhd', this.checked);
+            });
+        }
+        
+        // Camera radio buttons - handle as a group
+        const cameraRadios = document.querySelectorAll('input[data-field="package_cameras"]');
+        cameraRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    console.log('Cameras changed to:', this.value);
+                    updateFieldWithFeedback('package_cameras', this.value);
+                }
+            });
+        });
+        
+        // Montage checkboxes (excluding special ones)
+        const montageHighlights = document.querySelector('input[data-field="montage_highlights"]');
+        if (montageHighlights) {
+            montageHighlights.addEventListener('change', function() {
+                console.log('Highlights changed to:', this.checked);
+                updateFieldWithFeedback('montage_highlights', this.checked);
+            });
+        }
+        
+        const montageMovie = document.querySelector('input[data-field="montage_movie"]');
+        if (montageMovie) {
+            montageMovie.addEventListener('change', function() {
+                console.log('Movie changed to:', this.checked);
+                updateFieldWithFeedback('montage_movie', this.checked);
+                
+                // Show/hide movie duration section
+                const durationSection = document.getElementById('movie-duration-section');
+                if (durationSection) {
+                    if (this.checked) {
+                        durationSection.style.display = 'block';
+                    } else {
+                        durationSection.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        const montageBonus = document.querySelector('input[data-field="montage_bonus_full"]');
+        if (montageBonus) {
+            montageBonus.addEventListener('change', function() {
+                console.log('Cinema style movie changed to:', this.checked);
+                updateFieldWithFeedback('montage_bonus_full', this.checked);
+                
+                // Show/hide cinema duration section
+                const cinemaDurationSection = document.getElementById('cinema-duration-section');
+                if (cinemaDurationSection) {
+                    if (this.checked) {
+                        cinemaDurationSection.style.display = 'block';
+                    } else {
+                        cinemaDurationSection.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        const cinemaDuration = document.querySelector('select[data-field="montage_cinema_duration"]');
+        if (cinemaDuration) {
+            cinemaDuration.addEventListener('change', function() {
+                console.log('Cinema duration changed to:', this.value);
+                updateFieldWithFeedback('montage_cinema_duration', this.value);
+            });
+        }
+        
+        const montagePrimary = document.querySelector('input[data-field="montage_bonus_primary"]');
+        if (montagePrimary) {
+            montagePrimary.addEventListener('change', function() {
+                console.log('Primary edit changed to:', this.checked);
+                updateFieldWithFeedback('montage_bonus_primary', this.checked);
+            });
+        }
+        
+        
+        // Equipment checkboxes
+        const equipmentFields = ['equipment_audio_recorder', 'equipment_stabilizer', 'equipment_external_light'];
+        equipmentFields.forEach(fieldName => {
+            const field = document.querySelector(`input[data-field="${fieldName}"]`);
+            if (field) {
+                field.addEventListener('change', function() {
+                    console.log(`${fieldName} changed to:`, this.checked);
+                    updateFieldWithFeedback(fieldName, this.checked);
+                });
+            }
+        });
+        
+        // Team number fields
+        const teamFields = ['team_videographer', 'team_operator', 'team_assistant'];
+        teamFields.forEach(fieldName => {
+            const field = document.querySelector(`input[data-field="${fieldName}"]`);
+            if (field) {
+                field.addEventListener('change', function() {
+                    console.log(`${fieldName} changed to:`, this.value);
+                    updateFieldWithFeedback(fieldName, this.value);
+                });
+            }
+        });
+        
+        // Delivery checkboxes
+        const deliveryOnline = document.querySelector('input[data-field="delivery_online"]');
+        if (deliveryOnline) {
+            deliveryOnline.addEventListener('change', function() {
+                console.log('Online delivery changed to:', this.checked);
+                updateFieldWithFeedback('delivery_online', this.checked);
+            });
+        }
+        
+        const deliveryUsb = document.querySelector('input[data-field="delivery_usb"]');
+        if (deliveryUsb) {
+            deliveryUsb.addEventListener('change', function() {
+                console.log('USB delivery changed to:', this.checked);
+                updateFieldWithFeedback('delivery_usb', this.checked);
+            });
+        }
+        
+        // Event presence textarea
+        const eventPresence = document.querySelector('textarea[data-field="event_presence"]');
+        if (eventPresence) {
+            eventPresence.addEventListener('blur', function() {
+                console.log('Event presence changed to:', this.value);
+                updateFieldWithFeedback('event_presence', this.value);
+            });
+        }
+    }
+    
+    // Load package presets from server (loaded once)
+    const packagePresets = JSON.parse('{{ package_presets|escapejs }}');
+    console.log('📦 Package presets loaded:', packagePresets);
+    
+    // Brief success indicator for fields
+    function showFieldSuccess(fieldName) {
+        const field = document.querySelector(`[data-field="${fieldName}"]`);
+        if (field) {
+            field.style.borderColor = '#28a745';
+            setTimeout(() => {
+                field.style.borderColor = '';
+            }, 1000);
+        }
+    }
+    
+    // Initialize package field listeners
+    setupPackageFieldListeners();
+
+    // Remove duplicate package type handler - it's now handled in setupPackageFieldListeners
+    
+    // Simple and fast package preset application (no server calls during preset selection)
+    function applyPackagePreset(presetName) {
+        console.log(`🎯 APPLYING PRESET: ${presetName}`);
+        const preset = packagePresets[presetName];
+        if (!preset) {
+            console.error('Preset not found:', presetName);
+            return;
+        }
+        
+        console.log(`📋 PRESET DATA for ${presetName}:`, preset);
+        
+        // Apply all values instantly from the loaded preset data
+        Object.keys(preset).forEach(fieldName => {
+            const value = preset[fieldName];
+            
+            // Handle checkboxes
+            const checkbox = document.querySelector(`input[type="checkbox"][data-field="${fieldName}"]`);
+            if (checkbox) {
+                const oldValue = checkbox.checked;
+                checkbox.checked = value;
+                console.log(`✓ ${fieldName}: ${oldValue} → ${value} (checkbox)`);
+                return;
+            }
+            
+            // Handle radio buttons (cameras)
+            if (fieldName === 'package_cameras') {
+                const radios = document.querySelectorAll(`input[type="radio"][data-field="${fieldName}"]`);
+                let oldValue = '';
+                radios.forEach(radio => {
+                    if (radio.checked) oldValue = radio.value;
+                    radio.checked = (radio.value == value);
+                });
+                console.log(`✓ ${fieldName}: ${oldValue} → ${value} (radio)`);
+                return;
+            }
+            
+            // Handle number inputs
+            const numberInput = document.querySelector(`input[type="number"][data-field="${fieldName}"]`);
+            if (numberInput) {
+                const oldValue = numberInput.value;
+                numberInput.value = value;
+                console.log(`✓ ${fieldName}: ${oldValue} → ${value} (number)`);
+                return;
+            }
+            
+            // Handle select dropdowns (cinema duration)
+            const selectInput = document.querySelector(`select[data-field="${fieldName}"]`);
+            if (selectInput) {
+                const oldValue = selectInput.value;
+                selectInput.value = value;
+                console.log(`✓ ${fieldName}: ${oldValue} → ${value} (select)`);
+                return;
+            }
+            
+            console.log(`⚠️ FIELD NOT FOUND: ${fieldName} (value: ${value})`);
+        });
+        
+        // Handle movie duration visibility
+        const movieCheckbox = document.querySelector('input[data-field="montage_movie"]');
+        const durationSection = document.getElementById('movie-duration-section');
+        if (movieCheckbox && durationSection) {
+            if (preset.montage_movie) {
+                durationSection.style.display = 'block';
+            } else {
+                durationSection.style.display = 'none';
+            }
+        }
+        
+        // Handle cinema duration visibility
+        const cinemaCheckbox = document.querySelector('input[data-field="montage_bonus_full"]');
+        const cinemaDurationSection = document.getElementById('cinema-duration-section');
+        if (cinemaCheckbox && cinemaDurationSection) {
+            if (preset.montage_bonus_full) {
+                cinemaDurationSection.style.display = 'block';
+            } else {
+                cinemaDurationSection.style.display = 'none';
+            }
+        }
+        
+        console.log('✅ Package preset applied instantly - no server call needed!');
+        
+        // CRITICAL FIX: Update original values to reflect the preset changes
+        // This ensures that when Save is clicked, the changes are detected properly
+        if (!originalValues['package']) {
+            originalValues['package'] = {};
+        }
+        
+        // Reset original values to empty/default so preset changes are detected as changes
+        Object.keys(preset).forEach(fieldName => {
+            // Set original value to something different so the change is detected
+            if (typeof preset[fieldName] === 'boolean') {
+                originalValues['package'][fieldName] = !preset[fieldName]; // Opposite boolean
+            } else if (typeof preset[fieldName] === 'number') {
+                originalValues['package'][fieldName] = 0; // Default number
+            } else {
+                originalValues['package'][fieldName] = ''; // Empty string
+            }
+            console.log(`🔄 Updated original ${fieldName}: "${originalValues['package'][fieldName]}" (will detect change to "${preset[fieldName]}")`);
+        });
+        
+        // Show immediate success message
+        showMessage('Package preset applied instantly!', 'success');
+    }
 });
 </script>
 

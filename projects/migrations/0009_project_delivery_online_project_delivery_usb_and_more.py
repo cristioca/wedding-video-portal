@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='project',
             name='montage_movie_duration',
-            field=models.CharField(blank=True, choices=[('30min', '30 min'), ('1h', '1 h'), ('1h30min', '1h30min'), ('2h-3h', '2h-3h'), ('3h+', '3h+'), ('Other', 'Other')], max_length=20, null=True),
+            field=models.CharField(blank=True, choices=[('30min', '30 min'), ('1h', '1 h'), ('1h30min', '1h30min'), ('2h-3h', '2h-3h'), ('3h-4h', '3h-4h'), ('Other', 'Other')], max_length=20, null=True),
         ),
         migrations.AddField(
             model_name='project',

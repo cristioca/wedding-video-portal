@@ -17,5 +17,6 @@ urlpatterns = [
     path('<str:slug>/send-credentials/', views.send_credentials, name='send_credentials'),
     path('<str:slug>/change-client-data/', views.change_client_data, name='change_client_data'),
     path('<str:slug>/update-field/', views.update_project_field, name='update_project_field'),
+    path('<str:slug>/batch-update/', views.batch_update_project, name='batch_update_project'),
     path('<str:slug>/update-field-order/', views.update_field_order, name='update_field_order'),
 ]
