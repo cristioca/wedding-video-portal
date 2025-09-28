@@ -1115,6 +1115,35 @@
     margin-bottom: 5px;
     color: #adb5bd;
 }
+
+/* Empty Field Highlighting */
+.field-empty {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+    border-left: 3px solid #ffc107 !important;
+    position: relative;
+    padding: 8px 12px !important;
+    border-radius: 4px;
+    margin: 2px 0;
+}
+
+.field-empty::after {
+    content: "⚠️ Not filled";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: #856404;
+    background: rgba(255, 193, 7, 0.2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.field-empty.form-control-plaintext {
+    color: #856404 !important;
+    font-style: italic;
+}
 </style>
 
 <!-- Load SortableJS from CDN -->
@@ -1123,6 +1152,42 @@
 <script>
 // Store original values for cancel functionality
 let originalValues = {};
+
+// Function to highlight empty fields
+function highlightEmptyFields() {
+    console.log('🔍 Checking for empty fields...');
+    
+    // Find all view-mode paragraphs and check if they're empty
+    document.querySelectorAll('.view-mode .form-control-plaintext').forEach(field => {
+        const text = field.textContent.trim();
+        const isEmpty = text === 'Not specified' || text === '' || text === 'Not filled' || text === 'No production notes yet' || text === 'No additional equipment' || text === 'No montages selected' || text === 'No format selected' || text === 'No delivery method selected';
+        
+        if (isEmpty) {
+            field.classList.add('field-empty');
+            console.log('⚠️ Empty field found:', text);
+        } else {
+            field.classList.remove('field-empty');
+        }
+    });
+    
+    // Also check delivery medium and other multi-option fields
+    document.querySelectorAll('.view-mode .form-control-plaintext').forEach(field => {
+        const parent = field.closest('.mb-3');
+        if (parent) {
+            const label = parent.querySelector('.form-label');
+            if (label) {
+                const labelText = label.textContent.trim();
+                const fieldText = field.textContent.trim();
+                
+                // Special cases for specific field types
+                if ((labelText.includes('Format') || labelText.includes('Montages') || labelText.includes('Equipment') || labelText.includes('Delivery')) && 
+                    (fieldText.includes('No ') || fieldText.includes('Not '))) {
+                    field.classList.add('field-empty');
+                }
+            }
+        }
+    });
+}
 
 // Tab switching functionality
 function switchTab(tabName) {
@@ -1160,6 +1225,9 @@ function switchTab(tabName) {
             cancelEdit(sectionName);
         }
     });
+    
+    // Re-highlight empty fields in the new tab
+    setTimeout(() => highlightEmptyFields(), 100);
 }
 
 function toggleEdit(section) {
@@ -1461,6 +1529,9 @@ function updateViewMode(section) {
             }
         }
     });
+    
+    // Re-check empty fields after updating view mode
+    setTimeout(() => highlightEmptyFields(), 100);
 }
 
 function showMessage(message, type) {
@@ -2198,6 +2269,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize package field listeners
     setupPackageFieldListeners();
+    
+    // Initialize empty field highlighting
+    highlightEmptyFields();
 
     // Remove duplicate package type handler - it's now handled in setupPackageFieldListeners
     
