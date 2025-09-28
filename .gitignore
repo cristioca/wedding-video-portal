@@ -1,3 +1,5 @@
 node_modules
 .env
 .next/
+dbsqlite3
+__pycache__
