@@ -88,10 +88,34 @@
 
 <div class="row">
     <div class="col-lg-8">
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-info-circle"></i> Project Details
+        <!-- Project Phase Navigation -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="text-white mb-0">Project Workflow</h6>
+            <div class="btn-group" role="group" aria-label="Project phases">
+                <button type="button" class="btn btn-outline-secondary btn-sm active" id="preproduction-tab" onclick="switchTab('preproduction')">
+                    <i class="bi bi-clipboard-check"></i> Pre-production
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="production-tab" onclick="switchTab('production')">
+                    <i class="bi bi-film"></i> Production
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="download-tab" onclick="switchTab('download')" disabled>
+                    <i class="bi bi-download"></i> Download
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="approval-tab" onclick="switchTab('approval')" disabled>
+                    <i class="bi bi-check-circle"></i> Approval
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="feedback-tab" onclick="switchTab('feedback')" disabled>
+                    <i class="bi bi-chat-dots"></i> Feedback
+                </button>
             </div>
+        </div>
+
+        <!-- Pre-production Tab (Current Project Details) -->
+        <div class="tab-content" id="preproduction-content">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-info-circle"></i> Project Details
+                </div>
             <div class="card-body">
                 <!-- Basic Information -->
                 <div class="editable-section mb-4" data-section="basic">
@@ -328,6 +352,206 @@
                             <i class="bi bi-x"></i> Cancel
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Production Tab (Editing Phase) -->
+        <div class="tab-content" id="production-content" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-film"></i> Production & Editing
+                </div>
+                <div class="card-body">
+                    <!-- Editing Status -->
+                    <div class="editable-section mb-4" data-section="editing-status">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Editing Progress</h6>
+                            {% if is_admin %}
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-section="editing-status">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Current Phase</label>
+                                <div class="view-mode">
+                                    <p class="form-control-plaintext">{{ project.get_edit_status_display }}</p>
+                                </div>
+                                {% if is_admin %}
+                                <div class="edit-mode" style="display: none;">
+                                    <select class="form-control" data-field="edit_status">
+                                        {% for value, label in form.edit_status.field.choices %}
+                                        <option value="{{ value }}" {% if value == project.edit_status %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Progress</label>
+                                <div class="view-mode">
+                                    <div class="progress">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                    </div>
+                                    <small class="text-muted mt-1">Estimated completion</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if is_admin %}
+                        <div class="edit-actions" style="display: none;">
+                            <button class="btn btn-success btn-sm me-2 save-btn" data-section="editing-status">
+                                <i class="bi bi-check"></i> Save
+                            </button>
+                            <button class="btn btn-secondary btn-sm cancel-btn" data-section="editing-status">
+                                <i class="bi bi-x"></i> Cancel
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Editing Timeline -->
+                    <div class="editable-section mb-4" data-section="timeline">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Production Timeline</h6>
+                            {% if is_admin %}
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-section="timeline">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Raw Footage Received</h6>
+                                    <small class="text-muted">{{ project.created_at|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-warning"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Editing in Progress</h6>
+                                    <small class="text-muted">Current phase</small>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Client Review</h6>
+                                    <small class="text-muted">Pending</small>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Final Delivery</h6>
+                                    <small class="text-muted">Pending</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Editing Notes -->
+                    <div class="editable-section mb-4" data-section="editing-notes">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Production Notes</h6>
+                            {% if is_admin %}
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-section="editing-notes">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Editor Notes</label>
+                            <div class="view-mode">
+                                <p class="form-control-plaintext">{{ project.notes|default:"No production notes yet" }}</p>
+                            </div>
+                            {% if is_admin %}
+                            <div class="edit-mode" style="display: none;">
+                                <textarea class="form-control" data-field="notes" rows="4" placeholder="Add production notes, editing decisions, technical details...">{{ project.notes|default:'' }}</textarea>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if is_admin %}
+                        <div class="edit-actions" style="display: none;">
+                            <button class="btn btn-success btn-sm me-2 save-btn" data-section="editing-notes">
+                                <i class="bi bi-check"></i> Save
+                            </button>
+                            <button class="btn btn-secondary btn-sm cancel-btn" data-section="editing-notes">
+                                <i class="bi bi-x"></i> Cancel
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Version History -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Version History</h6>
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">Version 1.0 - Initial Cut</h6>
+                                        <p class="mb-1">First rough edit with basic timeline and music</p>
+                                        <small class="text-muted">Created 2 days ago</small>
+                                    </div>
+                                    <span class="badge bg-primary">Current</span>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">Version 0.5 - Raw Assembly</h6>
+                                        <p class="mb-1">Initial footage organization and selection</p>
+                                        <small class="text-muted">Created 5 days ago</small>
+                                    </div>
+                                    <span class="badge bg-secondary">Archive</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Future Tabs (Placeholder) -->
+        <div class="tab-content" id="download-content" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-download"></i> Download & Delivery
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Download functionality coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="approval-content" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-check-circle"></i> Client Approval
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Approval workflow coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="feedback-content" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-chat-dots"></i> Client Feedback
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Feedback system coming soon...</p>
                 </div>
             </div>
         </div>
@@ -827,6 +1051,70 @@
 .reorder-mode .field-content {
     pointer-events: none;
 }
+
+/* Tab System Styles */
+.btn-group .btn.active {
+    background-color: rgba(13, 110, 253, 0.8);
+    border-color: #0d6efd;
+    color: white;
+}
+
+.tab-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Timeline Styles */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+.timeline-content {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #0d6efd;
+}
+
+.timeline-content h6 {
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.timeline-content p {
+    margin-bottom: 5px;
+    color: #adb5bd;
+}
 </style>
 
 <!-- Load SortableJS from CDN -->
@@ -835,6 +1123,44 @@
 <script>
 // Store original values for cancel functionality
 let originalValues = {};
+
+// Tab switching functionality
+function switchTab(tabName) {
+    console.log(`🔄 Switching to tab: ${tabName}`);
+    
+    // Hide all tab contents
+    const allTabContents = document.querySelectorAll('.tab-content');
+    allTabContents.forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Remove active class from all tab buttons
+    const allTabButtons = document.querySelectorAll('.btn-group .btn');
+    allTabButtons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    const selectedContent = document.getElementById(`${tabName}-content`);
+    if (selectedContent) {
+        selectedContent.style.display = 'block';
+    }
+    
+    // Add active class to selected tab button
+    const selectedButton = document.getElementById(`${tabName}-tab`);
+    if (selectedButton) {
+        selectedButton.classList.add('active');
+    }
+    
+    // Cancel any active editing when switching tabs
+    const editingSections = document.querySelectorAll('.editable-section.editing');
+    editingSections.forEach(section => {
+        const sectionName = section.getAttribute('data-section');
+        if (sectionName) {
+            cancelEdit(sectionName);
+        }
+    });
+}
 
 function toggleEdit(section) {
     const sectionElement = document.querySelector(`[data-section="${section}"]`);
