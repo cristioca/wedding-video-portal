@@ -80,6 +80,7 @@ class Project(models.Model):
     ]
     
     STATUS_CHOICES = [
+        ('Not Started', 'Not Started'),
         ('Planning', 'Planning'),
         ('Filming', 'Filming'),
         ('Editing', 'Editing'),
@@ -87,6 +88,7 @@ class Project(models.Model):
     ]
     
     EDIT_STATUS_CHOICES = [
+        ('Not Started', 'Not Started'),
         ('Pending', 'Pending'),
         ('In Progress', 'In Progress'),
         ('Review', 'Review'),
@@ -99,8 +101,8 @@ class Project(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
     client_name = models.CharField(max_length=255, blank=True, null=True)
     client_email = models.EmailField(blank=True, null=True)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Planning')
-    edit_status = models.CharField(max_length=50, choices=EDIT_STATUS_CHOICES, default='Pending')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Not Started')
+    edit_status = models.CharField(max_length=50, choices=EDIT_STATUS_CHOICES, default='Not Started')
     notes = models.TextField(blank=True, null=True)
     is_archived = models.BooleanField(default=False)
     
