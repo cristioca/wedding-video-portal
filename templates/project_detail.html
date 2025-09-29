@@ -84,31 +84,31 @@
 
 {% if not is_admin %}
 <!-- Show rejected modifications to clients -->
-{% with rejected_modifications=project.modifications.all|dictsortreversed:"created_at" %}
-{% if rejected_modifications %}
+{% with all_modifications=project.modifications.all|dictsortreversed:"created_at" %}
+{% if all_modifications %}
 <div class="card mb-4" id="rejectedModificationsCard">
     <div class="card-header d-flex justify-content-between align-items-center" 
          style="cursor: pointer; background-color: rgba(108, 117, 125, 0.15); border-bottom: 1px solid rgba(220, 53, 69, 0.2); padding: 0.25rem 0.75rem; font-size: 0.8rem;" 
          onclick="toggleRejectedSection()" 
          data-bs-toggle="collapse" 
          data-bs-target="#rejectedModificationsBody" 
-         aria-expanded="true" 
+         aria-expanded="false" 
          aria-controls="rejectedModificationsBody">
         <div class="d-flex align-items-center">
             <i class="bi bi-x-circle me-2 text-muted" style="font-size: 0.75rem; opacity: 0.6;"></i>
             <span id="rejectedSectionTitle" class="text-muted" style="opacity: 0.7;">Rejected Change Requests</span>
-            <span class="badge text-muted ms-2" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; background-color: rgba(220, 53, 69, 0.15);">{{ rejected_modifications|length }}</span>
+            <span class="badge text-muted ms-2" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; background-color: rgba(220, 53, 69, 0.15);" id="rejectedCount">0</span>
         </div>
         <div class="d-flex align-items-center">
-            <i class="bi bi-chevron-down me-2 text-muted" id="rejectedChevron" style="font-size: 0.7rem; opacity: 0.5;"></i>
+            <i class="bi bi-chevron-up me-2 text-muted" id="rejectedChevron" style="font-size: 0.7rem; opacity: 0.5;"></i>
             <button type="button" class="btn btn-sm text-muted" onclick="dismissRejectedSection(event)" title="Dismiss notifications" style="padding: 0.1rem 0.3rem; font-size: 0.7rem; border: 1px solid rgba(108, 117, 125, 0.3); opacity: 0.6;">
                 <i class="bi bi-eye-slash"></i>
             </button>
         </div>
     </div>
-    <div class="collapse show" id="rejectedModificationsBody">
+    <div class="collapse" id="rejectedModificationsBody">
         <div class="card-body">
-            {% for mod in rejected_modifications %}
+            {% for mod in all_modifications %}
             {% if mod.status == 'REJECTED' %}
             <div class="border rounded p-3 mb-2 border-danger">
                 <div class="row">
@@ -153,7 +153,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <div class="text-muted">
             <i class="bi bi-exclamation-triangle me-1" style="font-size: 0.7rem;"></i>
-            <span>{{ rejected_modifications|length }} rejected change{{ rejected_modifications|length|pluralize }}</span>
+            <span id="rejectedMinimizedCount">0 rejected changes</span>
             <small class="ms-1 opacity-50" style="font-size: 0.65rem;">• click to review</small>
         </div>
         <i class="bi bi-chevron-up text-muted opacity-50" style="font-size: 0.6rem;"></i>
@@ -247,6 +247,7 @@
                             <div class="view-mode">
                                 <p class="form-control-plaintext">{{ project.get_status_display }}</p>
                             </div>
+                            {% if is_admin %}
                             <div class="edit-mode" style="display: none;">
                                 <select class="form-control" data-field="status">
                                     {% for value, label in form.status.field.choices %}
@@ -254,12 +255,14 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Edit Status</label>
                             <div class="view-mode">
                                 <p class="form-control-plaintext">{{ project.get_edit_status_display }}</p>
                             </div>
+                            {% if is_admin %}
                             <div class="edit-mode" style="display: none;">
                                 <select class="form-control" data-field="edit_status">
                                     {% for value, label in form.edit_status.field.choices %}
@@ -267,6 +270,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -1977,14 +1981,20 @@ function submitRejection(modificationId, reason) {
 function toggleRejectedSection() {
     const chevron = document.getElementById('rejectedChevron');
     const body = document.getElementById('rejectedModificationsBody');
+    const header = document.querySelector('#rejectedModificationsCard .card-header');
     
-    // Toggle chevron direction
+    // Toggle chevron direction and aria-expanded
     if (body.classList.contains('show')) {
         chevron.classList.remove('bi-chevron-down');
         chevron.classList.add('bi-chevron-up');
+        header.setAttribute('aria-expanded', 'false');
     } else {
         chevron.classList.remove('bi-chevron-up');
         chevron.classList.add('bi-chevron-down');
+        header.setAttribute('aria-expanded', 'true');
+        
+        // Mark rejections as seen when user manually expands
+        markRejectionsAsSeen();
     }
 }
 
@@ -1993,6 +2003,9 @@ function dismissRejectedSection(event) {
     
     const card = document.getElementById('rejectedModificationsCard');
     const minimizedBar = document.getElementById('rejectedMinimizedBar');
+    
+    // Mark all rejections as seen when dismissing
+    markRejectionsAsSeen();
     
     // Hide the full card
     card.classList.add('d-none');
@@ -2030,6 +2043,39 @@ function showRejectedSection() {
     }
 }
 
+// Update the rejected count in the UI
+function updateRejectedCount() {
+    const rejectedItems = document.querySelectorAll('#rejectedModificationsBody .border-danger');
+    const rejectedCount = rejectedItems.length;
+    
+    console.log('📊 Found', rejectedCount, 'rejected modifications');
+    
+    // Update badge count
+    const countBadge = document.getElementById('rejectedCount');
+    if (countBadge) {
+        countBadge.textContent = rejectedCount;
+    }
+    
+    // Update minimized bar count
+    const minimizedCount = document.getElementById('rejectedMinimizedCount');
+    if (minimizedCount) {
+        const plural = rejectedCount === 1 ? 'change' : 'changes';
+        minimizedCount.textContent = `${rejectedCount} rejected ${plural}`;
+    }
+    
+    // Hide the entire section if no rejected modifications
+    const card = document.getElementById('rejectedModificationsCard');
+    if (card) {
+        if (rejectedCount === 0) {
+            card.style.display = 'none';
+            console.log('🚫 No rejected modifications, hiding section');
+        } else {
+            card.style.display = 'block';
+            console.log('✅ Showing section with', rejectedCount, 'rejected modifications');
+        }
+    }
+}
+
 // Auto-dismiss rejected section after 10 seconds if not interacted with
 function autoMinimizeRejectedSection() {
     const card = document.getElementById('rejectedModificationsCard');
@@ -2037,23 +2083,11 @@ function autoMinimizeRejectedSection() {
     
     if (!card || !header) return;
     
-    // Check for new rejections (within last 24 hours)
-    const hasNewRejections = checkForNewRejections();
+    console.log('🔍 Checking rejection section state...');
     
-    if (hasNewRejections) {
-        // Show with accent color for new rejections
-        showNewRejectionHighlight(header);
-        
-        // Auto-fade to normal after 30 seconds
-        setTimeout(() => {
-            fadeToNormalVisibility(header);
-        }, 30000);
-        
-        return; // Don't auto-minimize if there are new rejections
-    }
-    
-    // Check if user has already dismissed it
+    // Check if user has manually dismissed the section
     if (localStorage.getItem('rejectedSectionDismissed') === 'true') {
+        console.log('📦 Section was dismissed, showing minimized bar');
         const minimizedBar = document.getElementById('rejectedMinimizedBar');
         
         if (card && minimizedBar) {
@@ -2063,43 +2097,108 @@ function autoMinimizeRejectedSection() {
         return;
     }
     
-    // Auto-minimize after 15 seconds if user hasn't interacted
-    if (!card.classList.contains('d-none')) {
+    // Check if all rejections have been seen
+    const hasUnseenRejections = checkForNewRejections();
+    console.log('👁️ Has unseen rejections:', hasUnseenRejections);
+    
+    if (hasUnseenRejections) {
+        console.log('🚨 Found unseen rejections, expanding section');
+        // Expand the section for new rejections
+        const body = document.getElementById('rejectedModificationsBody');
+        const chevron = document.getElementById('rejectedChevron');
+        
+        if (body && !body.classList.contains('show')) {
+            const collapse = new bootstrap.Collapse(body, { show: true });
+            chevron.classList.remove('bi-chevron-up');
+            chevron.classList.add('bi-chevron-down');
+            header.setAttribute('aria-expanded', 'true');
+        }
+        
+        // Show with accent color for new rejections
+        showNewRejectionHighlight(header);
+        
+        // Auto-fade to normal after 30 seconds and mark as seen
         setTimeout(() => {
-            // Only auto-minimize if user hasn't manually dismissed it
-            if (localStorage.getItem('rejectedSectionDismissed') !== 'true' && 
-                !card.classList.contains('d-none')) {
-                
-                const body = document.getElementById('rejectedModificationsBody');
-                const chevron = document.getElementById('rejectedChevron');
-                
-                // Just collapse it, don't fully dismiss
-                if (body && body.classList.contains('show')) {
-                    const collapse = new bootstrap.Collapse(body, { hide: true });
-                    chevron.classList.remove('bi-chevron-down');
-                    chevron.classList.add('bi-chevron-up');
-                    
-                    showMessage('Rejected notifications collapsed automatically. Click the header to expand.', 'info');
-                }
-            }
-        }, 15000); // 15 seconds
+            console.log('⏰ 30 seconds passed, marking rejections as seen');
+            fadeToNormalVisibility(header);
+            markRejectionsAsSeen(); // Mark all current rejections as seen
+        }, 30000);
+        
+        return; // Don't auto-minimize if there are new rejections
     }
+    
+    console.log('✅ All rejections have been seen, keeping section collapsed');
+    
+    // Auto-minimize after 15 seconds if user hasn't interacted (for old seen rejections)
+    setTimeout(() => {
+        // Only auto-minimize if user hasn't manually dismissed it
+        if (localStorage.getItem('rejectedSectionDismissed') !== 'true' && 
+            !card.classList.contains('d-none')) {
+            
+            const body = document.getElementById('rejectedModificationsBody');
+            const chevron = document.getElementById('rejectedChevron');
+            
+            // Just collapse it, don't fully dismiss
+            if (body && body.classList.contains('show')) {
+                const collapse = new bootstrap.Collapse(body, { hide: true });
+                chevron.classList.remove('bi-chevron-down');
+                chevron.classList.add('bi-chevron-up');
+                header.setAttribute('aria-expanded', 'false');
+                
+                showMessage('Rejected notifications collapsed automatically. Click the header to expand.', 'info');
+            }
+        }
+    }, 15000); // 15 seconds
 }
 
-// Check if there are rejections within the last 24 hours
+// Check if there are unseen rejections
 function checkForNewRejections() {
     const rejectedItems = document.querySelectorAll('#rejectedModificationsBody .border-danger');
-    const oneDayAgo = new Date();
-    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+    const seenRejections = JSON.parse(localStorage.getItem('seenRejections') || '[]');
+    
+    console.log('🔍 Found', rejectedItems.length, 'rejected items');
+    console.log('📚 Previously seen rejections:', seenRejections);
     
     for (let item of rejectedItems) {
-        const timeText = item.querySelector('small.text-muted')?.textContent;
-        if (timeText && (timeText.includes('minute') || timeText.includes('hour') || 
-            (timeText.includes('day') && !timeText.includes('days')))) {
-            return true; // Found recent rejection
+        // Create a more reliable unique identifier using field name and rejection reason
+        const fieldName = item.querySelector('h6.text-danger')?.textContent?.trim();
+        const reasonElement = item.querySelector('.alert-warning');
+        const reasonText = reasonElement ? reasonElement.textContent.replace('Rejection Reason:', '').trim().substring(0, 50) : '';
+        const rejectionId = `${fieldName}_${reasonText}`;
+        
+        console.log('🔍 Checking rejection:', rejectionId);
+        
+        if (!seenRejections.includes(rejectionId)) {
+            console.log('🆕 Found unseen rejection:', rejectionId);
+            return true; // Found unseen rejection
         }
     }
+    
+    console.log('✅ All rejections have been seen');
     return false;
+}
+
+// Mark all current rejections as seen
+function markRejectionsAsSeen() {
+    const rejectedItems = document.querySelectorAll('#rejectedModificationsBody .border-danger');
+    const seenRejections = JSON.parse(localStorage.getItem('seenRejections') || '[]');
+    
+    console.log('📝 Marking', rejectedItems.length, 'rejections as seen');
+    
+    rejectedItems.forEach(item => {
+        const fieldName = item.querySelector('h6.text-danger')?.textContent?.trim();
+        const reasonElement = item.querySelector('.alert-warning');
+        const reasonText = reasonElement ? reasonElement.textContent.replace('Rejection Reason:', '').trim().substring(0, 50) : '';
+        const rejectionId = `${fieldName}_${reasonText}`;
+        
+        if (!seenRejections.includes(rejectionId)) {
+            seenRejections.push(rejectionId);
+            console.log('✅ Marked as seen:', rejectionId);
+        }
+    });
+    
+    localStorage.setItem('seenRejections', JSON.stringify(seenRejections));
+    console.log('💾 Updated seen rejections:', seenRejections);
 }
 
 // Show header with accent color for new rejections
@@ -2721,6 +2820,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize rejected modifications section behavior
+    updateRejectedCount();
     autoMinimizeRejectedSection();
 });
 </script>
