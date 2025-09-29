@@ -71,19 +71,96 @@
                             <i class="bi bi-check"></i> Approve
                         </button>
                     </form>
-                    <form method="post" action="{% url 'approve_modification' mod.pk %}" class="d-inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="reject">
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="bi bi-x"></i> Reject
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="showRejectModal({{ mod.pk }}, '{{ mod.field_name|title }}')">
+                        <i class="bi bi-x"></i> Reject
+                    </button>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
+{% endif %}
+
+{% if not is_admin %}
+<!-- Show rejected modifications to clients -->
+{% with rejected_modifications=project.modifications.all|dictsortreversed:"created_at" %}
+{% if rejected_modifications %}
+<div class="card mb-4" id="rejectedModificationsCard">
+    <div class="card-header d-flex justify-content-between align-items-center" 
+         style="cursor: pointer; background-color: rgba(108, 117, 125, 0.15); border-bottom: 1px solid rgba(220, 53, 69, 0.2); padding: 0.25rem 0.75rem; font-size: 0.8rem;" 
+         onclick="toggleRejectedSection()" 
+         data-bs-toggle="collapse" 
+         data-bs-target="#rejectedModificationsBody" 
+         aria-expanded="true" 
+         aria-controls="rejectedModificationsBody">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-x-circle me-2 text-muted" style="font-size: 0.75rem; opacity: 0.6;"></i>
+            <span id="rejectedSectionTitle" class="text-muted" style="opacity: 0.7;">Rejected Change Requests</span>
+            <span class="badge text-muted ms-2" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; background-color: rgba(220, 53, 69, 0.15);">{{ rejected_modifications|length }}</span>
+        </div>
+        <div class="d-flex align-items-center">
+            <i class="bi bi-chevron-down me-2 text-muted" id="rejectedChevron" style="font-size: 0.7rem; opacity: 0.5;"></i>
+            <button type="button" class="btn btn-sm text-muted" onclick="dismissRejectedSection(event)" title="Dismiss notifications" style="padding: 0.1rem 0.3rem; font-size: 0.7rem; border: 1px solid rgba(108, 117, 125, 0.3); opacity: 0.6;">
+                <i class="bi bi-eye-slash"></i>
+            </button>
+        </div>
+    </div>
+    <div class="collapse show" id="rejectedModificationsBody">
+        <div class="card-body">
+            {% for mod in rejected_modifications %}
+            {% if mod.status == 'REJECTED' %}
+            <div class="border rounded p-3 mb-2 border-danger">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="text-danger">{{ mod.field_name|title }}</h6>
+                        <p class="mb-1"><strong>Your Request:</strong> {{ mod.new_value|default:"(empty)" }}</p>
+                        <p class="mb-1"><strong>Original Value:</strong> {{ mod.old_value|default:"(empty)" }}</p>
+                        {% if mod.notes %}
+                        <div class="alert alert-warning mt-2 mb-2">
+                            <strong><i class="bi bi-exclamation-triangle me-1"></i>Rejection Reason:</strong><br>
+                            {{ mod.notes|linebreaks }}
+                        </div>
+                        {% endif %}
+                        <small class="text-muted">
+                            Rejected by {{ mod.approved_by.get_full_name|default:mod.approved_by.email }} - {{ mod.approved_at|timesince }} ago
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge bg-danger">
+                            <i class="bi bi-x-circle"></i> Rejected
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Review the feedback above and submit new change requests with corrections.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Minimized rejected notifications bar (hidden by default) -->
+<div class="d-none border-start border-warning border-2 ps-2 mb-1" 
+     id="rejectedMinimizedBar" 
+     onclick="showRejectedSection()" 
+     style="cursor: pointer; background-color: rgba(255, 193, 7, 0.05); font-size: 0.75rem; padding-top: 2px; padding-bottom: 2px; line-height: 1.2;">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="text-muted">
+            <i class="bi bi-exclamation-triangle me-1" style="font-size: 0.7rem;"></i>
+            <span>{{ rejected_modifications|length }} rejected change{{ rejected_modifications|length|pluralize }}</span>
+            <small class="ms-1 opacity-50" style="font-size: 0.65rem;">• click to review</small>
+        </div>
+        <i class="bi bi-chevron-up text-muted opacity-50" style="font-size: 0.6rem;"></i>
+    </div>
+</div>
+{% endif %}
+{% endwith %}
 {% endif %}
 
 <div class="row">
@@ -1144,6 +1221,22 @@
     color: #856404 !important;
     font-style: italic;
 }
+
+/* Pulse animation for new rejection notifications */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 8px rgba(220, 53, 69, 0.1);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
 </style>
 
 <!-- Load SortableJS from CDN -->
@@ -1817,6 +1910,254 @@ function showConfirmation(message, onConfirm, options = {}) {
     bootstrapModal.show();
 }
 
+// Show rejection modal with reason input
+function showRejectModal(modificationId, fieldName) {
+    const modal = document.getElementById('rejectModal');
+    const fieldNameElement = document.getElementById('rejectFieldName');
+    const reasonTextarea = document.getElementById('rejectionReason');
+    const confirmBtn = document.getElementById('confirmRejectBtn');
+    
+    // Set field name
+    fieldNameElement.textContent = fieldName;
+    
+    // Clear previous reason
+    reasonTextarea.value = '';
+    
+    // Remove any existing event listeners
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    // Add new event listener
+    newConfirmBtn.addEventListener('click', function() {
+        const reason = reasonTextarea.value.trim();
+        
+        if (!reason) {
+            showMessage('Please provide a reason for rejection', 'error');
+            return;
+        }
+        
+        // Submit rejection with reason
+        submitRejection(modificationId, reason);
+    });
+    
+    // Show modal
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+}
+
+// Submit rejection with reason
+function submitRejection(modificationId, reason) {
+    const formData = new FormData();
+    formData.append('action', 'reject');
+    formData.append('notes', reason);
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    
+    fetch(`/projects/modification/${modificationId}/approve/`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            // Hide modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('rejectModal'));
+            modal.hide();
+            
+            showMessage('Modification rejected and client notified via email', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            throw new Error('Failed to reject modification');
+        }
+    })
+    .catch(error => {
+        showMessage('Error rejecting modification: ' + error.message, 'error');
+    });
+}
+
+// Rejected modifications section management
+function toggleRejectedSection() {
+    const chevron = document.getElementById('rejectedChevron');
+    const body = document.getElementById('rejectedModificationsBody');
+    
+    // Toggle chevron direction
+    if (body.classList.contains('show')) {
+        chevron.classList.remove('bi-chevron-down');
+        chevron.classList.add('bi-chevron-up');
+    } else {
+        chevron.classList.remove('bi-chevron-up');
+        chevron.classList.add('bi-chevron-down');
+    }
+}
+
+function dismissRejectedSection(event) {
+    event.stopPropagation(); // Prevent triggering the collapse
+    
+    const card = document.getElementById('rejectedModificationsCard');
+    const minimizedBar = document.getElementById('rejectedMinimizedBar');
+    
+    // Hide the full card
+    card.classList.add('d-none');
+    
+    // Show the minimized bar
+    minimizedBar.classList.remove('d-none');
+    
+    // Save dismiss state in localStorage
+    localStorage.setItem('rejectedSectionDismissed', 'true');
+    
+    showMessage('Rejected notifications minimized. Click the warning bar to review them again.', 'info');
+}
+
+function showRejectedSection() {
+    const card = document.getElementById('rejectedModificationsCard');
+    const minimizedBar = document.getElementById('rejectedMinimizedBar');
+    
+    // Show the full card
+    card.classList.remove('d-none');
+    
+    // Hide the minimized bar
+    minimizedBar.classList.add('d-none');
+    
+    // Remove dismiss state from localStorage
+    localStorage.removeItem('rejectedSectionDismissed');
+    
+    // Expand the section if it was collapsed
+    const body = document.getElementById('rejectedModificationsBody');
+    const chevron = document.getElementById('rejectedChevron');
+    
+    if (!body.classList.contains('show')) {
+        const collapse = new bootstrap.Collapse(body, { show: true });
+        chevron.classList.remove('bi-chevron-up');
+        chevron.classList.add('bi-chevron-down');
+    }
+}
+
+// Auto-dismiss rejected section after 10 seconds if not interacted with
+function autoMinimizeRejectedSection() {
+    const card = document.getElementById('rejectedModificationsCard');
+    const header = card?.querySelector('.card-header');
+    
+    if (!card || !header) return;
+    
+    // Check for new rejections (within last 24 hours)
+    const hasNewRejections = checkForNewRejections();
+    
+    if (hasNewRejections) {
+        // Show with accent color for new rejections
+        showNewRejectionHighlight(header);
+        
+        // Auto-fade to normal after 30 seconds
+        setTimeout(() => {
+            fadeToNormalVisibility(header);
+        }, 30000);
+        
+        return; // Don't auto-minimize if there are new rejections
+    }
+    
+    // Check if user has already dismissed it
+    if (localStorage.getItem('rejectedSectionDismissed') === 'true') {
+        const minimizedBar = document.getElementById('rejectedMinimizedBar');
+        
+        if (card && minimizedBar) {
+            card.classList.add('d-none');
+            minimizedBar.classList.remove('d-none');
+        }
+        return;
+    }
+    
+    // Auto-minimize after 15 seconds if user hasn't interacted
+    if (!card.classList.contains('d-none')) {
+        setTimeout(() => {
+            // Only auto-minimize if user hasn't manually dismissed it
+            if (localStorage.getItem('rejectedSectionDismissed') !== 'true' && 
+                !card.classList.contains('d-none')) {
+                
+                const body = document.getElementById('rejectedModificationsBody');
+                const chevron = document.getElementById('rejectedChevron');
+                
+                // Just collapse it, don't fully dismiss
+                if (body && body.classList.contains('show')) {
+                    const collapse = new bootstrap.Collapse(body, { hide: true });
+                    chevron.classList.remove('bi-chevron-down');
+                    chevron.classList.add('bi-chevron-up');
+                    
+                    showMessage('Rejected notifications collapsed automatically. Click the header to expand.', 'info');
+                }
+            }
+        }, 15000); // 15 seconds
+    }
+}
+
+// Check if there are rejections within the last 24 hours
+function checkForNewRejections() {
+    const rejectedItems = document.querySelectorAll('#rejectedModificationsBody .border-danger');
+    const oneDayAgo = new Date();
+    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+    
+    for (let item of rejectedItems) {
+        const timeText = item.querySelector('small.text-muted')?.textContent;
+        if (timeText && (timeText.includes('minute') || timeText.includes('hour') || 
+            (timeText.includes('day') && !timeText.includes('days')))) {
+            return true; // Found recent rejection
+        }
+    }
+    return false;
+}
+
+// Show header with accent color for new rejections
+function showNewRejectionHighlight(header) {
+    header.style.backgroundColor = 'rgba(220, 53, 69, 0.4)';
+    header.style.borderBottom = '2px solid rgba(220, 53, 69, 0.6)';
+    
+    // Make all elements more visible
+    const icon = header.querySelector('.bi-x-circle');
+    const title = header.querySelector('#rejectedSectionTitle');
+    const badge = header.querySelector('.badge');
+    const chevron = header.querySelector('#rejectedChevron');
+    const button = header.querySelector('button');
+    
+    if (icon) icon.style.opacity = '1';
+    if (title) title.style.opacity = '1';
+    if (badge) {
+        badge.style.backgroundColor = 'rgba(220, 53, 69, 0.3)';
+        badge.style.color = '#dc3545';
+    }
+    if (chevron) chevron.style.opacity = '0.8';
+    if (button) button.style.opacity = '0.9';
+    
+    // Add a subtle pulse animation
+    header.style.animation = 'pulse 2s ease-in-out 3';
+}
+
+// Fade back to normal visibility
+function fadeToNormalVisibility(header) {
+    header.style.transition = 'all 2s ease-out';
+    header.style.backgroundColor = 'rgba(108, 117, 125, 0.15)';
+    header.style.borderBottom = '1px solid rgba(220, 53, 69, 0.2)';
+    
+    // Reset element opacities
+    const icon = header.querySelector('.bi-x-circle');
+    const title = header.querySelector('#rejectedSectionTitle');
+    const badge = header.querySelector('.badge');
+    const chevron = header.querySelector('#rejectedChevron');
+    const button = header.querySelector('button');
+    
+    if (icon) icon.style.opacity = '0.6';
+    if (title) title.style.opacity = '0.7';
+    if (badge) {
+        badge.style.backgroundColor = 'rgba(220, 53, 69, 0.15)';
+        badge.style.color = '';
+    }
+    if (chevron) chevron.style.opacity = '0.5';
+    if (button) button.style.opacity = '0.6';
+    
+    // Remove animation
+    header.style.animation = '';
+    
+    // Remove transition after fade completes
+    setTimeout(() => {
+        header.style.transition = '';
+    }, 2000);
+}
+
 // Attach click handlers without inline JS to avoid IDE lint errors
 document.addEventListener('DOMContentLoaded', function() {
     const notifyButtons = document.querySelectorAll('.js-notify');
@@ -2378,6 +2719,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show immediate success message
         showMessage('Package preset applied instantly!', 'success');
     }
+    
+    // Initialize rejected modifications section behavior
+    autoMinimizeRejectedSection();
 });
 </script>
 
@@ -2436,6 +2780,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
                 <button type="button" class="btn btn-success" id="saveClientDataBtn">
                     <i class="bi bi-check"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modification Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="rejectModalLabel">
+                    <i class="bi bi-x-circle text-danger me-2"></i>
+                    Reject Modification
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to reject the modification for <strong id="rejectFieldName"></strong>.</p>
+                <p class="text-warning">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Please provide a reason for rejection. This will be sent to the client via email.
+                </p>
+                <form id="rejectForm">
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                        <textarea class="form-control bg-dark text-white border-secondary" 
+                                  id="rejectionReason" 
+                                  name="notes" 
+                                  rows="4" 
+                                  placeholder="Please explain why this change was rejected..."
+                                  required></textarea>
+                        <div class="form-text text-muted">
+                            This message will be sent to the client to help them understand what needs to be corrected.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmRejectBtn">
+                    <i class="bi bi-send"></i> Send Rejection
                 </button>
             </div>
         </div>

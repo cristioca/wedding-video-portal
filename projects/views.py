@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.utils import timezone
@@ -14,6 +14,62 @@ from .forms import LoginForm, ProjectForm, ProjectDetailForm, FileUploadForm
 import json
 import secrets
 import string
+
+
+def send_rejection_email(modification, rejection_reason, admin_user):
+    """Send rejection email to client with CC to admin"""
+    project = modification.project
+    client_email = project.client_email
+    
+    if not client_email:
+        raise Exception("No client email found for this project")
+    
+    # Get admin emails for CC
+    admin_users = User.objects.filter(role='ADMIN')
+    admin_emails = [admin.email for admin in admin_users if admin.email]
+    
+    # Prepare email content
+    field_display_name = modification.field_name.replace('_', ' ').title()
+    
+    subject = f'Change Request Rejected - {project.name}'
+    
+    message = f'''Dear {project.client_name or 'Client'},
+
+Your change request for the project "{project.name}" has been reviewed and rejected.
+
+Project Details:
+- Project: {project.name}
+- Event Date: {project.event_date.strftime('%B %d, %Y')}
+- Field: {field_display_name}
+- Your Requested Change: {modification.new_value}
+
+Rejection Reason:
+{rejection_reason}
+
+What's Next:
+Please review the feedback above and feel free to submit a new change request with the necessary corrections. If you have any questions, please don't hesitate to contact us.
+
+Best regards,
+{admin_user.get_full_name() or admin_user.email}
+Wedding Video Portal Team
+
+---
+This is an automated message from the Wedding Video Portal system.
+'''
+    
+    try:
+        # Send email to client with CC to admins using EmailMessage
+        email = EmailMessage(
+            subject=subject,
+            body=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[client_email],
+            cc=admin_emails,
+        )
+        email.send(fail_silently=False)
+        return True
+    except Exception as e:
+        raise Exception(f"Failed to send rejection email: {str(e)}")
 
 
 def home(request):
@@ -800,13 +856,24 @@ def approve_modification(request, mod_id):
         
         messages.success(request, 'Modification approved and applied.')
     elif action == 'reject':
+        rejection_reason = request.POST.get('notes', '').strip()
+        
+        if not rejection_reason:
+            messages.error(request, 'Rejection reason is required.')
+            return redirect('project_detail', slug=modification.project.slug)
+        
         modification.status = 'REJECTED'
         modification.approved_by = request.user
         modification.approved_at = timezone.now()
-        modification.notes = request.POST.get('notes', '')
+        modification.notes = rejection_reason
         modification.save()
         
-        messages.info(request, 'Modification rejected.')
+        # Send rejection email to client with CC to admin
+        try:
+            send_rejection_email(modification, rejection_reason, request.user)
+            messages.success(request, 'Modification rejected and client notified via email.')
+        except Exception as e:
+            messages.warning(request, f'Modification rejected, but email notification failed: {str(e)}')
     
     return redirect('project_detail', slug=modification.project.slug)
 
