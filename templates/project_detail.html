@@ -93,10 +93,10 @@
             <h6 class="text-white mb-0">Project Workflow</h6>
             <div class="btn-group" role="group" aria-label="Project phases">
                 <button type="button" class="btn btn-outline-secondary btn-sm active" id="preproduction-tab" onclick="switchTab('preproduction')">
-                    <i class="bi bi-clipboard-check"></i> Pre-production
+                    <i class="bi bi-clipboard-check"></i> Planning
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="production-tab" onclick="switchTab('production')">
-                    <i class="bi bi-film"></i> Production
+                    <i class="bi bi-film"></i> Editing
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="download-tab" onclick="switchTab('download')" disabled>
                     <i class="bi bi-download"></i> Download
@@ -110,7 +110,7 @@
             </div>
         </div>
 
-        <!-- Pre-production Tab (Current Project Details) -->
+        <!-- Planning Tab (Current Project Details) -->
         <div class="tab-content" id="preproduction-content">
             <div class="card mb-4">
                 <div class="card-header">
@@ -357,11 +357,11 @@
         </div>
         </div>
 
-        <!-- Production Tab (Editing Phase) -->
+        <!-- Editing Tab (Editing Phase) -->
         <div class="tab-content" id="production-content" style="display: none;">
             <div class="card mb-4">
                 <div class="card-header">
-                    <i class="bi bi-film"></i> Production & Editing
+                    <i class="bi bi-film"></i> Editing & Production
                 </div>
                 <div class="card-body">
                     <!-- Editing Status -->
@@ -417,7 +417,7 @@
                     <!-- Editing Timeline -->
                     <div class="editable-section mb-4" data-section="timeline">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Production Timeline</h6>
+                            <h6 class="mb-0">Editing Timeline</h6>
                             {% if is_admin %}
                             <button class="btn btn-sm btn-outline-primary edit-btn" data-section="timeline">
                                 <i class="bi bi-pencil"></i> Edit
@@ -460,7 +460,7 @@
                     <!-- Editing Notes -->
                     <div class="editable-section mb-4" data-section="editing-notes">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Production Notes</h6>
+                            <h6 class="mb-0">Editing Notes</h6>
                             {% if is_admin %}
                             <button class="btn btn-sm btn-outline-primary edit-btn" data-section="editing-notes">
                                 <i class="bi bi-pencil"></i> Edit
@@ -471,11 +471,11 @@
                         <div class="mb-3">
                             <label class="form-label">Editor Notes</label>
                             <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.notes|default:"No production notes yet" }}</p>
+                                <p class="form-control-plaintext">{{ project.notes|default:"No editing notes yet" }}</p>
                             </div>
                             {% if is_admin %}
                             <div class="edit-mode" style="display: none;">
-                                <textarea class="form-control" data-field="notes" rows="4" placeholder="Add production notes, editing decisions, technical details...">{{ project.notes|default:'' }}</textarea>
+                                <textarea class="form-control" data-field="notes" rows="4" placeholder="Add editing notes, production decisions, technical details...">{{ project.notes|default:'' }}</textarea>
                             </div>
                             {% endif %}
                         </div>
@@ -1160,7 +1160,7 @@ function highlightEmptyFields() {
     // Find all view-mode paragraphs and check if they're empty
     document.querySelectorAll('.view-mode .form-control-plaintext').forEach(field => {
         const text = field.textContent.trim();
-        const isEmpty = text === 'Not specified' || text === '' || text === 'Not filled' || text === 'No production notes yet' || text === 'No additional equipment' || text === 'No montages selected' || text === 'No format selected' || text === 'No delivery method selected';
+        const isEmpty = text === 'Not specified' || text === '' || text === 'Not filled' || text === 'No editing notes yet' || text === 'No production notes yet' || text === 'No additional equipment' || text === 'No montages selected' || text === 'No format selected' || text === 'No delivery method selected';
         
         if (isEmpty) {
             field.classList.add('field-empty');

@@ -146,39 +146,48 @@ def project_detail(request, slug):
     if not request.user.is_admin() and project.user != request.user:
         messages.error(request, 'You do not have permission to view this project.')
         return redirect('dashboard')
-    
     if request.method == 'POST':
         if 'update_project' in request.POST:
-            form = ProjectDetailForm(request.POST, instance=project)
-            if form.is_valid():
-                # Track modifications if client is editing
-                if request.user.is_client():
-                    for field in form.changed_data:
-                        old_value = str(getattr(project, field))
-                        new_value = str(form.cleaned_data[field])
-                        ProjectModification.objects.create(
-                            project=project,
-                            field_name=field,
-                            old_value=old_value,
-                            new_value=new_value,
-                            created_by=request.user,
-                            status='PENDING' if not request.user.is_admin() else 'AUTO_APPLIED'
-                        )
+            if request.user.is_client():
+                # For clients: Don't bind form to instance to prevent automatic changes
+                form = ProjectDetailForm(request.POST)
+                if form.is_valid():
+                    # Get original values from database
+                    original_project = Project.objects.get(pk=project.pk)
                     
-                    if form.changed_data:
-                        project.admin_notified_of_changes = True
-                        # Send email notification to admin
-                        if project.notify_admin_of_changes(request.user):
-                            messages.info(request, 'Your changes have been submitted for admin approval and administrators have been notified.')
-                        else:
-                            messages.info(request, 'Your changes have been submitted for admin approval.')
-                
-                # Admin changes are applied immediately
-                if request.user.is_admin():
+                    # Track modifications without applying changes
+                    for field_name, new_value in form.cleaned_data.items():
+                        old_value = str(getattr(original_project, field_name) or '')
+                        new_value_str = str(new_value or '')
+                        
+                        # Only create modification if value actually changed
+                        if old_value != new_value_str:
+                            ProjectModification.objects.create(
+                                project=project,
+                                field_name=field_name,
+                                old_value=old_value,
+                                new_value=new_value_str,
+                                created_by=request.user,
+                                status='PENDING'
+                            )
+                    
+                    project.admin_notified_of_changes = True
+                    project.has_unsent_changes = True
+                    project.save()
+                    
+                    # Send email notification to admin
+                    if project.notify_admin_of_changes(request.user):
+                        messages.info(request, 'Your changes have been submitted for admin approval and administrators have been notified.')
+                    else:
+                        messages.info(request, 'Your changes have been submitted for admin approval.')
+            else:
+                # For admins: Apply changes immediately
+                form = ProjectDetailForm(request.POST, instance=project)
+                if form.is_valid():
                     form.save()
                     messages.success(request, 'Project updated successfully.')
-                
-                return redirect('project_detail', slug=project.slug)
+            
+            return redirect('project_detail', slug=project.slug)
         
         elif 'upload_file' in request.POST:
             file_form = FileUploadForm(request.POST, request.FILES)
@@ -622,7 +631,10 @@ def batch_update_project(request, slug):
             return JsonResponse({'error': 'Updates must be a dictionary'}, status=400)
         
         updated_fields = []
+        original_values = {}  # Store original values before any changes
+        processed_updates = {}  # Store processed field values
         
+        # First pass: capture original values and validate fields
         for field_name, field_value in updates.items():
             # Validate field exists on model
             if not hasattr(project, field_name):
@@ -630,6 +642,9 @@ def batch_update_project(request, slug):
             
             try:
                 field = project._meta.get_field(field_name)
+                
+                # Store original value before any changes
+                original_values[field_name] = str(getattr(project, field_name) or '')
                 
                 # Handle boolean fields
                 if field.__class__.__name__ == 'BooleanField':
@@ -651,56 +666,88 @@ def batch_update_project(request, slug):
                     if field_value not in valid_choices and field_value != '':
                         continue  # Skip invalid choices
                 
-                # Set the field value
-                setattr(project, field_name, field_value)
+                # Store processed value
+                processed_updates[field_name] = field_value
                 updated_fields.append(field_name)
                 
             except Exception:
                 continue  # Skip fields that cause errors
         
-        # Save all changes at once
-        print(f"💾 SAVING {len(updated_fields)} fields: {updated_fields}")
-        project.has_unsent_changes = True
+        # Apply changes only for admins
+        if request.user.is_admin():
+            # Apply changes immediately for admins
+            for field_name, field_value in processed_updates.items():
+                setattr(project, field_name, field_value)
+            
+            print(f"💾 SAVING {len(updated_fields)} fields: {updated_fields}")
+            project.has_unsent_changes = True
+            
+            try:
+                project.save()
+                print(f"✅ PROJECT SAVED SUCCESSFULLY")
+            except Exception as save_error:
+                print(f"❌ DATABASE SAVE ERROR: {save_error}")
+                return JsonResponse({'error': f'Database error: {str(save_error)}'}, status=500)
+        else:
+            # For clients: Don't apply changes, just track them
+            print(f"📝 CLIENT BATCH UPDATE: {len(updated_fields)} fields queued for approval")
         
-        try:
-            project.save()
-            print(f"✅ PROJECT SAVED SUCCESSFULLY")
-        except Exception as save_error:
-            print(f"❌ DATABASE SAVE ERROR: {save_error}")
-            return JsonResponse({'error': f'Database error: {str(save_error)}'}, status=500)
-        
-        # Track modifications if client is editing
-        if request.user.is_client() and updated_fields:
+        # Track modifications
+        if updated_fields:
             try:
                 for field_name in updated_fields:
+                    # For clients, use the processed value; for admins, get from saved project
+                    if request.user.is_client():
+                        new_value = str(processed_updates.get(field_name, '') or '')
+                        status = 'PENDING'
+                    else:
+                        new_value = str(getattr(project, field_name) or '')
+                        status = 'AUTO_APPLIED'
+                    
                     ProjectModification.objects.create(
                         project=project,
                         field_name=field_name,
-                        old_value='',
-                        new_value=str(getattr(project, field_name)),
+                        old_value=original_values.get(field_name, ''),
+                        new_value=new_value,
                         created_by=request.user,
-                        status='PENDING'
+                        status=status
                     )
                 print(f"📝 CREATED {len(updated_fields)} MODIFICATION RECORDS")
             except Exception as mod_error:
                 print(f"⚠️ MODIFICATION TRACKING ERROR: {mod_error}")
                 # Don't fail the whole request for tracking errors
         
-        # Notify admin if client made changes
-        if request.user.is_client() and updated_fields and project.should_notify_admin():
-            try:
-                project.notify_admin_of_changes()
-                print(f"📧 ADMIN NOTIFICATION SENT")
-            except Exception as notify_error:
-                print(f"⚠️ NOTIFICATION ERROR: {notify_error}")
-                # Don't fail the whole request for notification errors
+        # Handle notifications and project state
+        if request.user.is_client() and updated_fields:
+            # Mark project as having unsent changes for clients
+            project.admin_notified_of_changes = True
+            project.has_unsent_changes = True
+            project.save()
+            
+            # Notify admin if client made changes
+            if project.should_notify_admin():
+                try:
+                    project.notify_admin_of_changes(request.user)
+                    print(f"📧 ADMIN NOTIFICATION SENT")
+                except Exception as notify_error:
+                    print(f"⚠️ NOTIFICATION ERROR: {notify_error}")
+                    # Don't fail the whole request for notification errors
         
         print(f"🎉 BATCH UPDATE COMPLETED SUCCESSFULLY")
-        return JsonResponse({
-            'success': True,
-            'updated_fields': updated_fields,
-            'pending_approval': request.user.is_client()
-        })
+        
+        if request.user.is_client():
+            return JsonResponse({
+                'success': True, 
+                'message': f'{len(updated_fields)} changes submitted for admin approval',
+                'pending_approval': True,
+                'updated_fields': updated_fields
+            }, status=202)
+        else:
+            return JsonResponse({
+                'success': True, 
+                'message': f'Updated {len(updated_fields)} fields successfully',
+                'updated_fields': updated_fields
+            }, status=200)
         
     except json.JSONDecodeError as json_error:
         print(f"❌ JSON DECODE ERROR: {json_error}")
