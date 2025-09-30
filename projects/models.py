@@ -103,6 +103,7 @@ class Project(models.Model):
     client_email = models.EmailField(blank=True, null=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Not Started')
     edit_status = models.CharField(max_length=50, choices=EDIT_STATUS_CHOICES, default='Not Started')
+    editing_progress = models.IntegerField(default=0, help_text="Editing progress percentage (0-100)")
     notes = models.TextField(blank=True, null=True)
     is_archived = models.BooleanField(default=False)
     

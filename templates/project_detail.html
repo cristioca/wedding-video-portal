@@ -457,10 +457,16 @@
                                 <label class="form-label">Progress</label>
                                 <div class="view-mode">
                                     <div class="progress">
-                                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ project.editing_progress }}%" aria-valuenow="{{ project.editing_progress }}" aria-valuemin="0" aria-valuemax="100">{{ project.editing_progress }}%</div>
                                     </div>
                                     <small class="text-muted mt-1">Estimated completion</small>
                                 </div>
+                                {% if is_admin %}
+                                <div class="edit-mode" style="display: none;">
+                                    <input type="number" class="form-control" data-field="editing_progress" value="{{ project.editing_progress }}" min="0" max="100" step="5">
+                                    <small class="text-muted">Enter percentage (0-100)</small>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         
@@ -1270,6 +1276,9 @@ function highlightEmptyFields() {
 // Tab switching functionality
 function switchTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
+    
+    // Store the current tab in sessionStorage
+    sessionStorage.setItem('activeTab', tabName);
     
     // Hide all tab contents
     const allTabContents = document.querySelectorAll('.tab-content');
@@ -2240,6 +2249,13 @@ function fadeToNormalVisibility(header) {
 
 // Attach click handlers without inline JS to avoid IDE lint errors
 document.addEventListener('DOMContentLoaded', function() {
+    // Restore the active tab from sessionStorage
+    const savedTab = sessionStorage.getItem('activeTab');
+    if (savedTab) {
+        console.log(`🔄 Restoring saved tab: ${savedTab}`);
+        switchTab(savedTab);
+    }
+    
     const notifyButtons = document.querySelectorAll('.js-notify');
     console.log('Found notify buttons:', notifyButtons.length);
     notifyButtons.forEach(btn => {

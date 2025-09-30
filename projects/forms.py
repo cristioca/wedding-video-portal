@@ -81,7 +81,7 @@ class ProjectDetailForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = [
-            'name', 'client_name', 'client_email', 'type', 'status', 'edit_status',
+            'name', 'client_name', 'client_email', 'type', 'status', 'edit_status', 'editing_progress',
             'event_date', 'city', 'title_video', 'civil_union_details',
             'prep', 'church', 'session', 'restaurant', 'main_details',
             'details_extra', 'editing_preferences', 'notes',
@@ -98,6 +98,7 @@ class ProjectDetailForm(forms.ModelForm):
             'type': forms.Select(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
             'edit_status': forms.Select(attrs={'class': 'form-control'}),
+            'editing_progress': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'max': '100', 'step': '5'}),
             'event_date': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date',
