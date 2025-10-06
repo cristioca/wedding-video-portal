@@ -175,6 +175,9 @@ class Project(models.Model):
     # Event presence
     event_presence = models.TextField(blank=True, null=True)
     
+    # Filming details
+    filming_details = models.TextField(blank=True, null=True, help_text="Details for the filming team")
+    
     # Field ordering configuration
     ceremony_field_order = models.JSONField(
         default=dict,
