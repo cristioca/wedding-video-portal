@@ -415,7 +415,7 @@ class File(models.Model):
             if size < 1024.0:
                 return f"{size:.1f} {unit}"
             size /= 1024.0
-        return f"{size:.1f} TB"
+        return f"{size:.1f} PB"
 
 
 class FileDownloadEvent(models.Model):
@@ -431,3 +431,22 @@ class FileDownloadEvent(models.Model):
     
     def __str__(self):
         return f"Download: {self.file.display_name} at {self.created_at}"
+
+
+class FieldHistory(models.Model):
+    """Track history of field changes with editor information"""
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='field_history')
+    field_name = models.CharField(max_length=100, help_text="Name of the field that was changed")
+    old_value = models.TextField(blank=True, null=True, help_text="Previous value")
+    new_value = models.TextField(blank=True, null=True, help_text="New value")
+    edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='field_edits')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Field History"
+        verbose_name_plural = "Field Histories"
+    
+    def __str__(self):
+        editor_name = self.edited_by.get_full_name() if self.edited_by and self.edited_by.get_full_name() else (self.edited_by.email if self.edited_by else 'Unknown')
+        return f"{self.project.name} - {self.field_name} by {editor_name}"

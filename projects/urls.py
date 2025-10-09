@@ -19,4 +19,5 @@ urlpatterns = [
     path('<str:slug>/update-field/', views.update_project_field, name='update_project_field'),
     path('<str:slug>/batch-update/', views.batch_update_project, name='batch_update_project'),
     path('<str:slug>/update-field-order/', views.update_field_order, name='update_field_order'),
+    path('<str:slug>/field-history/<str:field_name>/', views.get_field_history, name='get_field_history'),
 ]

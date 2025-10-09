@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from datetime import datetime
 from django.db.models import Q
-from .models import Project, File, FileDownloadEvent, ProjectModification, User
+from .models import Project, File, FileDownloadEvent, ProjectModification, User, FieldHistory
 from .forms import LoginForm, ProjectForm, ProjectDetailForm, FileUploadForm
 import json
 import secrets
@@ -655,6 +655,21 @@ def update_project_field(request, slug):
                 status='AUTO_APPLIED'
             )
             
+            # Track field history for specific fields (filming_details, notes)
+            if field_name in ['filming_details', 'notes']:
+                print(f"🔍 Field History Check: field={field_name}, old='{old_value}', new='{str(field_value)}'")
+                if old_value != str(field_value):
+                    history_entry = FieldHistory.objects.create(
+                        project=project,
+                        field_name=field_name,
+                        old_value=old_value,
+                        new_value=str(field_value),
+                        edited_by=request.user
+                    )
+                    print(f"✅ Field History Created: ID={history_entry.id}, by={request.user.email}")
+                else:
+                    print(f"⏭️ No change detected, skipping history entry")
+            
             return JsonResponse({
                 'success': True, 
                 'message': 'Field updated successfully',
@@ -768,6 +783,20 @@ def batch_update_project(request, slug):
                         created_by=request.user,
                         status=status
                     )
+                    
+                    # Track field history for specific fields (filming_details, notes)
+                    if request.user.is_admin() and field_name in ['filming_details', 'notes']:
+                        old_val = original_values.get(field_name, '')
+                        if old_val != new_value:
+                            history_entry = FieldHistory.objects.create(
+                                project=project,
+                                field_name=field_name,
+                                old_value=old_val,
+                                new_value=new_value,
+                                edited_by=request.user
+                            )
+                            print(f"📜 Field History Created: {field_name} (ID={history_entry.id})")
+                
                 print(f"📝 CREATED {len(updated_fields)} MODIFICATION RECORDS")
             except Exception as mod_error:
                 print(f"⚠️ MODIFICATION TRACKING ERROR: {mod_error}")
@@ -1062,3 +1091,46 @@ def update_field_order(request, slug):
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def get_field_history(request, slug, field_name):
+    """Get the edit history for a specific field"""
+    project = get_object_or_404(Project, slug=slug)
+    
+    print(f"📜 Fetching history for: project={slug}, field={field_name}")
+    
+    # Check permissions
+    if not request.user.is_admin() and project.user != request.user:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    # Get all history entries for this field
+    history_entries = FieldHistory.objects.filter(
+        project=project,
+        field_name=field_name
+    ).select_related('edited_by').order_by('-created_at')
+    
+    print(f"📊 Found {history_entries.count()} history entries")
+    
+    # Format the response
+    from django.utils.timesince import timesince
+    history_data = []
+    for entry in history_entries:
+        editor_name = entry.edited_by.get_full_name() if entry.edited_by and entry.edited_by.get_full_name() else (
+            entry.edited_by.email if entry.edited_by else 'Unknown'
+        )
+        
+        history_data.append({
+            'id': entry.id,
+            'old_value': entry.old_value or '',
+            'new_value': entry.new_value or '',
+            'edited_by': editor_name,
+            'created_at': entry.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'time_ago': timesince(entry.created_at)
+        })
+    
+    return JsonResponse({
+        'success': True,
+        'field_name': field_name,
+        'history': history_data
+    })

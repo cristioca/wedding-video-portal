@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Project, ProjectModification, File, FileDownloadEvent
+from .models import User, Project, ProjectModification, File, FileDownloadEvent, FieldHistory
 
 
 class UserAdmin(BaseUserAdmin):
@@ -81,6 +81,15 @@ class FileDownloadEventAdmin(admin.ModelAdmin):
     """File download event admin"""
     list_display = ['file', 'downloaded_by', 'success', 'created_at']
     list_filter = ['success', 'created_at']
+    readonly_fields = ['created_at']
+
+
+@admin.register(FieldHistory)
+class FieldHistoryAdmin(admin.ModelAdmin):
+    """Field history admin"""
+    list_display = ['project', 'field_name', 'edited_by', 'created_at']
+    list_filter = ['field_name', 'created_at']
+    search_fields = ['project__name', 'field_name']
     readonly_fields = ['created_at']
 
 
