@@ -439,6 +439,53 @@
                     <i class="bi bi-film"></i> Production
                 </div>
                 <div class="card-body">
+                    {% if is_admin %}
+                    <!-- Critical Production Details Section (Admin Only) -->
+                    <div class="editable-section mb-4" data-section="critical-production" id="critical-production-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0 text-danger">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>CRITICAL PRODUCTION DETAILS
+                            </h6>
+                            <button class="btn btn-sm btn-outline-primary edit-btn" data-section="critical-production">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                        </div>
+                        
+                        {% if project.critical_production_notes %}
+                        <!-- Show field if it has content -->
+                        <div class="mb-3">
+                            <label class="form-label">Notes only for videographer</label>
+                            <div class="view-mode">
+                                <p class="form-control-plaintext" style="white-space: pre-wrap;">{{ project.critical_production_notes }}</p>
+                            </div>
+                            <div class="edit-mode" style="display: none;">
+                                <textarea class="form-control" data-field="critical_production_notes" rows="4" placeholder="Critical production notes that must be known...">{{ project.critical_production_notes|default:'' }}</textarea>
+                            </div>
+                        </div>
+                        {% else %}
+                        <!-- Hide field when empty, show only in edit mode -->
+                        <div class="mb-3" style="display: none;" id="critical-notes-field">
+                            <label class="form-label">Notes only for videographer</label>
+                            <div class="view-mode">
+                                <p class="form-control-plaintext" style="white-space: pre-wrap;">Not specified</p>
+                            </div>
+                            <div class="edit-mode">
+                                <textarea class="form-control" data-field="critical_production_notes" rows="4" placeholder="Critical production notes that must be known...">{{ project.critical_production_notes|default:'' }}</textarea>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="edit-actions" style="display: none;">
+                            <button class="btn btn-success btn-sm me-2 save-btn" data-section="critical-production">
+                                <i class="bi bi-check"></i> Save
+                            </button>
+                            <button class="btn btn-secondary btn-sm cancel-btn" data-section="critical-production">
+                                <i class="bi bi-x"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
                     <!-- Filming Section -->
                     <div class="editable-section mb-4" data-section="filming">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -1469,6 +1516,14 @@ function toggleEdit(section) {
     editActions.style.display = 'block';
     // Add visual editing state
     sectionElement.classList.add('editing');
+    
+    // Special handling for critical-production section: show hidden field when editing
+    if (section === 'critical-production') {
+        const criticalField = document.getElementById('critical-notes-field');
+        if (criticalField) {
+            criticalField.style.display = 'block';
+        }
+    }
 }
 
 function cancelEdit(section) {
@@ -1505,6 +1560,15 @@ function cancelEdit(section) {
     editActions.style.display = 'none';
     // Remove visual editing state
     sectionElement.classList.remove('editing');
+    
+    // Special handling for critical-production section: hide field if empty
+    if (section === 'critical-production') {
+        const criticalField = document.getElementById('critical-notes-field');
+        const criticalTextarea = sectionElement.querySelector('[data-field="critical_production_notes"]');
+        if (criticalField && criticalTextarea && !criticalTextarea.value.trim()) {
+            criticalField.style.display = 'none';
+        }
+    }
 }
 
 function saveSection(section) {

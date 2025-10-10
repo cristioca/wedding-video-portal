@@ -293,6 +293,22 @@ a:hover { color: #c7d2fe; }
   color: var(--text-100) !important;
 }
 
+/* Critical Production Section */
+#critical-production-section {
+  border-left: 3px solid var(--danger);
+  padding-left: 0.75rem;
+  background: rgba(239, 68, 68, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+}
+#critical-production-section.editing {
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+#critical-production-section h6 {
+  color: var(--danger) !important;
+}
+
 /* Fine-tuning */
 h1, h2, h3, h4, h5, h6 { letter-spacing: 0.3px; color: var(--text-100); }
 /* Ensure small headers inside cards/lists are bright */
@@ -429,4 +445,13 @@ body.theme-light {
 .theme-light .history-value-new {
   background-color: rgba(25, 135, 84, 0.12) !important;
   color: var(--text-100) !important;
+}
+
+/* Light theme critical production section */
+.theme-light #critical-production-section {
+  background: rgba(239, 68, 68, 0.08);
+}
+.theme-light #critical-production-section.editing {
+  background: rgba(239, 68, 68, 0.12);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
 }

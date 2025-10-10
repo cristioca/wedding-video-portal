@@ -178,6 +178,7 @@ class Project(models.Model):
     # Filming details
     filming_details = models.TextField(blank=True, null=True, help_text="Client requests for filming")
     videographer_filming_notes = models.TextField(blank=True, null=True, help_text="Videographer's notes for filming (admin only)")
+    critical_production_notes = models.TextField(blank=True, null=True, help_text="Critical production details (admin only)")
     
     # Editing notes
     videographer_editing_notes = models.TextField(blank=True, null=True, help_text="Videographer's notes for editing (admin only)")

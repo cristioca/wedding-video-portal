@@ -85,7 +85,7 @@ class ProjectDetailForm(forms.ModelForm):
             'event_date', 'city', 'title_video', 'civil_union_details',
             'prep', 'church', 'session', 'restaurant', 'main_details',
             'details_extra', 'editing_preferences', 'notes', 'filming_details',
-            'videographer_filming_notes', 'videographer_editing_notes',
+            'videographer_filming_notes', 'critical_production_notes', 'videographer_editing_notes',
             # Package fields
             'package_type', 'package_4k', 'package_fullhd', 'package_cameras',
             'montage_highlights', 'montage_movie', 'montage_movie_duration', 'montage_movie_other',
@@ -117,6 +117,7 @@ class ProjectDetailForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'filming_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'videographer_filming_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'critical_production_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'videographer_editing_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'main_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 8}),
             # Package widgets
