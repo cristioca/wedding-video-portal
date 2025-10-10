@@ -176,7 +176,11 @@ class Project(models.Model):
     event_presence = models.TextField(blank=True, null=True)
     
     # Filming details
-    filming_details = models.TextField(blank=True, null=True, help_text="Details for the filming team")
+    filming_details = models.TextField(blank=True, null=True, help_text="Client requests for filming")
+    videographer_filming_notes = models.TextField(blank=True, null=True, help_text="Videographer's notes for filming (admin only)")
+    
+    # Editing notes
+    videographer_editing_notes = models.TextField(blank=True, null=True, help_text="Videographer's notes for editing (admin only)")
     
     # Field ordering configuration
     ceremony_field_order = models.JSONField(

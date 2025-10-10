@@ -208,7 +208,7 @@
                         </button>
                     </div>
                     <div class="collapse mb-3" id="infoBasic">
-                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem; color: inherit;">
                             <i class="bi bi-lightbulb me-1"></i>
                             The main details about the event. These are usually filled by the videographer, but if you need to make a change, please do so. The changes will be reviewed and will appear when approved by the videographer.
                         </div>
@@ -345,7 +345,7 @@
                         </div>
                     </div>
                     <div class="collapse mb-3" id="infoCeremony">
-                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem; color: inherit;">
                             <i class="bi bi-lightbulb me-1"></i>
                             Fill in the details about the main moments of your event. They can be reordered if needed. The changes will be sent to and reviewed by the videographer and will appear when approved.
                         </div>
@@ -403,7 +403,7 @@
                         </button>
                     </div>
                     <div class="collapse mb-3" id="infoAdditional">
-                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem; color: inherit;">
                             <i class="bi bi-lightbulb me-1"></i>
                             If there are more details to be known and established, or some requests or any other information for the preparation of the event, you can write them here. The changes will be sent to and reviewed by the videographer and will appear when approved.
                         </div>
@@ -453,7 +453,7 @@
                             </button>
                         </div>
                         <div class="collapse mb-3" id="infoFilming">
-                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem; color: inherit;">
                                 <i class="bi bi-lightbulb me-1"></i>
                                 Insert here any specific information that is relevant to you about the event or the people attending that must be known by the videographer to prepare for filming. Please fill this before the day of the event.
                             </div>
@@ -461,7 +461,7 @@
                         
                         <div class="mb-3">
                             <label class="form-label">
-                                Filming Details
+                                Filming Details (Client Requests)
                                 {% if filming_details_history %}
                                 <button type="button" class="btn btn-link btn-sm p-0 ms-2 text-info history-btn" 
                                         data-field="filming_details" 
@@ -485,11 +485,23 @@
                                 {% endif %}
                             </label>
                             <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.filming_details|default:"Not specified" }}</p>
+                                <p class="form-control-plaintext" style="white-space: pre-wrap;">{{ project.filming_details|default:"Not specified" }}</p>
                             </div>
                             <div class="edit-mode" style="display: none;">
                                 <textarea class="form-control" data-field="filming_details" rows="4" placeholder="Insert here any details that the filming team should know about. Anything you like and don't like in particular, so we can follow your directions.">{{ project.filming_details|default:'' }}</textarea>
                             </div>
+                        </div>
+                        
+                        <div class="mb-3 videographer-notes-field">
+                            <label class="form-label">Videographer Notes for Filming</label>
+                            <div class="view-mode">
+                                <p class="form-control-plaintext" style="white-space: pre-wrap;">{{ project.videographer_filming_notes|default:"Not specified" }}</p>
+                            </div>
+                            {% if is_admin %}
+                            <div class="edit-mode" style="display: none;">
+                                <textarea class="form-control" data-field="videographer_filming_notes" rows="4" placeholder="Videographer's internal notes for filming...">{{ project.videographer_filming_notes|default:'' }}</textarea>
+                            </div>
+                            {% endif %}
                         </div>
                         
                         <div class="edit-actions" style="display: none;">
@@ -518,7 +530,7 @@
                             {% endif %}
                         </div>
                         <div class="collapse mb-3" id="infoEditingStatus">
-                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem; color: inherit;">
                                 <i class="bi bi-lightbulb me-1"></i>
                                 This section shows the status of the editing process. This can be modified only by the videographer.
                             </div>
@@ -583,7 +595,7 @@
                             </button>
                         </div>
                         <div class="collapse mb-3" id="infoEditingNotes">
-                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem; color: inherit;">
                                 <i class="bi bi-lightbulb me-1"></i>
                                 Insert here any specific information that is relevant to the editing process (e.g., length of the ceremony, details to include or exclude, coloring preferences, song preferences, etc.). These will be taken as suggestions by the videographer. Please fill them before the editing process is complete.
                             </div>
@@ -591,7 +603,7 @@
                         
                         <div class="mb-3">
                             <label class="form-label">
-                                Notes for edit:
+                                Editing Notes (Client Requests)
                                 {% if notes_history %}
                                 <button type="button" class="btn btn-link btn-sm p-0 ms-2 text-info history-btn" 
                                         data-field="notes" 
@@ -615,11 +627,23 @@
                                 {% endif %}
                             </label>
                             <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.notes|default:"No editing notes yet" }}</p>
+                                <p class="form-control-plaintext" style="white-space: pre-wrap;">{{ project.notes|default:"No editing notes yet" }}</p>
                             </div>
                             <div class="edit-mode" style="display: none;">
                                 <textarea class="form-control" data-field="notes" rows="4" placeholder="Add editing notes, production decisions, technical details...">{{ project.notes|default:'' }}</textarea>
                             </div>
+                        </div>
+                        
+                        <div class="mb-3 videographer-notes-field">
+                            <label class="form-label">Videographer Notes for Editing</label>
+                            <div class="view-mode">
+                                <p class="form-control-plaintext" style="white-space: pre-wrap;">{{ project.videographer_editing_notes|default:"Not specified" }}</p>
+                            </div>
+                            {% if is_admin %}
+                            <div class="edit-mode" style="display: none;">
+                                <textarea class="form-control" data-field="videographer_editing_notes" rows="4" placeholder="Videographer's internal notes for editing...">{{ project.videographer_editing_notes|default:'' }}</textarea>
+                            </div>
+                            {% endif %}
                         </div>
                         
                         <div class="edit-actions" style="display: none;">
@@ -1369,6 +1393,10 @@ function toggleEdit(section) {
     const editModes = sectionElement.querySelectorAll('.edit-mode');
     const editBtn = sectionElement.querySelector('.edit-btn');
     const editActions = sectionElement.querySelector('.edit-actions');
+    const isAdmin = {{ is_admin|lower }};
+    
+    // Keep videographer notes visible for clients during edit mode
+    const videographerFields = sectionElement.querySelectorAll('.videographer-notes-field');
     
     // Store original values
     originalValues[section] = {};
@@ -1427,6 +1455,16 @@ function toggleEdit(section) {
     // Toggle visibility
     viewModes.forEach(vm => vm.style.display = 'none');
     editModes.forEach(em => em.style.display = 'block');
+    
+    // Keep videographer notes visible (read-only) for clients during edit
+    if (!isAdmin) {
+        videographerFields.forEach(field => {
+            field.style.display = 'block';
+            const viewMode = field.querySelector('.view-mode');
+            if (viewMode) viewMode.style.display = 'block';
+        });
+    }
+    
     editBtn.style.display = 'none';
     editActions.style.display = 'block';
     // Add visual editing state
@@ -2871,18 +2909,18 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Custom Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-secondary">
-            <div class="modal-header border-secondary">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h5 class="modal-title" id="confirmationModalLabel">
                     <i class="bi bi-exclamation-triangle text-warning me-2"></i>
                     Confirm Action
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p id="confirmationMessage" class="mb-0"></p>
             </div>
-            <div class="modal-footer border-secondary">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x"></i> Cancel
                 </button>
@@ -2897,27 +2935,27 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Change Client Data Modal -->
 <div class="modal fade" id="changeClientModal" tabindex="-1" aria-labelledby="changeClientModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-secondary">
-            <div class="modal-header border-secondary">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h5 class="modal-title" id="changeClientModalLabel">
                     <i class="bi bi-person-gear text-success me-2"></i>
                     Change Client Data
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="changeClientForm">
                     <div class="mb-3">
                         <label for="clientName" class="form-label">Client Name</label>
-                        <input type="text" class="form-control bg-secondary text-white border-secondary" id="clientName" required>
+                        <input type="text" class="form-control" id="clientName" required>
                     </div>
                     <div class="mb-3">
                         <label for="clientEmail" class="form-label">Client Email</label>
-                        <input type="email" class="form-control bg-secondary text-white border-secondary" id="clientEmail" required>
+                        <input type="email" class="form-control" id="clientEmail" required>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer border-secondary">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x"></i> Cancel
                 </button>
@@ -2932,13 +2970,13 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Reject Modification Modal -->
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-secondary">
-            <div class="modal-header border-secondary">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h5 class="modal-title" id="rejectModalLabel">
                     <i class="bi bi-x-circle text-danger me-2"></i>
                     Reject Modification
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>You are about to reject the modification for <strong id="rejectFieldName"></strong>.</p>
@@ -2949,7 +2987,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form id="rejectForm">
                     <div class="mb-3">
                         <label for="rejectionReason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
-                        <textarea class="form-control bg-dark text-white border-secondary" 
+                        <textarea class="form-control" 
                                   id="rejectionReason" 
                                   name="notes" 
                                   rows="4" 
@@ -2961,7 +2999,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </form>
             </div>
-            <div class="modal-footer border-secondary">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x"></i> Cancel
                 </button>
@@ -2976,13 +3014,13 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Field History Modal -->
 <div class="modal fade" id="fieldHistoryModal" tabindex="-1" aria-labelledby="fieldHistoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content bg-dark text-white border-secondary">
-            <div class="modal-header border-secondary">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h5 class="modal-title" id="fieldHistoryModalLabel">
                     <i class="bi bi-clock-history text-info me-2"></i>
                     Edit History: <span id="historyFieldName"></span>
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="fieldHistoryContent">
@@ -2994,7 +3032,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-secondary">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x"></i> Close
                 </button>
@@ -3098,13 +3136,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <label class="form-label text-muted small">Previous Value:</label>
-                            <div class="p-2 bg-secondary rounded" style="max-height: 150px; overflow-y: auto; white-space: pre-wrap; font-size: 0.9rem;">
+                            <div class="p-2 border rounded text-body history-value-box history-value-old">
                                 ${escapeHtml(oldValue)}
                             </div>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label class="form-label text-success small">New Value:</label>
-                            <div class="p-2 bg-dark border border-success rounded" style="max-height: 150px; overflow-y: auto; white-space: pre-wrap; font-size: 0.9rem;">
+                            <div class="p-2 border border-success rounded text-body history-value-box history-value-new">
                                 ${escapeHtml(newValue)}
                             </div>
                         </div>
