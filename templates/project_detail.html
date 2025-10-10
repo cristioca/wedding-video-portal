@@ -173,7 +173,7 @@
                     <i class="bi bi-clipboard-check"></i> Details
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="production-tab" onclick="switchTab('production')">
-                    <i class="bi bi-film"></i> Editing
+                    <i class="bi bi-film"></i> Production
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="download-tab" onclick="switchTab('download')" disabled>
                     <i class="bi bi-download"></i> Download
@@ -197,10 +197,21 @@
                 <!-- Basic Information -->
                 <div class="editable-section mb-4" data-section="basic">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="mb-0">Basic Information</h6>
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Basic Information</h6>
+                            <button class="btn btn-link btn-sm p-0 ms-2 text-info" type="button" data-bs-toggle="collapse" data-bs-target="#infoBasic" aria-expanded="false" aria-controls="infoBasic" title="Show info">
+                                <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i>
+                            </button>
+                        </div>
                         <button class="btn btn-sm btn-outline-primary edit-btn" data-section="basic">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
+                    </div>
+                    <div class="collapse mb-3" id="infoBasic">
+                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-lightbulb me-1"></i>
+                            The main details about the event. These are usually filled by the videographer, but if you need to make a change, please do so. The changes will be reviewed and will appear when approved by the videographer.
+                        </div>
                     </div>
                     
                     <div class="row">
@@ -318,7 +329,12 @@
                 <!-- Event Details -->
                 <div class="editable-section mb-4" data-section="ceremony">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="mb-0">Event Details</h6>
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Event Details</h6>
+                            <button class="btn btn-link btn-sm p-0 ms-2 text-info" type="button" data-bs-toggle="collapse" data-bs-target="#infoCeremony" aria-expanded="false" aria-controls="infoCeremony" title="Show info">
+                                <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i>
+                            </button>
+                        </div>
                         <div>
                             <button class="btn btn-sm btn-outline-secondary reorder-btn" data-section="ceremony" title="Reorder fields">
                                 <i class="bi bi-arrows-move"></i> Reorder
@@ -326,6 +342,12 @@
                             <button class="btn btn-sm btn-outline-primary edit-btn" data-section="ceremony">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
+                        </div>
+                    </div>
+                    <div class="collapse mb-3" id="infoCeremony">
+                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-lightbulb me-1"></i>
+                            Fill in the details about the main moments of your event. They can be reordered if needed. The changes will be sent to and reviewed by the videographer and will appear when approved.
                         </div>
                     </div>
                     
@@ -370,10 +392,21 @@
                 <!-- Additional Information -->
                 <div class="editable-section mb-4" data-section="additional">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="mb-0">Additional Information</h6>
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Additional Information</h6>
+                            <button class="btn btn-link btn-sm p-0 ms-2 text-info" type="button" data-bs-toggle="collapse" data-bs-target="#infoAdditional" aria-expanded="false" aria-controls="infoAdditional" title="Show info">
+                                <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i>
+                            </button>
+                        </div>
                         <button class="btn btn-sm btn-outline-primary edit-btn" data-section="additional">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
+                    </div>
+                    <div class="collapse mb-3" id="infoAdditional">
+                        <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                            <i class="bi bi-lightbulb me-1"></i>
+                            If there are more details to be known and established, or some requests or any other information for the preparation of the event, you can write them here. The changes will be sent to and reviewed by the videographer and will appear when approved.
+                        </div>
                     </div>
                     
                     <div class="mb-3">
@@ -383,26 +416,6 @@
                         </div>
                         <div class="edit-mode" style="display: none;">
                             <textarea class="form-control" data-field="details_extra" rows="3">{{ project.details_extra|default:'' }}</textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Editing Preferences</label>
-                        <div class="view-mode">
-                            <p class="form-control-plaintext">{{ project.editing_preferences|default:"Not specified" }}</p>
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <textarea class="form-control" data-field="editing_preferences" rows="3">{{ project.editing_preferences|default:'' }}</textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <div class="view-mode">
-                            <p class="form-control-plaintext">{{ project.notes|default:"Not specified" }}</p>
-                        </div>
-                        <div class="edit-mode" style="display: none;">
-                            <textarea class="form-control" data-field="notes" rows="3">{{ project.notes|default:'' }}</textarea>
                         </div>
                     </div>
                     
@@ -419,20 +432,31 @@
         </div>
         </div>
 
-        <!-- Editing Tab (Editing Phase) -->
+        <!-- Production Tab -->
         <div class="tab-content" id="production-content" style="display: none;">
             <div class="card mb-4">
                 <div class="card-header">
-                    <i class="bi bi-film"></i> Filming & Editing
+                    <i class="bi bi-film"></i> Production
                 </div>
                 <div class="card-body">
                     <!-- Filming Section -->
                     <div class="editable-section mb-4" data-section="filming">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Filming</h6>
+                            <div class="d-flex align-items-center">
+                                <h6 class="mb-0">Filming</h6>
+                                <button class="btn btn-link btn-sm p-0 ms-2 text-info" type="button" data-bs-toggle="collapse" data-bs-target="#infoFilming" aria-expanded="false" aria-controls="infoFilming" title="Show info">
+                                    <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i>
+                                </button>
+                            </div>
                             <button class="btn btn-sm btn-outline-primary edit-btn" data-section="filming">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
+                        </div>
+                        <div class="collapse mb-3" id="infoFilming">
+                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                                <i class="bi bi-lightbulb me-1"></i>
+                                Insert here any specific information that is relevant to you about the event or the people attending that must be known by the videographer to prepare for filming. Please fill this before the day of the event.
+                            </div>
                         </div>
                         
                         <div class="mb-3">
@@ -481,12 +505,23 @@
                     <!-- Editing Status -->
                     <div class="editable-section mb-4" data-section="editing-status">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Editing Progress</h6>
+                            <div class="d-flex align-items-center">
+                                <h6 class="mb-0">Editing Progress</h6>
+                                <button class="btn btn-link btn-sm p-0 ms-2 text-info" type="button" data-bs-toggle="collapse" data-bs-target="#infoEditingStatus" aria-expanded="false" aria-controls="infoEditingStatus" title="Show info">
+                                    <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i>
+                                </button>
+                            </div>
                             {% if is_admin %}
                             <button class="btn btn-sm btn-outline-primary edit-btn" data-section="editing-status">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
                             {% endif %}
+                        </div>
+                        <div class="collapse mb-3" id="infoEditingStatus">
+                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                                <i class="bi bi-lightbulb me-1"></i>
+                                This section shows the status of the editing process. This can be modified only by the videographer.
+                            </div>
                         </div>
                         
                         <div class="row">
@@ -537,10 +572,21 @@
                     <!-- Editing Notes -->
                     <div class="editable-section mb-4" data-section="editing-notes">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Editing Notes</h6>
+                            <div class="d-flex align-items-center">
+                                <h6 class="mb-0">Editing Notes</h6>
+                                <button class="btn btn-link btn-sm p-0 ms-2 text-info" type="button" data-bs-toggle="collapse" data-bs-target="#infoEditingNotes" aria-expanded="false" aria-controls="infoEditingNotes" title="Show info">
+                                    <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i>
+                                </button>
+                            </div>
                             <button class="btn btn-sm btn-outline-primary edit-btn" data-section="editing-notes">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
+                        </div>
+                        <div class="collapse mb-3" id="infoEditingNotes">
+                            <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem;">
+                                <i class="bi bi-lightbulb me-1"></i>
+                                Insert here any specific information that is relevant to the editing process (e.g., length of the ceremony, details to include or exclude, coloring preferences, song preferences, etc.). These will be taken as suggestions by the videographer. Please fill them before the editing process is complete.
+                            </div>
                         </div>
                         
                         <div class="mb-3">
