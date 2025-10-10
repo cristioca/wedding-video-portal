@@ -205,37 +205,75 @@ def project_detail(request, slug):
     if request.method == 'POST':
         if 'update_project' in request.POST:
             if request.user.is_client():
+                # Fields that bypass approval workflow (apply immediately for clients)
+                bypass_approval_fields = ['filming_details', 'notes']
+                
                 # For clients: Don't bind form to instance to prevent automatic changes
                 form = ProjectDetailForm(request.POST)
                 if form.is_valid():
                     # Get original values from database
                     original_project = Project.objects.get(pk=project.pk)
                     
-                    # Track modifications without applying changes
+                    has_pending_changes = False
+                    has_direct_changes = False
+                    
+                    # Track modifications and apply bypass field changes
                     for field_name, new_value in form.cleaned_data.items():
                         old_value = str(getattr(original_project, field_name) or '')
                         new_value_str = str(new_value or '')
                         
-                        # Only create modification if value actually changed
+                        # Only process if value actually changed
                         if old_value != new_value_str:
-                            ProjectModification.objects.create(
-                                project=project,
-                                field_name=field_name,
-                                old_value=old_value,
-                                new_value=new_value_str,
-                                created_by=request.user,
-                                status='PENDING'
-                            )
+                            if field_name in bypass_approval_fields:
+                                # Apply changes immediately for bypass fields
+                                setattr(project, field_name, new_value)
+                                has_direct_changes = True
+                                
+                                # Create AUTO_APPLIED modification record
+                                ProjectModification.objects.create(
+                                    project=project,
+                                    field_name=field_name,
+                                    old_value=old_value,
+                                    new_value=new_value_str,
+                                    created_by=request.user,
+                                    status='AUTO_APPLIED'
+                                )
+                                
+                                # Create field history
+                                FieldHistory.objects.create(
+                                    project=project,
+                                    field_name=field_name,
+                                    old_value=old_value,
+                                    new_value=new_value_str,
+                                    edited_by=request.user
+                                )
+                            else:
+                                # Create PENDING modification for other fields
+                                ProjectModification.objects.create(
+                                    project=project,
+                                    field_name=field_name,
+                                    old_value=old_value,
+                                    new_value=new_value_str,
+                                    created_by=request.user,
+                                    status='PENDING'
+                                )
+                                has_pending_changes = True
                     
-                    project.admin_notified_of_changes = True
-                    project.has_unsent_changes = True
+                    if has_pending_changes:
+                        project.admin_notified_of_changes = True
+                        project.has_unsent_changes = True
+                    
                     project.save()
                     
-                    # Send email notification to admin
-                    if project.notify_admin_of_changes(request.user):
-                        messages.info(request, 'Your changes have been submitted for admin approval and administrators have been notified.')
-                    else:
-                        messages.info(request, 'Your changes have been submitted for admin approval.')
+                    # Send email notification to admin only if there are pending changes
+                    if has_pending_changes:
+                        if project.notify_admin_of_changes(request.user):
+                            messages.info(request, 'Your changes have been submitted for admin approval and administrators have been notified.')
+                        else:
+                            messages.info(request, 'Your changes have been submitted for admin approval.')
+                    elif has_direct_changes:
+                        messages.success(request, 'Your changes have been saved successfully.')
+                    
             else:
                 # For admins: Apply changes immediately
                 form = ProjectDetailForm(request.POST, instance=project)
@@ -262,6 +300,10 @@ def project_detail(request, slug):
     files = project.files.all()
     modifications = project.modifications.filter(status='PENDING') if request.user.is_admin() else None
     ceremony_fields = project.get_ceremony_fields_ordered()
+    
+    # Get field history for filming_details and notes
+    filming_details_history = project.field_history.filter(field_name='filming_details').order_by('-created_at')
+    notes_history = project.field_history.filter(field_name='notes').order_by('-created_at')
     
     # Package presets for client-side use
     package_presets = {
@@ -339,6 +381,8 @@ def project_detail(request, slug):
         'is_admin': request.user.is_admin(),
         'ceremony_fields': ceremony_fields,
         'package_presets': json.dumps(package_presets),
+        'filming_details_history': filming_details_history,
+        'notes_history': notes_history,
     }
     
     return render(request, 'project_detail.html', context)
@@ -596,8 +640,11 @@ def update_project_field(request, slug):
             if field_value not in valid_choices and field_value != '':
                 return JsonResponse({'error': 'Invalid choice'}, status=400)
         
-        # Track modifications if client is editing
-        if request.user.is_client():
+        # Fields that bypass approval workflow (apply immediately for both admin and client)
+        bypass_approval_fields = ['filming_details', 'notes']
+        
+        # Track modifications if client is editing (except bypass fields)
+        if request.user.is_client() and field_name not in bypass_approval_fields:
             ProjectModification.objects.create(
                 project=project,
                 field_name=field_name,
@@ -618,8 +665,8 @@ def update_project_field(request, slug):
                 'pending_approval': True
             })
         
-        # Admin changes are applied immediately
-        if request.user.is_admin():
+        # Admin changes OR client changes to bypass fields are applied immediately
+        if request.user.is_admin() or field_name in bypass_approval_fields:
             # Convert date strings for DateTimeField where needed
             if field_name == 'event_date':
                 # Accept either 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM'
@@ -744,7 +791,10 @@ def batch_update_project(request, slug):
             except Exception:
                 continue  # Skip fields that cause errors
         
-        # Apply changes only for admins
+        # Fields that bypass approval workflow
+        bypass_approval_fields = ['filming_details', 'notes']
+        
+        # Apply changes for admins or bypass fields for clients
         if request.user.is_admin():
             # Apply changes immediately for admins
             for field_name, field_value in processed_updates.items():
@@ -760,17 +810,28 @@ def batch_update_project(request, slug):
                 print(f"❌ DATABASE SAVE ERROR: {save_error}")
                 return JsonResponse({'error': f'Database error: {str(save_error)}'}, status=500)
         else:
-            # For clients: Don't apply changes, just track them
-            print(f"📝 CLIENT BATCH UPDATE: {len(updated_fields)} fields queued for approval")
+            # For clients: Apply changes only for bypass fields
+            bypass_fields_to_save = [f for f in updated_fields if f in bypass_approval_fields]
+            pending_fields = [f for f in updated_fields if f not in bypass_approval_fields]
+            
+            if bypass_fields_to_save:
+                for field_name in bypass_fields_to_save:
+                    setattr(project, field_name, processed_updates[field_name])
+                project.save()
+                print(f"✅ CLIENT: Applied {len(bypass_fields_to_save)} bypass fields: {bypass_fields_to_save}")
+            
+            if pending_fields:
+                print(f"📝 CLIENT BATCH UPDATE: {len(pending_fields)} fields queued for approval: {pending_fields}")
         
         # Track modifications
         if updated_fields:
             try:
                 for field_name in updated_fields:
-                    # For clients, use the processed value; for admins, get from saved project
+                    # Determine status and value based on user and field type
                     if request.user.is_client():
                         new_value = str(processed_updates.get(field_name, '') or '')
-                        status = 'PENDING'
+                        # Bypass fields get AUTO_APPLIED status for clients too
+                        status = 'AUTO_APPLIED' if field_name in bypass_approval_fields else 'PENDING'
                     else:
                         new_value = str(getattr(project, field_name) or '')
                         status = 'AUTO_APPLIED'
@@ -784,8 +845,8 @@ def batch_update_project(request, slug):
                         status=status
                     )
                     
-                    # Track field history for specific fields (filming_details, notes)
-                    if request.user.is_admin() and field_name in ['filming_details', 'notes']:
+                    # Track field history for specific fields (filming_details, notes) for both admin and client
+                    if field_name in ['filming_details', 'notes']:
                         old_val = original_values.get(field_name, '')
                         if old_val != new_value:
                             history_entry = FieldHistory.objects.create(
@@ -795,7 +856,7 @@ def batch_update_project(request, slug):
                                 new_value=new_value,
                                 edited_by=request.user
                             )
-                            print(f"📜 Field History Created: {field_name} (ID={history_entry.id})")
+                            print(f"📜 Field History Created: {field_name} by {request.user.email} (ID={history_entry.id})")
                 
                 print(f"📝 CREATED {len(updated_fields)} MODIFICATION RECORDS")
             except Exception as mod_error:
@@ -804,29 +865,54 @@ def batch_update_project(request, slug):
         
         # Handle notifications and project state
         if request.user.is_client() and updated_fields:
-            # Mark project as having unsent changes for clients
-            project.admin_notified_of_changes = True
-            project.has_unsent_changes = True
-            project.save()
+            # Check if there are any pending fields (not bypass fields)
+            pending_fields = [f for f in updated_fields if f not in bypass_approval_fields]
             
-            # Notify admin if client made changes
-            if project.should_notify_admin():
-                try:
-                    project.notify_admin_of_changes(request.user)
-                    print(f"📧 ADMIN NOTIFICATION SENT")
-                except Exception as notify_error:
-                    print(f"⚠️ NOTIFICATION ERROR: {notify_error}")
-                    # Don't fail the whole request for notification errors
+            if pending_fields:
+                # Mark project as having unsent changes only if there are pending fields
+                project.admin_notified_of_changes = True
+                project.has_unsent_changes = True
+                project.save()
+                
+                # Notify admin if client made pending changes
+                if project.should_notify_admin():
+                    try:
+                        project.notify_admin_of_changes(request.user)
+                        print(f"📧 ADMIN NOTIFICATION SENT for {len(pending_fields)} pending fields")
+                    except Exception as notify_error:
+                        print(f"⚠️ NOTIFICATION ERROR: {notify_error}")
+                        # Don't fail the whole request for notification errors
         
         print(f"🎉 BATCH UPDATE COMPLETED SUCCESSFULLY")
         
         if request.user.is_client():
-            return JsonResponse({
-                'success': True, 
-                'message': f'{len(updated_fields)} changes submitted for admin approval',
-                'pending_approval': True,
-                'updated_fields': updated_fields
-            }, status=202)
+            bypass_fields_updated = [f for f in updated_fields if f in bypass_approval_fields]
+            pending_fields_updated = [f for f in updated_fields if f not in bypass_approval_fields]
+            
+            if bypass_fields_updated and pending_fields_updated:
+                message = f'{len(bypass_fields_updated)} changes saved, {len(pending_fields_updated)} changes submitted for approval'
+                return JsonResponse({
+                    'success': True, 
+                    'message': message,
+                    'pending_approval': True,
+                    'updated_fields': updated_fields
+                }, status=202)
+            elif bypass_fields_updated:
+                message = f'{len(bypass_fields_updated)} changes saved successfully'
+                return JsonResponse({
+                    'success': True, 
+                    'message': message,
+                    'pending_approval': False,
+                    'updated_fields': updated_fields
+                })
+            else:
+                message = f'{len(pending_fields_updated)} changes submitted for admin approval'
+                return JsonResponse({
+                    'success': True, 
+                    'message': message,
+                    'pending_approval': True,
+                    'updated_fields': updated_fields
+                }, status=202)
         else:
             return JsonResponse({
                 'success': True, 
