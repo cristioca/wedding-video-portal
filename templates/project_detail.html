@@ -48,6 +48,22 @@
     </div>
 </div>
 
+{% if not is_admin and show_guidance %}
+<!-- Client Guidance Banner -->
+<div class="alert alert-info alert-dismissible fade show mb-4" role="alert" id="clientGuidanceBanner">
+    <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle-fill me-3 mt-1" style="font-size: 1.2rem;"></i>
+        <div class="flex-grow-1">
+            <strong class="d-block mb-2">Action Required</strong>
+            <p class="mb-3">{{ guidance_message }}</p>
+            <button type="button" class="btn btn-primary btn-sm" onclick="dismissGuidance('{{ guidance_message_type }}')">
+                <i class="bi bi-check-circle me-1"></i> OK, I understand
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% if is_admin and modifications %}
 <div class="card mb-4">
     <div class="card-header bg-warning text-dark">
@@ -2393,6 +2409,40 @@ function fadeToNormalVisibility(header) {
     setTimeout(() => {
         header.style.transition = '';
     }, 2000);
+}
+
+// Function to dismiss client guidance message
+function dismissGuidance(messageType) {
+    const banner = document.getElementById('clientGuidanceBanner');
+    if (!banner) return;
+    
+    // Send dismissal to server
+    fetch(`/projects/{{ project.slug }}/dismiss-guidance/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            message_type: messageType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Fade out the banner
+            banner.classList.remove('show');
+            setTimeout(() => {
+                banner.remove();
+            }, 150);
+        } else {
+            showMessage('Error dismissing guidance: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error dismissing guidance:', error);
+        showMessage('Failed to dismiss guidance message', 'error');
+    });
 }
 
 // Attach click handlers without inline JS to avoid IDE lint errors

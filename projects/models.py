@@ -196,6 +196,10 @@ class Project(models.Model):
     last_client_notification_date = models.DateTimeField(blank=True, null=True)
     has_unsent_changes = models.BooleanField(default=False)
     
+    # Client guidance tracking
+    current_guidance_message = models.CharField(max_length=50, default='initial', help_text="Current guidance message type")
+    dismissed_guidance_messages = models.JSONField(default=list, blank=True, help_text="List of dismissed guidance message types")
+    
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -369,6 +373,43 @@ class Project(models.Model):
             'delivery_usb': {'label': 'USB memory stick', 'type': 'checkbox'},
             'event_presence': {'label': 'Event presence', 'type': 'textarea'},
         }
+    
+    def get_client_guidance_message(self):
+        """Get the appropriate guidance message based on project status"""
+        messages = {
+            'initial': "Please review all the details carefully and add or improve your preferences in the specific areas. Your input helps us create the perfect video for your special day.",
+            'planning': "The project is now in planning phase. Please ensure all your preferences are clearly stated in each section.",
+            'filming': "Filming is scheduled. Review the production details and add any last-minute requests or special moments you want captured.",
+            'editing': "Your video is being edited. Check the editing preferences and package details to ensure they match your vision.",
+            'review': "Your video is ready for review. Please provide detailed feedback in the appropriate sections.",
+            'completed': "Your project is complete! Thank you for choosing us. Feel free to leave any final feedback.",
+        }
+        
+        # Determine message type based on status
+        if self.status == 'Planning':
+            message_type = 'planning'
+        elif self.status == 'Filming':
+            message_type = 'filming'
+        elif self.edit_status in ['In Progress', 'Review']:
+            message_type = 'editing' if self.edit_status == 'In Progress' else 'review'
+        elif self.status == 'Completed' or self.edit_status == 'Completed':
+            message_type = 'completed'
+        else:
+            message_type = 'initial'
+        
+        # Update current message type if it changed
+        if self.current_guidance_message != message_type:
+            self.current_guidance_message = message_type
+            # Reset dismissed messages when status changes
+            self.dismissed_guidance_messages = []
+            self.save(update_fields=['current_guidance_message', 'dismissed_guidance_messages'])
+        
+        return messages.get(message_type, messages['initial']), message_type
+    
+    def should_show_guidance(self):
+        """Check if the current guidance message should be shown"""
+        message_text, message_type = self.get_client_guidance_message()
+        return message_type not in self.dismissed_guidance_messages
 
 
 class ProjectModification(models.Model):

@@ -372,6 +372,15 @@ def project_detail(request, slug):
         }
     }
     
+    # Get guidance message info for clients
+    guidance_message = None
+    guidance_message_type = None
+    show_guidance = False
+    
+    if request.user.is_client() and project.user == request.user:
+        guidance_message, guidance_message_type = project.get_client_guidance_message()
+        show_guidance = project.should_show_guidance()
+    
     context = {
         'project': project,
         'form': form,
@@ -383,6 +392,9 @@ def project_detail(request, slug):
         'package_presets': json.dumps(package_presets),
         'filming_details_history': filming_details_history,
         'notes_history': notes_history,
+        'guidance_message': guidance_message,
+        'guidance_message_type': guidance_message_type,
+        'show_guidance': show_guidance,
     }
     
     return render(request, 'project_detail.html', context)
@@ -400,8 +412,8 @@ def create_project(request):
         if form.is_valid():
             project = form.save(commit=False)
             # Set defaults for required fields not in form
-            project.status = 'Planning'
-            project.edit_status = 'Pending'
+            project.status = 'Not Started'
+            project.edit_status = 'Not Started'
             
             # Handle client user creation/assignment
             client_email = form.cleaned_data.get('client_email')
@@ -1220,3 +1232,38 @@ def get_field_history(request, slug, field_name):
         'field_name': field_name,
         'history': history_data
     })
+
+
+@login_required
+def dismiss_guidance(request, slug):
+    """Dismiss the current guidance message for a project"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    project = get_object_or_404(Project, slug=slug)
+    
+    # Only clients can dismiss guidance messages
+    if request.user.is_admin() or project.user != request.user:
+        return JsonResponse({'error': 'Only clients can dismiss guidance messages'}, status=403)
+    
+    try:
+        data = json.loads(request.body)
+        message_type = data.get('message_type')
+        
+        if not message_type:
+            return JsonResponse({'error': 'Message type is required'}, status=400)
+        
+        # Add the message type to dismissed list if not already there
+        if message_type not in project.dismissed_guidance_messages:
+            project.dismissed_guidance_messages.append(message_type)
+            project.save(update_fields=['dismissed_guidance_messages'])
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Guidance dismissed successfully'
+        })
+    
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
