@@ -700,8 +700,21 @@ def update_project_field(request, slug):
 
             setattr(project, field_name, field_value)
             
+            # Admin-only fields that should NOT trigger client notification
+            admin_only_fields = [
+                'videographer_filming_notes',
+                'critical_production_notes', 
+                'videographer_editing_notes',
+                'price',
+                'price_currency',
+                'price_other_details'
+            ]
+            
             # Mark that there are changes not yet notified to the client
-            project.has_unsent_changes = True
+            # BUT only if the field is visible to clients
+            if field_name not in admin_only_fields:
+                project.has_unsent_changes = True
+            
             project.save()  # The save method will auto-update project name if title_video changed
             
             # Create auto-applied modification record
@@ -813,7 +826,21 @@ def batch_update_project(request, slug):
                 setattr(project, field_name, field_value)
             
             print(f"💾 SAVING {len(updated_fields)} fields: {updated_fields}")
-            project.has_unsent_changes = True
+            
+            # Admin-only fields that should NOT trigger client notification
+            admin_only_fields = [
+                'videographer_filming_notes',
+                'critical_production_notes', 
+                'videographer_editing_notes',
+                'price',
+                'price_currency',
+                'price_other_details'
+            ]
+            
+            # Check if any client-visible fields were updated
+            client_visible_fields = [f for f in updated_fields if f not in admin_only_fields]
+            if client_visible_fields:
+                project.has_unsent_changes = True
             
             try:
                 project.save()

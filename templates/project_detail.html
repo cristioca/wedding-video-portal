@@ -1158,6 +1158,70 @@
                     {% endif %}
                 </div>
                 {% endif %}
+                
+                {% if is_admin %}
+                <!-- Price Details Sub-section (Admin Only) -->
+                <hr class="my-4">
+                <h6 class="text-muted mb-3"><i class="bi bi-currency-exchange"></i> Price Details (Admin Only)</h6>
+                
+                <div class="view-mode">
+                    <!-- Price -->
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <div class="d-flex align-items-center">
+                            <p class="form-control-plaintext mb-0">
+                                {% if project.price %}
+                                    {{ project.price }}
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            </p>
+                            <span class="ms-2 badge bg-secondary">
+                                {% if project.price_currency == 'EUR' %}Euro{% else %}Lei{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Other Details -->
+                    <div class="mb-3">
+                        <label class="form-label">Other details</label>
+                        <p class="form-control-plaintext">{{ project.price_other_details|default:"Not specified" }}</p>
+                    </div>
+                </div>
+                
+                <div class="edit-mode" style="display: none;">
+                    <!-- Price -->
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <div class="row g-2">
+                            <div class="col-7">
+                                <input type="number" class="form-control" data-field="price" 
+                                       value="{{ project.price|default:'' }}" 
+                                       min="0" placeholder="Enter price">
+                            </div>
+                            <div class="col-5">
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="price_currency" id="currency_eur" 
+                                           value="EUR" data-field="price_currency" 
+                                           {% if project.price_currency == 'EUR' or not project.price_currency %}checked{% endif %}>
+                                    <label class="btn btn-outline-secondary" for="currency_eur">Euro</label>
+                                    
+                                    <input type="radio" class="btn-check" name="price_currency" id="currency_lei" 
+                                           value="LEI" data-field="price_currency" 
+                                           {% if project.price_currency == 'LEI' %}checked{% endif %}>
+                                    <label class="btn btn-outline-secondary" for="currency_lei">Lei</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Other Details -->
+                    <div class="mb-3">
+                        <label class="form-label">Other details</label>
+                        <textarea class="form-control" data-field="price_other_details" rows="3">{{ project.price_other_details|default:'' }}</textarea>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
         
@@ -3249,13 +3313,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-2">
-                            <label class="form-label text-muted small">Previous Value:</label>
+                            <label class="form-label text-muted small">Previous instructions:</label>
                             <div class="p-2 border rounded text-body history-value-box history-value-old">
                                 ${escapeHtml(oldValue)}
                             </div>
                         </div>
                         <div class="col-md-6 mb-2">
-                            <label class="form-label text-success small">New Value:</label>
+                            <label class="form-label text-success small">New instructions:</label>
                             <div class="p-2 border border-success rounded text-body history-value-box history-value-new">
                                 ${escapeHtml(newValue)}
                             </div>

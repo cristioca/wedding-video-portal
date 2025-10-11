@@ -92,7 +92,9 @@ class ProjectDetailForm(forms.ModelForm):
             'montage_bonus_primary', 'montage_bonus_full', 'montage_cinema_duration',
             'equipment_audio_recorder', 'equipment_stabilizer', 'equipment_external_light',
             'team_videographer', 'team_operator', 'team_assistant',
-            'delivery_online', 'delivery_usb', 'event_presence'
+            'delivery_online', 'delivery_usb', 'event_presence',
+            # Price fields (admin only)
+            'price', 'price_currency', 'price_other_details'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -141,6 +143,10 @@ class ProjectDetailForm(forms.ModelForm):
             'delivery_online': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'delivery_usb': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'event_presence': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            # Price widgets (admin only)
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'price_currency': forms.RadioSelect(attrs={'class': 'form-check-input'}),
+            'price_other_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
     
     def __init__(self, *args, **kwargs):

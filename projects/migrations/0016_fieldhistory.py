@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('field_name', models.CharField(help_text='Name of the field that was changed', max_length=100)),
-                ('old_value', models.TextField(blank=True, help_text='Previous value', null=True)),
-                ('new_value', models.TextField(blank=True, help_text='New value', null=True)),
+                ('old_value', models.TextField(blank=True, help_text='Previous instructions', null=True)),
+                ('new_value', models.TextField(blank=True, help_text='New instructions', null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('edited_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='field_edits', to=settings.AUTH_USER_MODEL)),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='field_history', to='projects.project')),

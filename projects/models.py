@@ -175,6 +175,15 @@ class Project(models.Model):
     # Event presence
     event_presence = models.TextField(blank=True, null=True)
     
+    # Price details (admin only)
+    CURRENCY_CHOICES = [
+        ('EUR', 'Euro'),
+        ('LEI', 'Lei'),
+    ]
+    price = models.IntegerField(blank=True, null=True)
+    price_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='EUR')
+    price_other_details = models.TextField(blank=True, null=True)
+    
     # Filming details
     filming_details = models.TextField(blank=True, null=True, help_text="Client requests for filming")
     videographer_filming_notes = models.TextField(blank=True, null=True, help_text="Videographer's notes for filming (admin only)")
@@ -483,8 +492,8 @@ class FieldHistory(models.Model):
     """Track history of field changes with editor information"""
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='field_history')
     field_name = models.CharField(max_length=100, help_text="Name of the field that was changed")
-    old_value = models.TextField(blank=True, null=True, help_text="Previous value")
-    new_value = models.TextField(blank=True, null=True, help_text="New value")
+    old_value = models.TextField(blank=True, null=True, help_text="Previous instructions")
+    new_value = models.TextField(blank=True, null=True, help_text="New instructions")
     edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='field_edits')
     created_at = models.DateTimeField(auto_now_add=True)
     
