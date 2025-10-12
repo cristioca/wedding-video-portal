@@ -1,0 +1,911 @@
+# Romanian translation for Wedding Video Portal
+# Copyright (C) 2025
+# This file is distributed under the same license as the Wedding Video Portal package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-12 17:00+0200\n"
+"PO-Revision-Date: 2025-01-12 17:00+0200\n"
+"Last-Translator: \n"
+"Language-Team: Romanian\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
+
+# Navigation
+msgid "Dashboard"
+msgstr "Tablou de Bord"
+
+msgid "New Project"
+msgstr "Proiect Nou"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Logout"
+msgstr "Deconectare"
+
+msgid "Login"
+msgstr "Autentificare"
+
+# Login Page
+msgid "Sign in to your account"
+msgstr "Autentifică-te în contul tău"
+
+msgid "Email Address"
+msgstr "Adresa de Email"
+
+msgid "Password"
+msgstr "Parolă"
+
+msgid "Remember me"
+msgstr "Ține-mă minte"
+
+msgid "Sign In"
+msgstr "Autentificare"
+
+msgid "Invalid email or password"
+msgstr "Email sau parolă invalidă"
+
+# Dashboard
+msgid "All Projects"
+msgstr "Toate Proiectele"
+
+msgid "My Projects"
+msgstr "Proiectele Mele"
+
+msgid "Search projects..."
+msgstr "Caută proiecte..."
+
+msgid "Search"
+msgstr "Caută"
+
+msgid "Filter"
+msgstr "Filtrează"
+
+msgid "All Types"
+msgstr "Toate Tipurile"
+
+msgid "All Statuses"
+msgstr "Toate Statusurile"
+
+msgid "Reset"
+msgstr "Resetează"
+
+msgid "Archived Projects"
+msgstr "Proiecte Arhivate"
+
+msgid "No projects found"
+msgstr "Nu s-au găsit proiecte"
+
+msgid "Create your first project using the 'New Project' button above."
+msgstr "Creează primul tău proiect folosind butonul 'Proiect Nou' de mai sus."
+
+msgid "No projects match your search criteria."
+msgstr "Niciun proiect nu corespunde criteriilor tale de căutare."
+
+# Project Types
+msgid "Nunta"
+msgstr "Nuntă"
+
+msgid "Botez"
+msgstr "Botez"
+
+msgid "Altele"
+msgstr "Altele"
+
+# Project Status
+msgid "Not Started"
+msgstr "Neînceput"
+
+msgid "Planning"
+msgstr "Planificare"
+
+msgid "Filming"
+msgstr "Filmare"
+
+msgid "Editing"
+msgstr "Editare"
+
+msgid "Completed"
+msgstr "Finalizat"
+
+msgid "Pending"
+msgstr "În Așteptare"
+
+msgid "In Progress"
+msgstr "În Desfășurare"
+
+msgid "Review"
+msgstr "Revizuire"
+
+# Project Detail
+msgid "View Project"
+msgstr "Vezi Proiect"
+
+msgid "Edit"
+msgstr "Editează"
+
+msgid "Save"
+msgstr "Salvează"
+
+msgid "Cancel"
+msgstr "Anulează"
+
+msgid "Archive"
+msgstr "Arhivează"
+
+msgid "Delete"
+msgstr "Șterge"
+
+msgid "Send Credentials"
+msgstr "Trimite Credențiale"
+
+msgid "Change Client Data"
+msgstr "Schimbă Datele Clientului"
+
+msgid "Notify Client"
+msgstr "Notifică Clientul"
+
+msgid "Clear notification"
+msgstr "Șterge notificarea"
+
+# Project Sections
+msgid "Basic Information"
+msgstr "Informații Generale"
+
+msgid "Event Details"
+msgstr "Detalii Eveniment"
+
+msgid "Ceremony Details"
+msgstr "Detalii Ceremonie"
+
+msgid "Package"
+msgstr "Pachet"
+
+msgid "Price Details"
+msgstr "Detalii Preț"
+
+msgid "Files"
+msgstr "Fișiere"
+
+msgid "Modifications"
+msgstr "Modificări"
+
+# Project Fields
+msgid "Project Name"
+msgstr "Nume Proiect"
+
+msgid "Client Name"
+msgstr "Nume Client"
+
+msgid "Client Email"
+msgstr "Email Client"
+
+msgid "Event Date"
+msgstr "Data Evenimentului"
+
+msgid "Event Type"
+msgstr "Tip Eveniment"
+
+msgid "City"
+msgstr "Oraș"
+
+msgid "Title Video"
+msgstr "Titlu Video"
+
+msgid "Project Status"
+msgstr "Status Proiect"
+
+msgid "Editing Status"
+msgstr "Status Editare"
+
+msgid "Editing Progress"
+msgstr "Progres Editare"
+
+# Ceremony Fields
+msgid "Civil Union Details"
+msgstr "Detalii Cununie Civilă"
+
+msgid "Preparation"
+msgstr "Pregătirea"
+
+msgid "Church"
+msgstr "Biserica"
+
+msgid "Photo Session"
+msgstr "Ședință Foto"
+
+msgid "Restaurant"
+msgstr "Restaurant"
+
+msgid "Main Details"
+msgstr "Detalii Principale"
+
+# Package Fields
+msgid "Package Type"
+msgstr "Tip Pachet"
+
+msgid "4K"
+msgstr "4K"
+
+msgid "Cameras"
+msgstr "Camere"
+
+msgid "Highlights Clip"
+msgstr "Clip Highlights"
+
+msgid "Movie"
+msgstr "Film"
+
+msgid "Movie Duration"
+msgstr "Durata Filmului"
+
+msgid "Primary Edit"
+msgstr "Editare Primară"
+
+msgid "Full Movie"
+msgstr "Film Complet"
+
+msgid "Equipment"
+msgstr "Echipament"
+
+msgid "Audio Recorder"
+msgstr "Recorder Audio"
+
+msgid "Stabilizer"
+msgstr "Stabilizator"
+
+msgid "External Light"
+msgstr "Lumină Externă"
+
+msgid "Team"
+msgstr "Echipă"
+
+msgid "Videographer"
+msgstr "Videograf"
+
+msgid "Operator"
+msgstr "Operator"
+
+msgid "Assistant"
+msgstr "Asistent"
+
+msgid "Delivery"
+msgstr "Livrare"
+
+msgid "Online"
+msgstr "Online"
+
+msgid "USB"
+msgstr "USB"
+
+msgid "Event Presence"
+msgstr "Prezență Eveniment"
+
+# Price Fields
+msgid "Price"
+msgstr "Preț"
+
+msgid "Currency"
+msgstr "Monedă"
+
+msgid "Euro"
+msgstr "Euro"
+
+msgid "Lei"
+msgstr "Lei"
+
+msgid "Other Details"
+msgstr "Alte Detalii"
+
+# Production Fields
+msgid "Filming Details"
+msgstr "Detalii Filmare"
+
+msgid "Videographer Filming Notes"
+msgstr "Notițe Videograf pentru Filmare"
+
+msgid "Critical Production Notes"
+msgstr "Notițe Critice Producție"
+
+msgid "Videographer Editing Notes"
+msgstr "Notițe Videograf pentru Editare"
+
+msgid "Production"
+msgstr "Producție"
+
+msgid "Pre-production"
+msgstr "Pre-producție"
+
+msgid "Download"
+msgstr "Descărcare"
+
+msgid "Approval"
+msgstr "Aprobare"
+
+msgid "Feedback"
+msgstr "Feedback"
+
+# File Management
+msgid "Upload File"
+msgstr "Încarcă Fișier"
+
+msgid "Display Name"
+msgstr "Nume Afișat"
+
+msgid "Choose File"
+msgstr "Alege Fișier"
+
+msgid "Upload"
+msgstr "Încarcă"
+
+msgid "File Name"
+msgstr "Nume Fișier"
+
+msgid "Size"
+msgstr "Dimensiune"
+
+msgid "Uploaded By"
+msgstr "Încărcat De"
+
+msgid "Uploaded At"
+msgstr "Încărcat La"
+
+msgid "Actions"
+msgstr "Acțiuni"
+
+msgid "No files uploaded yet."
+msgstr "Niciun fișier încărcat încă."
+
+# Modifications
+msgid "Pending Modifications"
+msgstr "Modificări în Așteptare"
+
+msgid "Rejected Modifications"
+msgstr "Modificări Respinse"
+
+msgid "Field"
+msgstr "Câmp"
+
+msgid "Old Value"
+msgstr "Valoare Veche"
+
+msgid "New Value"
+msgstr "Valoare Nouă"
+
+msgid "Requested By"
+msgstr "Solicitat De"
+
+msgid "Requested At"
+msgstr "Solicitat La"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Approve"
+msgstr "Aprobă"
+
+msgid "Reject"
+msgstr "Respinge"
+
+msgid "Rejection Reason"
+msgstr "Motiv Respingere"
+
+msgid "Approved"
+msgstr "Aprobat"
+
+msgid "Rejected"
+msgstr "Respins"
+
+msgid "No pending modifications."
+msgstr "Nicio modificare în așteptare."
+
+msgid "No rejected modifications."
+msgstr "Nicio modificare respinsă."
+
+# Messages
+msgid "Project created successfully."
+msgstr "Proiect creat cu succes."
+
+msgid "Project updated successfully."
+msgstr "Proiect actualizat cu succes."
+
+msgid "Project archived successfully."
+msgstr "Proiect arhivat cu succes."
+
+msgid "Project deleted successfully."
+msgstr "Proiect șters cu succes."
+
+msgid "File uploaded successfully."
+msgstr "Fișier încărcat cu succes."
+
+msgid "Modification approved."
+msgstr "Modificare aprobată."
+
+msgid "Modification rejected."
+msgstr "Modificare respinsă."
+
+msgid "Client notified successfully."
+msgstr "Client notificat cu succes."
+
+msgid "Credentials sent successfully."
+msgstr "Credențiale trimise cu succes."
+
+msgid "Changes submitted for approval."
+msgstr "Modificări trimise pentru aprobare."
+
+msgid "You have been logged out."
+msgstr "Ai fost deconectat."
+
+msgid "Only administrators can create projects."
+msgstr "Doar administratorii pot crea proiecte."
+
+msgid "Only administrators can archive projects."
+msgstr "Doar administratorii pot arhiva proiecte."
+
+msgid "Only administrators can delete projects."
+msgstr "Doar administratorii pot șterge proiecte."
+
+msgid "Unauthorized"
+msgstr "Neautorizat"
+
+# Buttons
+msgid "Create Project"
+msgstr "Creează Proiect"
+
+msgid "Update Project"
+msgstr "Actualizează Proiect"
+
+msgid "Back to Dashboard"
+msgstr "Înapoi la Tablou de Bord"
+
+msgid "View All Projects"
+msgstr "Vezi Toate Proiectele"
+
+msgid "Reorder Fields"
+msgstr "Rearanjează Câmpurile"
+
+msgid "Save Order"
+msgstr "Salvează Ordinea"
+
+msgid "Apply Preset"
+msgstr "Aplică Preset"
+
+# Package Types
+msgid "Clasic"
+msgstr "Clasic"
+
+msgid "Highlights"
+msgstr "Highlights"
+
+msgid "Duo"
+msgstr "Duo"
+
+msgid "Cinema"
+msgstr "Cinema"
+
+msgid "Creative"
+msgstr "Creativ"
+
+msgid "Custom"
+msgstr "Personalizat"
+
+# Common
+msgid "Yes"
+msgstr "Da"
+
+msgid "No"
+msgstr "Nu"
+
+msgid "Optional"
+msgstr "Opțional"
+
+msgid "Required"
+msgstr "Obligatoriu"
+
+msgid "Loading..."
+msgstr "Se încarcă..."
+
+msgid "Saving..."
+msgstr "Se salvează..."
+
+msgid "Success"
+msgstr "Succes"
+
+msgid "Error"
+msgstr "Eroare"
+
+msgid "Warning"
+msgstr "Avertisment"
+
+msgid "Info"
+msgstr "Informație"
+
+msgid "Use credentials sent via email"
+msgstr "Folosește credențialele trimise prin email"
+
+msgid "Client"
+msgstr "Client"
+
+msgid "Confirm"
+msgstr "Confirmă"
+
+msgid "Are you sure?"
+msgstr "Ești sigur?"
+
+msgid "Close"
+msgstr "Închide"
+
+msgid "Submit"
+msgstr "Trimite"
+
+msgid "Clear"
+msgstr "Șterge"
+
+msgid "Not specified"
+msgstr "Nespecificat"
+
+msgid "Unknown"
+msgstr "Necunoscut"
+
+# Date/Time
+msgid "Today"
+msgstr "Astăzi"
+
+msgid "Yesterday"
+msgstr "Ieri"
+
+msgid "Tomorrow"
+msgstr "Mâine"
+
+msgid "Date"
+msgstr "Dată"
+
+msgid "Time"
+msgstr "Oră"
+
+# Guidance Messages
+msgid "Welcome! Complete the event details to get started."
+msgstr "Bine ai venit! Completează detaliile evenimentului pentru a începe."
+
+msgid "Event details updated. Review package options next."
+msgstr "Detalii eveniment actualizate. Verifică opțiunile de pachete în continuare."
+
+msgid "Package configured. Check ceremony details."
+msgstr "Pachet configurat. Verifică detaliile ceremoniei."
+
+msgid "All set! Waiting for files."
+msgstr "Totul este gata! Așteptăm fișierele."
+
+msgid "Files uploaded. Review and download when ready."
+msgstr "Fișiere încărcate. Verifică și descarcă când ești pregătit."
+
+# Additional Dashboard Translations
+msgid "Projects"
+msgstr "Proiecte"
+
+msgid "Clear search"
+msgstr "Șterge căutarea"
+
+msgid "Include archived"
+msgstr "Include arhivate"
+
+msgid "Newest First"
+msgstr "Cele Mai Recente Întâi"
+
+msgid "Oldest First"
+msgstr "Cele Mai Vechi Întâi"
+
+msgid "Name A-Z"
+msgstr "Nume A-Z"
+
+msgid "Name Z-A"
+msgstr "Nume Z-A"
+
+msgid "Event Date (Early)"
+msgstr "Data Evenimentului (Timpuriu)"
+
+msgid "Event Date (Late)"
+msgstr "Data Evenimentului (Târziu)"
+
+msgid "Status A-Z"
+msgstr "Status A-Z"
+
+msgid "Status Z-A"
+msgstr "Status Z-A"
+
+msgid "Client A-Z"
+msgstr "Client A-Z"
+
+msgid "Client Z-A"
+msgstr "Client Z-A"
+
+msgid "Has Changes"
+msgstr "Are Modificări"
+
+msgid "Create First Project"
+msgstr "Creează Primul Proiect"
+
+msgid "By"
+msgstr "De"
+
+msgid "ago"
+msgstr "în urmă"
+
+msgid "No archived projects found"
+msgstr "Nu s-au găsit proiecte arhivate"
+
+# Project Detail Page Translations
+msgid "Send credentials email"
+msgstr "Trimite email cu credențiale"
+
+msgid "Change client data"
+msgstr "Schimbă datele clientului"
+
+msgid "Action Required"
+msgstr "Acțiune Necesară"
+
+msgid "OK, I understand"
+msgstr "OK, am înțeles"
+
+msgid "Old"
+msgstr "Vechi"
+
+msgid "Your Request"
+msgstr "Cererea Ta"
+
+msgid "Original Value"
+msgstr "Valoare Originală"
+
+msgid "Rejected by"
+msgstr "Respins de"
+
+msgid "Rejected Change Requests"
+msgstr "Cereri de Modificare Respinse"
+
+msgid "Dismiss notifications"
+msgstr "Ascunde notificările"
+
+msgid "Review the feedback above and submit new change requests with corrections."
+msgstr "Revizuiește feedback-ul de mai sus și trimite cereri noi de modificare cu corecțiile necesare."
+
+msgid "rejected changes"
+msgstr "modificări respinse"
+
+msgid "click to review"
+msgstr "clic pentru a revizui"
+
+msgid "Project Workflow"
+msgstr "Flux de Lucru Proiect"
+
+msgid "Details"
+msgstr "Detalii"
+
+msgid "Show info"
+msgstr "Arată informații"
+
+msgid "Basic Information"
+msgstr "Informații Generale"
+
+msgid "The main details about the event. These are usually filled by the videographer, but if you need to make a change, please do so. The changes will be reviewed and will appear when approved by the videographer."
+msgstr "Detaliile principale despre eveniment. Acestea sunt de obicei completate de videograf, dar dacă trebuie să faci o modificare, te rog să o faci. Modificările vor fi revizuite și vor apărea când sunt aprobate de videograf."
+
+msgid "Not specified"
+msgstr "Nespecificat"
+
+msgid "Event Details"
+msgstr "Detalii Eveniment"
+
+msgid "Reorder"
+msgstr "Rearanjează"
+
+msgid "Additional Information"
+msgstr "Informații Suplimentare"
+
+msgid "Extra Details"
+msgstr "Detalii Extra"
+
+msgid "Filming"
+msgstr "Filmare"
+
+msgid "Notes"
+msgstr "Notițe"
+
+msgid "Save Order"
+msgstr "Salvează Ordinea"
+
+# Common Actions
+msgid "Save"
+msgstr "Salvează"
+
+msgid "Cancel"
+msgstr "Anulează"
+
+msgid "Edit"
+msgstr "Editează"
+
+msgid "Approve"
+msgstr "Aprobă"
+
+# Production & Workflow
+msgid "Download & Delivery"
+msgstr "Descărcare & Livrare"
+
+msgid "Download functionality coming soon..."
+msgstr "Funcționalitate de descărcare în curând..."
+
+msgid "Client Approval"
+msgstr "Aprobare Client"
+
+msgid "Approval workflow coming soon..."
+msgstr "Flux de aprobare în curând..."
+
+msgid "Client Feedback"
+msgstr "Feedback Client"
+
+msgid "Feedback system coming soon..."
+msgstr "Sistem de feedback în curând..."
+
+msgid "Videographer Notes for Editing"
+msgstr "Notițe Videograf pentru Editare"
+
+msgid "Filming Details (Client Requests)"
+msgstr "Detalii Filmare (Cerințe Client)"
+
+# Package Section
+msgid "Package"
+msgstr "Pachet"
+
+msgid "Admin Editable"
+msgstr "Editabil de Admin"
+
+msgid "Client View"
+msgstr "Vizualizare Client"
+
+msgid "Package Type"
+msgstr "Tip Pachet"
+
+msgid "Select Package"
+msgstr "Selectează Pachetul"
+
+msgid "Size Format"
+msgstr "Format Dimensiune"
+
+msgid "No format selected"
+msgstr "Niciun format selectat"
+
+msgid "No of cameras"
+msgstr "Număr camere"
+
+msgid "Montages"
+msgstr "Montaje"
+
+msgid "Highlights clip"
+msgstr "Clip highlights"
+
+msgid "Cinema style movie"
+msgstr "Film stil cinema"
+
+msgid "Full length movie"
+msgstr "Film integral"
+
+msgid "Primary edit (aprox 4 h)"
+msgstr "Editare primară (aprox 4 h)"
+
+msgid "No montages selected"
+msgstr "Niciun montaj selectat"
+
+msgid "Select Duration"
+msgstr "Selectează Durata"
+
+msgid "Specify other duration"
+msgstr "Specifică altă durată"
+
+msgid "Equipment details"
+msgstr "Detalii echipament"
+
+msgid "External audio recorder(s)"
+msgstr "Înregistrator(oare) audio extern(e)"
+
+msgid "Stabilizer"
+msgstr "Stabilizator"
+
+msgid "External light"
+msgstr "Lumină externă"
+
+msgid "No additional equipment"
+msgstr "Fără echipament suplimentar"
+
+msgid "Team"
+msgstr "Echipă"
+
+msgid "Videographer"
+msgstr "Videograf"
+
+msgid "Operator"
+msgstr "Operator"
+
+msgid "Assistant"
+msgstr "Asistent"
+
+msgid "Delivery medium"
+msgstr "Mediu de livrare"
+
+msgid "Online"
+msgstr "Online"
+
+msgid "USB memory stick"
+msgstr "Stick USB"
+
+msgid "No delivery method selected"
+msgstr "Nicio metodă de livrare selectată"
+
+msgid "Event presence"
+msgstr "Prezență eveniment"
+
+msgid "Price Details (Admin Only)"
+msgstr "Detalii Preț (Doar Admin)"
+
+msgid "Price"
+msgstr "Preț"
+
+msgid "Euro"
+msgstr "Euro"
+
+msgid "Lei"
+msgstr "Lei"
+
+msgid "Other details"
+msgstr "Alte detalii"
+
+msgid "Enter price"
+msgstr "Introdu prețul"
+
+# Files Section
+msgid "Files"
+msgstr "Fișiere"
+
+msgid "Upload File"
+msgstr "Încarcă Fișier"
+
+msgid "No files uploaded yet"
+msgstr "Niciun fișier încărcat încă"
+
+# Field Labels
+msgid "Project Name"
+msgstr "Nume Proiect"
+
+msgid "Client"
+msgstr "Client"
+
+msgid "Client name"
+msgstr "Nume client"
+
+msgid "Client email"
+msgstr "Email client"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Edit Status"
+msgstr "Status Editare"
+
+msgid "Event Date"
+msgstr "Data Evenimentului"
+
+msgid "City"
+msgstr "Oraș"
+
+msgid "Event Type"
+msgstr "Tip Eveniment"
+
+msgid "Title Video"
+msgstr "Titlu Video"
+
+msgid "Reorder fields"
+msgstr "Rearanjează câmpurile"

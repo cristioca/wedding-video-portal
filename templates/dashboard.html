@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Dashboard - Wedding Video Portal{% endblock %}
+{% block title %}{% trans "Dashboard" %} - Wedding Video Portal{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col">
         <h2 class="text-white">
-            <i class="bi bi-speedometer2"></i> Dashboard
+            <i class="bi bi-speedometer2"></i> {% trans "Dashboard" %}
             {% if is_admin %}
                 <span class="badge bg-danger">Admin</span>
             {% endif %}
@@ -15,10 +16,10 @@
     {% if is_admin %}
     <div class="col-auto">
         <a href="{% url 'create_project' %}" class="btn btn-light me-2">
-            <i class="bi bi-plus-circle"></i> New Project
+            <i class="bi bi-plus-circle"></i> {% trans "New Project" %}
         </a>
         <a href="{% url 'archived_projects' %}" class="btn btn-outline-light">
-            <i class="bi bi-archive"></i> Archived Projects
+            <i class="bi bi-archive"></i> {% trans "Archived Projects" %}
         </a>
     </div>
     {% endif %}
@@ -27,7 +28,7 @@
 {% if is_admin and pending_modifications %}
 <div class="card mb-4">
     <div class="card-header bg-warning text-dark">
-        <i class="bi bi-exclamation-triangle"></i> Pending Modifications ({{ pending_modifications|length }})
+        <i class="bi bi-exclamation-triangle"></i> {% trans "Pending Modifications" %} ({{ pending_modifications|length }})
     </div>
     <div class="card-body">
         <div class="list-group">
@@ -37,8 +38,8 @@
                     <h6 class="mb-1">{{ mod.project.name }}</h6>
                     <small>{{ mod.created_at|timesince }} ago</small>
                 </div>
-                <p class="mb-1">Field: {{ mod.field_name|title }}</p>
-                <small>By: {{ mod.created_by.get_full_name|default:mod.created_by.email }}</small>
+                <p class="mb-1">{% trans "Field" %}: {{ mod.field_name|title }}</p>
+                <small>{% trans "By" %}: {{ mod.created_by.get_full_name|default:mod.created_by.email }}</small>
             </a>
             {% endfor %}
         </div>
@@ -49,7 +50,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <div>
-            <i class="bi bi-folder-fill"></i> Projects
+            <i class="bi bi-folder-fill"></i> {% trans "Projects" %}
             {% if projects %}
                 <span class="badge bg-secondary ms-2">{{ projects|length }}</span>
             {% endif %}
@@ -58,13 +59,13 @@
             <!-- Search Field -->
             <div class="input-group" style="width: 250px;">
                 <input type="text" class="form-control form-control-sm" id="projectSearch" 
-                       placeholder="Search projects..." value="{{ search_query }}"
+                       placeholder="{% trans 'Search projects...' %}" value="{{ search_query }}"
                        style="background-color: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white;">
                 <button class="btn btn-outline-light btn-sm" type="button" id="searchButton">
                     <i class="bi bi-search"></i>
                 </button>
                 {% if search_query %}
-                <button class="btn btn-outline-light btn-sm" type="button" id="clearSearch" title="Clear search">
+                <button class="btn btn-outline-light btn-sm" type="button" id="clearSearch" title="{% trans 'Clear search' %}">
                     <i class="bi bi-x"></i>
                 </button>
                 {% endif %}
@@ -76,7 +77,7 @@
                        {% if include_archived %}checked{% endif %}
                        style="background-color: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);">
                 <label class="form-check-label text-light small" for="includeArchived">
-                    <i class="bi bi-archive"></i> Include archived
+                    <i class="bi bi-archive"></i> {% trans "Include archived" %}
                 </label>
             </div>
             
@@ -84,53 +85,53 @@
             <div class="dropdown">
                 <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" 
                         id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-sort-down"></i> Sort
+                    <i class="bi bi-sort-down"></i> {% trans "Sort" %}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item {% if current_sort == 'newest' %}active{% endif %}" 
                            href="#" data-sort="newest">
-                        <i class="bi bi-sort-numeric-down"></i> Newest First
+                        <i class="bi bi-sort-numeric-down"></i> {% trans "Newest First" %}
                     </a></li>
                     <li><a class="dropdown-item {% if current_sort == 'oldest' %}active{% endif %}" 
                            href="#" data-sort="oldest">
-                        <i class="bi bi-sort-numeric-up"></i> Oldest First
+                        <i class="bi bi-sort-numeric-up"></i> {% trans "Oldest First" %}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item {% if current_sort == 'name' %}active{% endif %}" 
                            href="#" data-sort="name">
-                        <i class="bi bi-sort-alpha-down"></i> Name A-Z
+                        <i class="bi bi-sort-alpha-down"></i> {% trans "Name A-Z" %}
                     </a></li>
                     <li><a class="dropdown-item {% if current_sort == '-name' %}active{% endif %}" 
                            href="#" data-sort="-name">
-                        <i class="bi bi-sort-alpha-up"></i> Name Z-A
+                        <i class="bi bi-sort-alpha-up"></i> {% trans "Name Z-A" %}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item {% if current_sort == 'date' %}active{% endif %}" 
                            href="#" data-sort="date">
-                        <i class="bi bi-calendar"></i> Event Date (Early)
+                        <i class="bi bi-calendar"></i> {% trans "Event Date (Early)" %}
                     </a></li>
                     <li><a class="dropdown-item {% if current_sort == '-date' %}active{% endif %}" 
                            href="#" data-sort="-date">
-                        <i class="bi bi-calendar"></i> Event Date (Late)
+                        <i class="bi bi-calendar"></i> {% trans "Event Date (Late)" %}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item {% if current_sort == 'status' %}active{% endif %}" 
                            href="#" data-sort="status">
-                        <i class="bi bi-flag"></i> Status A-Z
+                        <i class="bi bi-flag"></i> {% trans "Status A-Z" %}
                     </a></li>
                     <li><a class="dropdown-item {% if current_sort == '-status' %}active{% endif %}" 
                            href="#" data-sort="-status">
-                        <i class="bi bi-flag"></i> Status Z-A
+                        <i class="bi bi-flag"></i> {% trans "Status Z-A" %}
                     </a></li>
                     {% if is_admin %}
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item {% if current_sort == 'client' %}active{% endif %}" 
                            href="#" data-sort="client">
-                        <i class="bi bi-person"></i> Client A-Z
+                        <i class="bi bi-person"></i> {% trans "Client A-Z" %}
                     </a></li>
                     <li><a class="dropdown-item {% if current_sort == '-client' %}active{% endif %}" 
                            href="#" data-sort="-client">
-                        <i class="bi bi-person"></i> Client Z-A
+                        <i class="bi bi-person"></i> {% trans "Client Z-A" %}
                     </a></li>
                     {% endif %}
                 </ul>
@@ -162,12 +163,12 @@
                         <div class="mt-2">
                             {% if project.has_unsent_changes %}
                             <span class="badge bg-warning text-dark me-1">
-                                <i class="bi bi-exclamation-circle"></i> Has Changes
+                                <i class="bi bi-exclamation-circle"></i> {% trans "Has Changes" %}
                             </span>
                             {% endif %}
                             {% if project.is_archived %}
                             <span class="badge bg-dark">
-                                <i class="bi bi-archive"></i> Archived
+                                <i class="bi bi-archive"></i> {% trans "Archived" %}
                             </span>
                             {% endif %}
                         </div>
@@ -179,10 +180,10 @@
         {% else %}
         <div class="text-center py-5">
             <i class="bi bi-folder-x" style="font-size: 3rem; color: var(--text-muted);"></i>
-            <p class="mt-3 text-muted">No projects found</p>
+            <p class="mt-3 text-muted">{% trans "No projects found" %}</p>
             {% if is_admin %}
             <a href="{% url 'create_project' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Create First Project
+                <i class="bi bi-plus-circle"></i> {% trans "Create First Project" %}
             </a>
             {% endif %}
         </div>

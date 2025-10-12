@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+{% load i18n %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,13 +28,13 @@
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'dashboard' %}">
-                                <i class="bi bi-speedometer2"></i> Dashboard
+                                <i class="bi bi-speedometer2"></i> {% trans "Dashboard" %}
                             </a>
                         </li>
                         {% if user.is_admin %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'create_project' %}">
-                                <i class="bi bi-plus-circle"></i> New Project
+                                <i class="bi bi-plus-circle"></i> {% trans "New Project" %}
                             </a>
                         </li>
                         <li class="nav-item">
@@ -48,17 +49,47 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'logout' %}">
-                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                    <i class="bi bi-box-arrow-right"></i> {% trans "Logout" %}
                                 </a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'login' %}">
-                                <i class="bi bi-box-arrow-in-right"></i> Login
+                                <i class="bi bi-box-arrow-in-right"></i> {% trans "Login" %}
                             </a>
                         </li>
                     {% endif %}
+                    
+                    <!-- Language Switcher -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-translate"></i>
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% if LANGUAGE_CODE == 'ro' %}🇷🇴 RO{% else %}🇬🇧 EN{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary" aria-labelledby="languageDropdown" style="min-width: 200px;">
+                            {% get_current_language as CURRENT_LANGUAGE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                                <li>
+                                    <form action="{% url 'set_language' %}" method="post" style="display: inline; width: 100%;">
+                                        {% csrf_token %}
+                                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                                        <input name="language" type="hidden" value="{{ language.code }}">
+                                        <button type="submit" class="dropdown-item text-white {% if language.code == CURRENT_LANGUAGE %}active bg-primary{% endif %}" style="background-color: rgba(0, 0, 0, 0.7); border: none; padding: 0.5rem 1rem; width: 100%; text-align: left;">
+                                            {% if language.code == 'en' %}
+                                                🇬🇧 English
+                                            {% elif language.code == 'ro' %}
+                                                🇷🇴 Română
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

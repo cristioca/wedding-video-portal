@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block title %}{{ title }} - Wedding Video Portal{% endblock %}
 
@@ -14,7 +15,7 @@
                     {% csrf_token %}
                     
                     <div class="mb-3">
-                        <label class="form-label">Project Title</label>
+                        <label class="form-label">{% trans "Project Name" %}</label>
                         {{ form.name }}
                     </div>
                     
@@ -31,7 +32,7 @@
                     
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="form-label">Type</label>
+                            <label class="form-label">{% trans "Event Type" %}</label>
                             {{ form.type }}
                         </div>
                         <div class="col-md-4">
@@ -45,7 +46,7 @@
                     </div>
                     
                     <button type="submit" class="btn btn-primary" id="create-btn" disabled>
-                        <i class="bi bi-save"></i> Create Project
+                        <i class="bi bi-save"></i> {% trans "Create Project" %}
                     </button>
                     <a href="{% url 'dashboard' %}" class="btn btn-secondary">
                         <i class="bi bi-x-circle"></i> Cancel

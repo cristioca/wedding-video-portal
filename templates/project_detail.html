@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load project_filters %}
+{% load i18n %}
 
 {% block title %}{{ project.name }} - Wedding Video Portal{% endblock %}
 
@@ -14,10 +15,10 @@
         {% if is_admin %}
         <div class="mt-2">
             <button class="btn btn-light btn-sm js-send-credentials" data-project-id="{{ project.slug }}" style="background-color: rgba(85, 215, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);">
-                <i class="bi bi-envelope-at"></i> Send credentials email
+                <i class="bi bi-envelope-at"></i> {% trans "Send credentials email" %}
             </button>
             <button class="btn btn-light btn-sm js-change-client" data-project-id="{{ project.slug }}" style="background-color: rgba(85, 255, 105, 0.5); border: 1px solid rgba(255, 255, 255, 0.3);">
-                <i class="bi bi-person-gear"></i> Change client data
+                <i class="bi bi-person-gear"></i> {% trans "Change client data" %}
             </button>
         </div>
         {% endif %}
@@ -26,23 +27,23 @@
         {% if is_admin %}
         <!-- Always show notify button, but style differently based on changes -->
         <button class="btn {% if project.has_unsent_changes %}btn-warning{% else %}btn-secondary{% endif %} js-notify" data-project-id="{{ project.slug }}">
-            <i class="bi bi-envelope"></i> Notify Client
+            <i class="bi bi-envelope"></i> {% trans "Notify Client" %}
         </button>
         <!-- Show clear button only when there are changes, with less contrast -->
         {% if project.has_unsent_changes %}
         <button class="btn btn-outline-secondary opacity-75 js-clear-notify" data-project-id="{{ project.slug }}">
-            <i class="bi bi-bell-slash"></i> Clear notification
+            <i class="bi bi-bell-slash"></i> {% trans "Clear notification" %}
         </button>
         {% else %}
         <button class="btn btn-outline-secondary opacity-50" disabled>
-            <i class="bi bi-bell-slash"></i> Clear notification
+            <i class="bi bi-bell-slash"></i> {% trans "Clear notification" %}
         </button>
         {% endif %}
         <button class="btn btn-warning btn-sm me-2 js-archive-project" data-project-id="{{ project.slug }}" data-url="{% url 'archive_project' project.slug %}">
-            <i class="bi bi-archive"></i> Archive
+            <i class="bi bi-archive"></i> {% trans "Archive" %}
         </button>
         <button class="btn btn-danger btn-sm js-delete-project" data-project-id="{{ project.slug }}" data-url="{% url 'delete_project' project.slug %}">
-            <i class="bi bi-trash"></i> Delete
+            <i class="bi bi-trash"></i> {% trans "Delete" %}
         </button>
         {% endif %}
     </div>
@@ -54,10 +55,10 @@
     <div class="d-flex align-items-start">
         <i class="bi bi-info-circle-fill me-3 mt-1" style="font-size: 1.2rem;"></i>
         <div class="flex-grow-1">
-            <strong class="d-block mb-2">Action Required</strong>
+            <strong class="d-block mb-2">{% trans "Action Required" %}</strong>
             <p class="mb-3">{{ guidance_message }}</p>
             <button type="button" class="btn btn-primary btn-sm" onclick="dismissGuidance('{{ guidance_message_type }}')">
-                <i class="bi bi-check-circle me-1"></i> OK, I understand
+                <i class="bi bi-check-circle me-1"></i> {% trans "OK, I understand" %}
             </button>
         </div>
     </div>
@@ -67,7 +68,7 @@
 {% if is_admin and modifications %}
 <div class="card mb-4">
     <div class="card-header bg-warning text-dark">
-        <i class="bi bi-exclamation-triangle"></i> Pending Modifications
+        <i class="bi bi-exclamation-triangle"></i> {% trans "Pending Modifications" %}
     </div>
     <div class="card-body">
         {% for mod in modifications %}
@@ -75,8 +76,8 @@
             <div class="row">
                 <div class="col-md-8">
                     <h6>{{ mod.field_name|title }}</h6>
-                    <p class="mb-1"><strong>Old:</strong> {{ mod.old_value|default:"(empty)" }}</p>
-                    <p class="mb-1"><strong>New:</strong> {{ mod.new_value|default:"(empty)" }}</p>
+                    <p class="mb-1"><strong>{% trans "Old" %}:</strong> {{ mod.old_value|default:"(empty)" }}</p>
+                    <p class="mb-1"><strong>{% trans "New" %}:</strong> {{ mod.new_value|default:"(empty)" }}</p>
                     <small class="text-muted">By {{ mod.created_by.get_full_name|default:mod.created_by.email }} - {{ mod.created_at|timesince }} ago</small>
                 </div>
                 <div class="col-md-4 text-end">
@@ -88,7 +89,7 @@
                         </button>
                     </form>
                     <button type="button" class="btn btn-danger btn-sm" onclick="showRejectModal({{ mod.pk }}, '{{ mod.field_name|title }}')">
-                        <i class="bi bi-x"></i> Reject
+                        <i class="bi bi-x"></i> {% trans "Reject" %}
                     </button>
                 </div>
             </div>
@@ -112,12 +113,12 @@
          aria-controls="rejectedModificationsBody">
         <div class="d-flex align-items-center">
             <i class="bi bi-x-circle me-2 text-muted" style="font-size: 0.75rem; opacity: 0.6;"></i>
-            <span id="rejectedSectionTitle" class="text-muted" style="opacity: 0.7;">Rejected Change Requests</span>
+            <span id="rejectedSectionTitle" class="text-muted" style="opacity: 0.7;">{% trans "Rejected Change Requests" %}</span>
             <span class="badge text-muted ms-2" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; background-color: rgba(220, 53, 69, 0.15);" id="rejectedCount">0</span>
         </div>
         <div class="d-flex align-items-center">
             <i class="bi bi-chevron-up me-2 text-muted" id="rejectedChevron" style="font-size: 0.7rem; opacity: 0.5;"></i>
-            <button type="button" class="btn btn-sm text-muted" onclick="dismissRejectedSection(event)" title="Dismiss notifications" style="padding: 0.1rem 0.3rem; font-size: 0.7rem; border: 1px solid rgba(108, 117, 125, 0.3); opacity: 0.6;">
+            <button type="button" class="btn btn-sm text-muted" onclick="dismissRejectedSection(event)" title="{% trans 'Dismiss notifications' %}" style="padding: 0.1rem 0.3rem; font-size: 0.7rem; border: 1px solid rgba(108, 117, 125, 0.3); opacity: 0.6;">
                 <i class="bi bi-eye-slash"></i>
             </button>
         </div>
@@ -130,21 +131,21 @@
                 <div class="row">
                     <div class="col-md-8">
                         <h6 class="text-danger">{{ mod.field_name|title }}</h6>
-                        <p class="mb-1"><strong>Your Request:</strong> {{ mod.new_value|default:"(empty)" }}</p>
-                        <p class="mb-1"><strong>Original Value:</strong> {{ mod.old_value|default:"(empty)" }}</p>
+                        <p class="mb-1"><strong>{% trans "Your Request" %}:</strong> {{ mod.new_value|default:"(empty)" }}</p>
+                        <p class="mb-1"><strong>{% trans "Original Value" %}:</strong> {{ mod.old_value|default:"(empty)" }}</p>
                         {% if mod.notes %}
                         <div class="alert alert-warning mt-2 mb-2">
-                            <strong><i class="bi bi-exclamation-triangle me-1"></i>Rejection Reason:</strong><br>
+                            <strong><i class="bi bi-exclamation-triangle me-1"></i>{% trans "Rejection Reason" %}:</strong><br>
                             {{ mod.notes|linebreaks }}
                         </div>
                         {% endif %}
                         <small class="text-muted">
-                            Rejected by {{ mod.approved_by.get_full_name|default:mod.approved_by.email }} - {{ mod.approved_at|timesince }} ago
+                            {% trans "Rejected by" %} {{ mod.approved_by.get_full_name|default:mod.approved_by.email }} - {{ mod.approved_at|timesince }} {% trans "ago" %}
                         </small>
                     </div>
                     <div class="col-md-4 text-end">
                         <span class="badge bg-danger">
-                            <i class="bi bi-x-circle"></i> Rejected
+                            <i class="bi bi-x-circle"></i> {% trans "Rejected" %}
                         </span>
                     </div>
                 </div>
@@ -154,7 +155,7 @@
             <div class="text-center mt-3">
                 <small class="text-muted">
                     <i class="bi bi-info-circle me-1"></i>
-                    Review the feedback above and submit new change requests with corrections.
+                    {% trans "Review the feedback above and submit new change requests with corrections." %}
                 </small>
             </div>
         </div>
@@ -169,8 +170,8 @@
     <div class="d-flex justify-content-between align-items-center">
         <div class="text-muted">
             <i class="bi bi-exclamation-triangle me-1" style="font-size: 0.7rem;"></i>
-            <span id="rejectedMinimizedCount">0 rejected changes</span>
-            <small class="ms-1 opacity-50" style="font-size: 0.65rem;">• click to review</small>
+            <span id="rejectedMinimizedCount">0 {% trans "rejected changes" %}</span>
+            <small class="ms-1 opacity-50" style="font-size: 0.65rem;">• {% trans "click to review" %}</small>
         </div>
         <i class="bi bi-chevron-up text-muted opacity-50" style="font-size: 0.6rem;"></i>
     </div>
@@ -183,10 +184,10 @@
     <div class="col-lg-8">
         <!-- Project Phase Navigation -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="text-white mb-0">Project Workflow</h6>
+            <h6 class="text-white mb-0">{% trans "Project Workflow" %}</h6>
             <div class="btn-group" role="group" aria-label="Project phases">
                 <button type="button" class="btn btn-outline-secondary btn-sm active" id="preproduction-tab" onclick="switchTab('preproduction')">
-                    <i class="bi bi-clipboard-check"></i> Details
+                    <i class="bi bi-clipboard-check"></i> {% trans "Details" %}
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="production-tab" onclick="switchTab('production')">
                     <i class="bi bi-film"></i> Production
@@ -195,10 +196,10 @@
                     <i class="bi bi-download"></i> Download
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="approval-tab" onclick="switchTab('approval')" disabled>
-                    <i class="bi bi-check-circle"></i> Approval
+                    <i class="bi bi-check-circle"></i> {% trans "Approval" %}
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="feedback-tab" onclick="switchTab('feedback')" disabled>
-                    <i class="bi bi-chat-dots"></i> Feedback
+                    <i class="bi bi-chat-dots"></i> {% trans "Feedback" %}
                 </button>
             </div>
         </div>
@@ -207,15 +208,15 @@
         <div class="tab-content" id="preproduction-content">
             <div class="card mb-4">
                 <div class="card-header">
-                    <i class="bi bi-info-circle"></i> Project Details
+                    <i class="bi bi-info-circle"></i> {% trans "Project Details" %}
                 </div>
             <div class="card-body">
                 <!-- Basic Information -->
                 <div class="editable-section mb-4" data-section="basic">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="d-flex align-items-center">
-                            <h6 class="mb-0">Basic Information</h6>
-                            <button class="btn btn-link btn-sm p-0 ms-2 text-info" type="button" data-bs-toggle="collapse" data-bs-target="#infoBasic" aria-expanded="false" aria-controls="infoBasic" title="Show info">
+                            <h6 class="mb-0">{% trans "Basic Information" %}</h6>
+                            <button class="btn btn-link btn-sm p-0 ms-2 text-info" type="button" data-bs-toggle="collapse" data-bs-target="#infoBasic" aria-expanded="false" aria-controls="infoBasic" title="{% trans 'Show info' %}">
                                 <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i>
                             </button>
                         </div>
@@ -226,13 +227,13 @@
                     <div class="collapse mb-3" id="infoBasic">
                         <div class="alert alert-info py-2 px-3" style="font-size: 0.85rem; color: inherit;">
                             <i class="bi bi-lightbulb me-1"></i>
-                            The main details about the event. These are usually filled by the videographer, but if you need to make a change, please do so. The changes will be reviewed and will appear when approved by the videographer.
+                            {% trans "The main details about the event. These are usually filled by the videographer, but if you need to make a change, please do so. The changes will be reviewed and will appear when approved by the videographer." %}
                         </div>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Project Name</label>
+                            <label class="form-label">{% trans "Project Name" %}</label>
                             <div class="view-mode">
                                 <p class="form-control-plaintext">{{ project.name }}</p>
                             </div>
@@ -241,7 +242,7 @@
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Client</label>
+                            <label class="form-label">{% trans "Client" %}</label>
                             <div class="view-mode">
                                 <p class="form-control-plaintext">{{ project.client_name|default:project.user.get_full_name|default:project.user.username }}</p>
                                 {% if project.client_email %}
@@ -249,15 +250,15 @@
                                 {% endif %}
                             </div>
                             <div class="edit-mode" style="display: none;">
-                                <input type="text" class="form-control mb-2" data-field="client_name" value="{{ project.client_name|default:'' }}" placeholder="Client name">
-                                <input type="email" class="form-control" data-field="client_email" value="{{ project.client_email|default:'' }}" placeholder="Client email">
+                                <input type="text" class="form-control mb-2" data-field="client_name" value="{{ project.client_name|default:'' }}" placeholder="{% trans 'Client name' %}">
+                                <input type="email" class="form-control" data-field="client_email" value="{{ project.client_email|default:'' }}" placeholder="{% trans 'Client email' %}">
                             </div>
                         </div>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Type</label>
+                            <label class="form-label">{% trans "Event Type" %}</label>
                             <div class="view-mode">
                                 <p class="form-control-plaintext">{{ project.get_type_display }}</p>
                             </div>
@@ -270,7 +271,7 @@
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Status</label>
+                            <label class="form-label">{% trans "Status" %}</label>
                             <div class="view-mode">
                                 <p class="form-control-plaintext">{{ project.get_status_display }}</p>
                             </div>
@@ -285,7 +286,7 @@
                             {% endif %}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Edit Status</label>
+                            <label class="form-label">{% trans "Edit Status" %}</label>
                             <div class="view-mode">
                                 <p class="form-control-plaintext">{{ project.get_edit_status_display }}</p>
                             </div>
@@ -303,7 +304,7 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Event Date</label>
+                            <label class="form-label">{% trans "Event Date" %}</label>
                             <div class="view-mode">
                                 <p class="form-control-plaintext">{{ project.event_date|date:"Y-m-d" }}</p>
                             </div>
@@ -312,9 +313,9 @@
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">City</label>
+                            <label class="form-label">{% trans "City" %}</label>
                             <div class="view-mode">
-                                <p class="form-control-plaintext">{{ project.city|default:"Not specified" }}</p>
+                                <p class="form-control-plaintext">{{ project.city|default:_('Not specified') }}</p>
                             </div>
                             <div class="edit-mode" style="display: none;">
                                 <input type="text" class="form-control" data-field="city" value="{{ project.city|default:'' }}">
@@ -323,9 +324,9 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Video Title</label>
+                        <label class="form-label">{% trans "Title Video" %}</label>
                         <div class="view-mode">
-                            <p class="form-control-plaintext">{{ project.title_video|default:"Not specified" }}</p>
+                            <p class="form-control-plaintext">{{ project.title_video|default:_('Not specified') }}</p>
                         </div>
                         <div class="edit-mode" style="display: none;">
                             <input type="text" class="form-control" data-field="title_video" value="{{ project.title_video|default:'' }}">
@@ -727,10 +728,10 @@
         <div class="tab-content" id="download-content" style="display: none;">
             <div class="card mb-4">
                 <div class="card-header">
-                    <i class="bi bi-download"></i> Download & Delivery
+                    <i class="bi bi-download"></i> {% trans "Download & Delivery" %}
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Download functionality coming soon...</p>
+                    <p class="text-muted">{% trans "Download functionality coming soon..." %}</p>
                 </div>
             </div>
         </div>
@@ -738,10 +739,10 @@
         <div class="tab-content" id="approval-content" style="display: none;">
             <div class="card mb-4">
                 <div class="card-header">
-                    <i class="bi bi-check-circle"></i> Client Approval
+                    <i class="bi bi-check-circle"></i> {% trans "Client Approval" %}
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Approval workflow coming soon...</p>
+                    <p class="text-muted">{% trans "Approval workflow coming soon..." %}</p>
                 </div>
             </div>
         </div>
@@ -749,10 +750,10 @@
         <div class="tab-content" id="feedback-content" style="display: none;">
             <div class="card mb-4">
                 <div class="card-header">
-                    <i class="bi bi-chat-dots"></i> Client Feedback
+                    <i class="bi bi-chat-dots"></i> {% trans "Client Feedback" %}
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Feedback system coming soon...</p>
+                    <p class="text-muted">{% trans "Feedback system coming soon..." %}</p>
                 </div>
             </div>
         </div>
@@ -763,11 +764,11 @@
         <div class="card mb-4 editable-section" data-section="package">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <i class="bi bi-box-seam"></i> Package
+                    <i class="bi bi-box-seam"></i> {% trans "Package" %}
                     {% if is_admin %}
-                    <span class="badge bg-primary ms-2">Admin Editable</span>
+                    <span class="badge bg-primary ms-2">{% trans "Admin Editable" %}</span>
                     {% else %}
-                    <span class="badge bg-secondary ms-2">Client View</span>
+                    <span class="badge bg-secondary ms-2">{% trans "Client View" %}</span>
                     {% endif %}
                 </div>
                 {% if is_admin %}
@@ -781,13 +782,13 @@
                 <!-- Admin View - Editable Package Section -->
                 <!-- Package Type -->
                 <div class="mb-3">
-                    <label class="form-label">Package Type</label>
+                    <label class="form-label">{% trans "Package Type" %}</label>
                     <div class="view-mode">
                         <p class="form-control-plaintext">{{ project.package_type|default:"Not specified" }}</p>
                     </div>
                     <div class="edit-mode" style="display: none;">
                         <select class="form-control" data-field="package_type">
-                            <option value="">Select Package</option>
+                            <option value="">{% trans "Select Package" %}</option>
                             <option value="Clasic" {% if project.package_type == 'Clasic' %}selected{% endif %}>Clasic</option>
                             <option value="Highlights" {% if project.package_type == 'Highlights' %}selected{% endif %}>Highlights</option>
                             <option value="Duo" {% if project.package_type == 'Duo' %}selected{% endif %}>Duo</option>
@@ -801,13 +802,13 @@
 
                 <!-- Size Format -->
                 <div class="mb-3">
-                    <label class="form-label">Size Format</label>
+                    <label class="form-label">{% trans "Size Format" %}</label>
                     <div class="view-mode">
                         <div class="form-control-plaintext">
                             {% if project.package_4k %}<i class="bi bi-check text-success"></i> 4K<br>{% endif %}
                             {% if project.package_fullhd %}<i class="bi bi-check text-success"></i> FullHD<br>{% endif %}
                             {% if not project.package_4k and not project.package_fullhd %}
-                                <span class="text-muted">No format selected</span>
+                                <span class="text-muted">{% trans "No format selected" %}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -827,7 +828,7 @@
 
                 <!-- Number of Cameras -->
                 <div class="mb-3">
-                    <label class="form-label">No of cameras</label>
+                    <label class="form-label">{% trans "No of cameras" %}</label>
                     <div class="view-mode">
                         <p class="form-control-plaintext">{{ project.package_cameras|default:"Not specified" }}</p>
                     </div>
@@ -852,15 +853,15 @@
 
                 <!-- Montages -->
                 <div class="mb-3">
-                    <label class="form-label">Montages</label>
+                    <label class="form-label">{% trans "Montages" %}</label>
                     <div class="view-mode">
                         <div class="form-control-plaintext">
                             <!-- 1. Highlights clip -->
-                            {% if project.montage_highlights %}<i class="bi bi-check text-success"></i> Highlights clip<br>{% endif %}
+                            {% if project.montage_highlights %}<i class="bi bi-check text-success"></i> {% trans "Highlights clip" %}<br>{% endif %}
                             
                             <!-- 2. Cinema style movie -->
                             {% if project.montage_bonus_full %}
-                                <i class="bi bi-check text-success"></i> Cinema style movie
+                                <i class="bi bi-check text-success"></i> {% trans "Cinema style movie" %}
                                 {% if project.montage_cinema_duration %}
                                     ({{ project.get_montage_cinema_duration_display }})
                                 {% endif %}<br>
@@ -868,7 +869,7 @@
                             
                             <!-- 3. Full length movie -->
                             {% if project.montage_movie %}
-                                <i class="bi bi-check text-success"></i> Full length movie
+                                <i class="bi bi-check text-success"></i> {% trans "Full length movie" %}
                                 {% if project.montage_movie_duration %}
                                     ({{ project.get_montage_movie_duration_display }}
                                     {% if project.montage_movie_duration == 'Other' and project.montage_movie_other %}: {{ project.montage_movie_other }}{% endif %})
@@ -876,10 +877,10 @@
                             {% endif %}
                             
                             <!-- 4. Primary edit -->
-                            {% if project.montage_bonus_primary %}<i class="bi bi-check text-success"></i> Primary edit (aprox 4 h)<br>{% endif %}
+                            {% if project.montage_bonus_primary %}<i class="bi bi-check text-success"></i> {% trans "Primary edit (aprox 4 h)" %}<br>{% endif %}
                             
                             {% if not project.montage_highlights and not project.montage_movie and not project.montage_bonus_primary and not project.montage_bonus_full %}
-                                <span class="text-muted">No montages selected</span>
+                                <span class="text-muted">{% trans "No montages selected" %}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -912,7 +913,7 @@
                         </div>
                         <div class="ms-3 mb-2" id="movie-duration-section" style="{% if not project.montage_movie %}display: none;{% endif %}">
                             <select class="form-control form-control-sm" data-field="montage_movie_duration">
-                                <option value="">Select Duration</option>
+                                <option value="">{% trans "Select Duration" %}</option>
                                 <option value="30min" {% if project.montage_movie_duration == '30min' %}selected{% endif %}>30 min</option>
                                 <option value="1h" {% if project.montage_movie_duration == '1h' %}selected{% endif %}>1 h</option>
                                 <option value="1h30min" {% if project.montage_movie_duration == '1h30min' %}selected{% endif %}>1h30min</option>
@@ -921,7 +922,7 @@
                                 <option value="Other" {% if project.montage_movie_duration == 'Other' %}selected{% endif %}>Other</option>
                             </select>
                             <input type="text" class="form-control form-control-sm mt-1" 
-                                   placeholder="Specify other duration" data-field="montage_movie_other"
+                                   placeholder="{% trans 'Specify other duration' %}" data-field="montage_movie_other"
                                    value="{{ project.montage_movie_other|default:'' }}"
                                    style="{% if project.montage_movie_duration != 'Other' %}display: none;{% endif %}">
                         </div>
@@ -937,14 +938,14 @@
 
                 <!-- Equipment Details -->
                 <div class="mb-3">
-                    <label class="form-label">Equipment details</label>
+                    <label class="form-label">{% trans "Equipment details" %}</label>
                     <div class="view-mode">
                         <div class="form-control-plaintext">
-                            {% if project.equipment_audio_recorder %}<i class="bi bi-check text-success"></i> External audio recorder(s)<br>{% endif %}
-                            {% if project.equipment_stabilizer %}<i class="bi bi-check text-success"></i> Stabilizer<br>{% endif %}
-                            {% if project.equipment_external_light %}<i class="bi bi-check text-success"></i> External light<br>{% endif %}
+                            {% if project.equipment_audio_recorder %}<i class="bi bi-check text-success"></i> {% trans "External audio recorder(s)" %}<br>{% endif %}
+                            {% if project.equipment_stabilizer %}<i class="bi bi-check text-success"></i> {% trans "Stabilizer" %}<br>{% endif %}
+                            {% if project.equipment_external_light %}<i class="bi bi-check text-success"></i> {% trans "External light" %}<br>{% endif %}
                             {% if not project.equipment_audio_recorder and not project.equipment_stabilizer and not project.equipment_external_light %}
-                                <span class="text-muted">No additional equipment</span>
+                                <span class="text-muted">{% trans "No additional equipment" %}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -969,19 +970,19 @@
 
                 <!-- Team -->
                 <div class="mb-3">
-                    <label class="form-label">Team</label>
+                    <label class="form-label">{% trans "Team" %}</label>
                     <div class="view-mode">
                         <div class="row">
                             <div class="col-4">
-                                <small class="text-muted">Videographer</small>
+                                <small class="text-muted">{% trans "Videographer" %}</small>
                                 <p class="form-control-plaintext">{{ project.team_videographer }}</p>
                             </div>
                             <div class="col-4">
-                                <small class="text-muted">Operator</small>
+                                <small class="text-muted">{% trans "Operator" %}</small>
                                 <p class="form-control-plaintext">{{ project.team_operator }}</p>
                             </div>
                             <div class="col-4">
-                                <small class="text-muted">Assistant</small>
+                                <small class="text-muted">{% trans "Assistant" %}</small>
                                 <p class="form-control-plaintext">{{ project.team_assistant }}</p>
                             </div>
                         </div>
@@ -1009,13 +1010,13 @@
 
                 <!-- Delivery Medium -->
                 <div class="mb-3">
-                    <label class="form-label">Delivery medium</label>
+                    <label class="form-label">{% trans "Delivery medium" %}</label>
                     <div class="view-mode">
                         <div class="form-control-plaintext">
-                            {% if project.delivery_online %}<i class="bi bi-check text-success"></i> Online<br>{% endif %}
-                            {% if project.delivery_usb %}<i class="bi bi-check text-success"></i> USB memory stick<br>{% endif %}
+                            {% if project.delivery_online %}<i class="bi bi-check text-success"></i> {% trans "Online" %}<br>{% endif %}
+                            {% if project.delivery_usb %}<i class="bi bi-check text-success"></i> {% trans "USB memory stick" %}<br>{% endif %}
                             {% if not project.delivery_online and not project.delivery_usb %}
-                                <span class="text-muted">No delivery method selected</span>
+                                <span class="text-muted">{% trans "No delivery method selected" %}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -1035,7 +1036,7 @@
 
                 <!-- Event Presence -->
                 <div class="mb-3">
-                    <label class="form-label">Event presence</label>
+                    <label class="form-label">{% trans "Event presence" %}</label>
                     <div class="view-mode">
                         {% if project.event_presence %}
                         <p class="form-control-plaintext">{{ project.event_presence }}</p>
@@ -1074,7 +1075,7 @@
                             {% if project.package_4k %}<i class="bi bi-check text-success"></i> 4K<br>{% endif %}
                             {% if project.package_fullhd %}<i class="bi bi-check text-success"></i> FullHD<br>{% endif %}
                             {% if not project.package_4k and not project.package_fullhd %}
-                                <span class="text-muted">No format selected</span>
+                                <span class="text-muted">{% trans "No format selected" %}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -1089,18 +1090,18 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Montages</label>
                         <div class="form-control-plaintext">
-                            {% if project.montage_highlights %}<i class="bi bi-check text-success"></i> Highlights clip<br>{% endif %}
+                            {% if project.montage_highlights %}<i class="bi bi-check text-success"></i> {% trans "Highlights clip" %}<br>{% endif %}
                             {% if project.montage_movie %}
-                                <i class="bi bi-check text-success"></i> Full length movie
+                                <i class="bi bi-check text-success"></i> {% trans "Full length movie" %}
                                 {% if project.montage_movie_duration %}
                                     ({{ project.get_montage_movie_duration_display }}
                                     {% if project.montage_movie_duration == 'Other' and project.montage_movie_other %}: {{ project.montage_movie_other }}{% endif %})
                                 {% endif %}<br>
                             {% endif %}
-                            {% if project.montage_bonus_primary %}<i class="bi bi-check text-success"></i> Primary edit (aprox 4 h)<br>{% endif %}
+                            {% if project.montage_bonus_primary %}<i class="bi bi-check text-success"></i> {% trans "Primary edit (aprox 4 h)" %}<br>{% endif %}
                             {% if project.montage_bonus_full %}<i class="bi bi-check text-success"></i> Cinema style movie<br>{% endif %}
                             {% if not project.montage_highlights and not project.montage_movie and not project.montage_bonus_primary and not project.montage_bonus_full %}
-                                <span class="text-muted">No montages selected</span>
+                                <span class="text-muted">{% trans "No montages selected" %}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -1109,11 +1110,11 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Equipment details</label>
                         <div class="form-control-plaintext">
-                            {% if project.equipment_audio_recorder %}<i class="bi bi-check text-success"></i> External audio recorder(s)<br>{% endif %}
-                            {% if project.equipment_stabilizer %}<i class="bi bi-check text-success"></i> Stabilizer<br>{% endif %}
-                            {% if project.equipment_external_light %}<i class="bi bi-check text-success"></i> External light<br>{% endif %}
+                            {% if project.equipment_audio_recorder %}<i class="bi bi-check text-success"></i> {% trans "External audio recorder(s)" %}<br>{% endif %}
+                            {% if project.equipment_stabilizer %}<i class="bi bi-check text-success"></i> {% trans "Stabilizer" %}<br>{% endif %}
+                            {% if project.equipment_external_light %}<i class="bi bi-check text-success"></i> {% trans "External light" %}<br>{% endif %}
                             {% if not project.equipment_audio_recorder and not project.equipment_stabilizer and not project.equipment_external_light %}
-                                <span class="text-muted">No additional equipment</span>
+                                <span class="text-muted">{% trans "No additional equipment" %}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -1123,15 +1124,15 @@
                         <label class="form-label fw-bold">Team</label>
                         <div class="row">
                             <div class="col-4">
-                                <small class="text-muted">Videographer</small>
+                                <small class="text-muted">{% trans "Videographer" %}</small>
                                 <p class="form-control-plaintext">{{ project.team_videographer }}</p>
                             </div>
                             <div class="col-4">
-                                <small class="text-muted">Operator</small>
+                                <small class="text-muted">{% trans "Operator" %}</small>
                                 <p class="form-control-plaintext">{{ project.team_operator }}</p>
                             </div>
                             <div class="col-4">
-                                <small class="text-muted">Assistant</small>
+                                <small class="text-muted">{% trans "Assistant" %}</small>
                                 <p class="form-control-plaintext">{{ project.team_assistant }}</p>
                             </div>
                         </div>
@@ -1141,10 +1142,10 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Delivery medium</label>
                         <div class="form-control-plaintext">
-                            {% if project.delivery_online %}<i class="bi bi-check text-success"></i> Online<br>{% endif %}
-                            {% if project.delivery_usb %}<i class="bi bi-check text-success"></i> USB memory stick<br>{% endif %}
+                            {% if project.delivery_online %}<i class="bi bi-check text-success"></i> {% trans "Online" %}<br>{% endif %}
+                            {% if project.delivery_usb %}<i class="bi bi-check text-success"></i> {% trans "USB memory stick" %}<br>{% endif %}
                             {% if not project.delivery_online and not project.delivery_usb %}
-                                <span class="text-muted">No delivery method selected</span>
+                                <span class="text-muted">{% trans "No delivery method selected" %}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -1162,12 +1163,12 @@
                 {% if is_admin %}
                 <!-- Price Details Sub-section (Admin Only) -->
                 <hr class="my-4">
-                <h6 class="text-muted mb-3"><i class="bi bi-currency-exchange"></i> Price Details (Admin Only)</h6>
+                <h6 class="text-muted mb-3"><i class="bi bi-currency-exchange"></i> {% trans "Price Details (Admin Only)" %}</h6>
                 
                 <div class="view-mode">
                     <!-- Price -->
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
+                        <label class="form-label">{% trans "Price" %}</label>
                         <div class="d-flex align-items-center">
                             <p class="form-control-plaintext mb-0">
                                 {% if project.price %}
@@ -1177,14 +1178,14 @@
                                 {% endif %}
                             </p>
                             <span class="ms-2 badge bg-secondary">
-                                {% if project.price_currency == 'EUR' %}Euro{% else %}Lei{% endif %}
+                                {% if project.price_currency == 'EUR' %}{% trans "Euro" %}{% else %}{% trans "Lei" %}{% endif %}
                             </span>
                         </div>
                     </div>
                     
                     <!-- Other Details -->
                     <div class="mb-3">
-                        <label class="form-label">Other details</label>
+                        <label class="form-label">{% trans "Other details" %}</label>
                         <p class="form-control-plaintext">{{ project.price_other_details|default:"Not specified" }}</p>
                     </div>
                 </div>
@@ -1192,12 +1193,12 @@
                 <div class="edit-mode" style="display: none;">
                     <!-- Price -->
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
+                        <label class="form-label">{% trans "Price" %}</label>
                         <div class="row g-2">
                             <div class="col-7">
                                 <input type="number" class="form-control" data-field="price" 
                                        value="{{ project.price|default:'' }}" 
-                                       min="0" placeholder="Enter price">
+                                       min="0" placeholder="{% trans 'Enter price' %}">
                             </div>
                             <div class="col-5">
                                 <div class="btn-group w-100" role="group">
@@ -1217,7 +1218,7 @@
                     
                     <!-- Other Details -->
                     <div class="mb-3">
-                        <label class="form-label">Other details</label>
+                        <label class="form-label">{% trans "Other details" %}</label>
                         <textarea class="form-control" data-field="price_other_details" rows="3">{{ project.price_other_details|default:'' }}</textarea>
                     </div>
                 </div>
@@ -1227,7 +1228,7 @@
         
         <div class="card mb-4">
             <div class="card-header">
-                <i class="bi bi-file-earmark"></i> Files
+                <i class="bi bi-file-earmark"></i> {% trans "Files" %}
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data" class="mb-3">
@@ -1240,7 +1241,7 @@
                         {{ file_form.file }}
                     </div>
                     <button type="submit" class="btn btn-primary btn-sm w-100">
-                        <i class="bi bi-upload"></i> Upload File
+                        <i class="bi bi-upload"></i> {% trans "Upload File" %}
                     </button>
                 </form>
                 
@@ -1265,7 +1266,7 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-muted text-center">No files uploaded yet</p>
+                <p class="text-muted text-center">{% trans "No files uploaded yet" %}</p>
                 {% endif %}
             </div>
         </div>
