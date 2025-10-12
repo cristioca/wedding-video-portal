@@ -244,6 +244,47 @@ select.form-control optgroup {
 .dropdown-item { color: var(--text-100); }
 .dropdown-item:hover { background-color: rgba(255, 255, 255, 0.06); color: #fff; }
 
+/* Language Switcher Dropdown - Solid backgrounds, no transparency */
+.language-dropdown {
+  background-color: #1f2937 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+  min-width: 160px !important;
+  padding: 0.25rem 0 !important;
+  backdrop-filter: none !important;
+}
+
+.language-dropdown li {
+  background-color: transparent !important;
+}
+
+.language-dropdown .dropdown-item,
+.language-dropdown button.dropdown-item {
+  color: #f3f4f6 !important;
+  background-color: #1f2937 !important;
+  border: none !important;
+  padding: 0.6rem 1rem !important;
+  font-size: 0.95rem !important;
+  transition: all 0.15s ease !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  text-align: left !important;
+  display: block !important;
+}
+
+.language-dropdown .dropdown-item:hover,
+.language-dropdown button.dropdown-item:hover {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+}
+
+.language-dropdown .dropdown-item.active,
+.language-dropdown button.dropdown-item.active {
+  background-color: #7c3aed !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
 /* Modals - Dark Theme (Default) */
 .modal-content {
   background-color: var(--surface-800) !important;
@@ -399,6 +440,32 @@ body.theme-light {
 .theme-light .dropdown-menu { background-color: #ffffff; border: 1px solid rgba(0,0,0,0.08); }
 .theme-light .dropdown-item { color: var(--text-100); }
 .theme-light .dropdown-item:hover { background-color: rgba(0,0,0,0.04); color: #000; }
+
+/* Light mode language dropdown overrides */
+.theme-light .language-dropdown {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: none !important;
+}
+
+.theme-light .language-dropdown .dropdown-item,
+.theme-light .language-dropdown button.dropdown-item {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+}
+
+.theme-light .language-dropdown .dropdown-item:hover,
+.theme-light .language-dropdown button.dropdown-item:hover {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.theme-light .language-dropdown .dropdown-item.active,
+.theme-light .language-dropdown button.dropdown-item.active {
+  background-color: #7c3aed !important;
+  color: #ffffff !important;
+}
 .theme-light .btn-close { filter: none; opacity: 0.6; }
 .theme-light .btn-close:hover { opacity: 1; }
 .theme-light .alert { border-color: rgba(0,0,0,0.08); }
