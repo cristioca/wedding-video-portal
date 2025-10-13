@@ -1435,6 +1435,20 @@
 // Store original values for cancel functionality
 let originalValues = {};
 
+// Store URLs to avoid hardcoding in JavaScript
+const projectUrls = {
+    notify: "{% url 'notify_client' project.slug %}",
+    clearNotification: "{% url 'clear_notification' project.slug %}",
+    sendCredentials: "{% url 'send_credentials' project.slug %}",
+    changeClientData: "{% url 'change_client_data' project.slug %}",
+    updateField: "{% url 'update_project_field' project.slug %}",
+    batchUpdate: "{% url 'batch_update_project' project.slug %}",
+    updateFieldOrder: "{% url 'update_field_order' project.slug %}",
+    dismissGuidance: "{% url 'dismiss_guidance' project.slug %}",
+    fieldHistory: "/projects/{{ project.slug }}/field-history/",  // Base URL, field name appended
+    approveModification: "/projects/modification/"  // Base URL, mod ID appended
+};
+
 // Function to highlight empty fields
 function highlightEmptyFields() {
     console.log('🔍 Checking for empty fields...');
@@ -1736,7 +1750,7 @@ function saveSection(section) {
     console.log(`📦 BATCH UPDATE: Sending ${Object.keys(changedFields).length} fields in single request:`, changedFields);
     
     // Send all changes in a single batch update request
-    const batchUpdatePromise = fetch(`/projects/{{ project.slug }}/batch-update/`, {
+    const batchUpdatePromise = fetch(projectUrls.batchUpdate, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
@@ -1744,7 +1758,14 @@ function saveSection(section) {
         },
         body: JSON.stringify(changedFields)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         console.log(`📥 BATCH UPDATE RESPONSE:`, data);
         if (data.success) {
@@ -1755,7 +1776,7 @@ function saveSection(section) {
     })
     .catch(error => {
         console.error('❌ BATCH UPDATE ERROR:', error);
-        return { success: false, error: 'Network error: ' + error.message };
+        return { success: false, error: error.message || 'Network error' };
     });
     
     // Wait for batch update to complete
@@ -1799,7 +1820,7 @@ function updateField(fieldName, fieldValue) {
         console.log(`🚀 SENDING TO SERVER: ${fieldName} = "${fieldValue}"`);
     }
     
-    return fetch(`/projects/{{ project.slug }}/update-field/`, {
+    return fetch(projectUrls.updateField, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
@@ -1883,7 +1904,7 @@ function notifyClient(projectId, force = false) {
         console.log('Confirmation accepted, sending request...');
         const requestBody = force ? JSON.stringify({ force: true }) : '';
         
-        fetch(`/projects/${projectId}/notify/`, {
+        fetch(projectUrls.notify, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
@@ -1963,7 +1984,7 @@ function clearNotification(projectId) {
         'Clear unnotified changes for this project?',
         function() {
             console.log('Clear confirmation accepted, sending request...');
-            fetch(`/projects/${projectId}/clear-notification/`, {
+            fetch(projectUrls.clearNotification, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}',
@@ -1997,7 +2018,7 @@ function sendCredentials(projectId) {
     showConfirmation(
         'Send login credentials to client?',
         function() {
-            fetch(`/projects/${projectId}/send-credentials/`, {
+            fetch(projectUrls.sendCredentials, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}',
@@ -2027,7 +2048,7 @@ function sendCredentials(projectId) {
 
 function changeClientData(projectId) {
     // Get current data first
-    fetch(`/projects/${projectId}/change-client-data/`)
+    fetch(projectUrls.changeClientData)
     .then(response => response.json())
     .then(data => {
         // Populate modal with current data
@@ -2057,7 +2078,7 @@ function changeClientData(projectId) {
             newSaveBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
             
             // Update client data
-            fetch(`/projects/${projectId}/change-client-data/`, {
+            fetch(projectUrls.changeClientData, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}',
@@ -2482,7 +2503,7 @@ function dismissGuidance(messageType) {
     if (!banner) return;
     
     // Send dismissal to server
-    fetch(`/projects/{{ project.slug }}/dismiss-guidance/`, {
+    fetch(projectUrls.dismissGuidance, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -2714,7 +2735,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Send to server
-        fetch(`/projects/{{ project.slug }}/update-field-order/`, {
+        fetch(projectUrls.updateFieldOrder, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',

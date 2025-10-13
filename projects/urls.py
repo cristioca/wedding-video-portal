@@ -8,10 +8,7 @@ urlpatterns = [
     path('file/<int:file_id>/download/', views.download_file, name='download_file'),
     path('modification/<int:mod_id>/approve/', views.approve_modification, name='approve_modification'),
     
-    # Generic slug patterns (must come last)
-    path('<str:slug>/', views.project_detail, name='project_detail'),
-    path('archive/<str:slug>/', views.archive_project, name='archive_project'),
-    path('delete/<str:slug>/', views.delete_project, name='delete_project'),
+    # Slug-based action paths (must come before the generic slug detail view)
     path('<str:slug>/notify/', views.notify_client, name='notify_client'),
     path('<str:slug>/clear-notification/', views.clear_notification, name='clear_notification'),
     path('<str:slug>/send-credentials/', views.send_credentials, name='send_credentials'),
@@ -21,4 +18,9 @@ urlpatterns = [
     path('<str:slug>/update-field-order/', views.update_field_order, name='update_field_order'),
     path('<str:slug>/field-history/<str:field_name>/', views.get_field_history, name='get_field_history'),
     path('<str:slug>/dismiss-guidance/', views.dismiss_guidance, name='dismiss_guidance'),
+    path('archive/<str:slug>/', views.archive_project, name='archive_project'),
+    path('delete/<str:slug>/', views.delete_project, name='delete_project'),
+    
+    # Generic slug detail view (MUST be last)
+    path('<str:slug>/', views.project_detail, name='project_detail'),
 ]
