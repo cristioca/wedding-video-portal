@@ -114,7 +114,7 @@ def dashboard(request):
     """Dashboard view - shows projects based on user role"""
     user = request.user
     search_query = request.GET.get('search', '')
-    sort_by = request.GET.get('sort', 'newest')  # Default sort by newest first
+    sort_by = request.GET.get('sort', 'date')  # Default sort by event date (earliest first)
     include_archived = request.GET.get('include_archived', '') == 'on'
     
     # Valid sort options
