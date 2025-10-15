@@ -361,6 +361,14 @@ a:hover { color: #c7d2fe; }
   color: var(--danger) !important;
 }
 
+/* Due Date Color Classes */
+.text-warning-light {
+  color: #fbbf24 !important; /* lighter orange for due dates 2-4 weeks away */
+}
+.theme-light .text-warning-light {
+  color: #f59e0b !important;
+}
+
 /* Fine-tuning */
 h1, h2, h3, h4, h5, h6 { letter-spacing: 0.3px; color: var(--text-100); }
 /* Ensure small headers inside cards/lists are bright */

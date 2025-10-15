@@ -601,7 +601,7 @@
                         </div>
                         
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Current Phase</label>
                                 <div class="view-mode">
                                     <p class="form-control-plaintext">{{ project.get_edit_status_display }}</p>
@@ -616,7 +616,7 @@
                                 </div>
                                 {% endif %}
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Progress</label>
                                 <div class="view-mode">
                                     <div class="progress">
@@ -628,6 +628,25 @@
                                 <div class="edit-mode" style="display: none;">
                                     <input type="number" class="form-control" data-field="editing_progress" value="{{ project.editing_progress }}" min="0" max="100" step="5">
                                     <small class="text-muted">Enter percentage (0-100)</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Due Date</label>
+                                <div class="view-mode">
+                                    <p class="form-control-plaintext {{ project.get_due_date_color }}">
+                                        {% if project.due_date %}
+                                            {{ project.due_date|date:"M d, Y" }}
+                                        {% else %}
+                                            Not set
+                                        {% endif %}
+                                    </p>
+                                    <small class="text-muted mt-1">Completion deadline</small>
+                                </div>
+                                {% if is_admin %}
+                                <div class="edit-mode" style="display: none;">
+                                    <input type="date" class="form-control" data-field="due_date" value="{{ project.due_date|date:'Y-m-d' }}">
+                                    <small class="text-muted">Set completion deadline</small>
                                 </div>
                                 {% endif %}
                             </div>

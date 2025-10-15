@@ -192,6 +192,9 @@ class Project(models.Model):
     # Editing notes
     videographer_editing_notes = models.TextField(blank=True, null=True, help_text="Videographer's notes for editing (admin only)")
     
+    # Due date for editing completion (defaults to 3 months after event date)
+    due_date = models.DateField(blank=True, null=True, help_text="Due date for video completion (admin only)")
+    
     # Field ordering configuration
     ceremony_field_order = models.JSONField(
         default=dict,
@@ -297,7 +300,7 @@ class Project(models.Model):
             return False
     
     def save(self, *args, **kwargs):
-        """Override save to generate slug and update project name based on video title"""
+        """Override save to generate slug, update project name, and set default due date"""
         
         # Auto-update project name based on video title
         if self.title_video and self.title_video.strip():
@@ -306,6 +309,11 @@ class Project(models.Model):
             new_name = f"{type_display} - {self.title_video.strip()}"
             if self.name != new_name:
                 self.name = new_name
+        
+        # Set default due date to 3 months after event date if not set
+        if not self.due_date and self.event_date:
+            from dateutil.relativedelta import relativedelta
+            self.due_date = (self.event_date + relativedelta(months=3)).date()
         
         if not self.slug:
             # Need to save first to get created_at timestamp
@@ -419,6 +427,52 @@ class Project(models.Model):
         """Check if the current guidance message should be shown"""
         message_text, message_type = self.get_client_guidance_message()
         return message_type not in self.dismissed_guidance_messages
+    
+    def get_due_date_color(self):
+        """Calculate color for due date based on proximity (for admin view)"""
+        if not self.due_date:
+            return 'text-muted'
+        
+        from django.utils import timezone
+        today = timezone.now().date()
+        days_until_due = (self.due_date - today).days
+        
+        # Color gradient based on days remaining
+        if days_until_due < 0:
+            # Overdue - dark red
+            return 'text-danger fw-bold'
+        elif days_until_due <= 7:
+            # Less than a week - red
+            return 'text-danger'
+        elif days_until_due <= 14:
+            # Less than 2 weeks - orange/warning
+            return 'text-warning'
+        elif days_until_due <= 30:
+            # Less than a month - light orange
+            return 'text-warning-light'
+        else:
+            # More than a month - normal
+            return 'text-muted'
+    
+    def get_due_date_badge_color(self):
+        """Get Bootstrap badge color class for due date"""
+        if not self.due_date:
+            return 'bg-secondary'
+        
+        from django.utils import timezone
+        today = timezone.now().date()
+        days_until_due = (self.due_date - today).days
+        
+        if days_until_due < 0:
+            return 'bg-danger'
+        elif days_until_due <= 7:
+            return 'bg-danger'
+        elif days_until_due <= 14:
+            return 'bg-warning text-dark'
+        elif days_until_due <= 30:
+            return 'bg-warning text-dark'
+        else:
+            return 'bg-secondary'
 
 
 class ProjectModification(models.Model):

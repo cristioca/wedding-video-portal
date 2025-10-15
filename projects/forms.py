@@ -86,6 +86,7 @@ class ProjectDetailForm(forms.ModelForm):
             'prep', 'church', 'session', 'restaurant', 'main_details',
             'details_extra', 'editing_preferences', 'notes', 'filming_details',
             'videographer_filming_notes', 'critical_production_notes', 'videographer_editing_notes',
+            'due_date',  # Due date for editing completion
             # Package fields
             'package_type', 'package_4k', 'package_fullhd', 'package_cameras',
             'montage_highlights', 'montage_movie', 'montage_movie_duration', 'montage_movie_other',
@@ -121,6 +122,11 @@ class ProjectDetailForm(forms.ModelForm):
             'videographer_filming_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'critical_production_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'videographer_editing_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'due_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'lang': 'en-GB'
+            }),
             'main_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 8}),
             # Package widgets
             'package_type': forms.Select(attrs={'class': 'form-control'}),
