@@ -1294,3 +1294,182 @@ def dismiss_guidance(request, slug):
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def backup_database(request):
+    """Create a database backup - admin only"""
+    if not request.user.is_admin():
+        messages.error(request, 'Only administrators can create backups.')
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        from django.core.management import call_command
+        from pathlib import Path
+        from datetime import datetime
+        import io
+        
+        backup_format = request.POST.get('format', 'json')
+        
+        try:
+            # Create backups directory if it doesn't exist
+            backup_dir = Path(settings.BASE_DIR) / 'backups'
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            base_filename = f'wedding_portal_backup_{timestamp}'
+            
+            if backup_format == 'json':
+                # JSON backup
+                json_file = backup_dir / f'{base_filename}.json'
+                with open(json_file, 'w', encoding='utf-8') as f:
+                    call_command(
+                        'dumpdata',
+                        '--natural-foreign',
+                        '--natural-primary',
+                        '--indent', '2',
+                        stdout=f,
+                        exclude=['contenttypes', 'auth.permission', 'sessions.session']
+                    )
+                
+                file_size = json_file.stat().st_size / (1024 * 1024)
+                messages.success(request, f'Backup created successfully: {json_file.name} ({file_size:.2f} MB)')
+                
+            elif backup_format == 'sqlite':
+                # SQLite file copy
+                db_engine = settings.DATABASES['default']['ENGINE']
+                if 'sqlite' in db_engine:
+                    import shutil
+                    db_path = Path(settings.DATABASES['default']['NAME'])
+                    if db_path.exists():
+                        sqlite_file = backup_dir / f'{base_filename}.sqlite3'
+                        shutil.copy2(db_path, sqlite_file)
+                        file_size = sqlite_file.stat().st_size / (1024 * 1024)
+                        messages.success(request, f'Backup created successfully: {sqlite_file.name} ({file_size:.2f} MB)')
+                    else:
+                        messages.error(request, 'Database file not found.')
+                else:
+                    messages.error(request, 'SQLite backup only works with SQLite databases.')
+            
+            elif backup_format == 'both':
+                # Both formats
+                files_created = []
+                
+                # JSON
+                json_file = backup_dir / f'{base_filename}.json'
+                with open(json_file, 'w', encoding='utf-8') as f:
+                    call_command(
+                        'dumpdata',
+                        '--natural-foreign',
+                        '--natural-primary',
+                        '--indent', '2',
+                        stdout=f,
+                        exclude=['contenttypes', 'auth.permission', 'sessions.session']
+                    )
+                files_created.append(json_file.name)
+                
+                # SQLite
+                db_engine = settings.DATABASES['default']['ENGINE']
+                if 'sqlite' in db_engine:
+                    import shutil
+                    db_path = Path(settings.DATABASES['default']['NAME'])
+                    if db_path.exists():
+                        sqlite_file = backup_dir / f'{base_filename}.sqlite3'
+                        shutil.copy2(db_path, sqlite_file)
+                        files_created.append(sqlite_file.name)
+                
+                messages.success(request, f'Backups created: {", ".join(files_created)}')
+            
+        except Exception as e:
+            messages.error(request, f'Backup failed: {str(e)}')
+        
+        return redirect('backup_management')
+    
+    # GET request - show backup management page
+    from pathlib import Path
+    from datetime import datetime
+    
+    backup_dir = Path(settings.BASE_DIR) / 'backups'
+    backups = []
+    
+    if backup_dir.exists():
+        # List all backup files
+        backup_files = sorted(
+            backup_dir.glob('wedding_portal_backup_*'),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True
+        )
+        
+        for backup_file in backup_files:
+            backups.append({
+                'name': backup_file.name,
+                'size': backup_file.stat().st_size / (1024 * 1024),  # MB
+                'date': datetime.fromtimestamp(backup_file.stat().st_mtime),
+                'type': backup_file.suffix[1:].upper()  # .json -> JSON
+            })
+    
+    context = {
+        'backups': backups,
+        'backup_dir': str(backup_dir),
+        'is_admin': True
+    }
+    
+    return render(request, 'backup_management.html', context)
+
+
+@login_required
+def download_backup(request, filename):
+    """Download a backup file - admin only"""
+    if not request.user.is_admin():
+        messages.error(request, 'Only administrators can download backups.')
+        return redirect('dashboard')
+    
+    from pathlib import Path
+    
+    backup_dir = Path(settings.BASE_DIR) / 'backups'
+    backup_file = backup_dir / filename
+    
+    # Security check: ensure file is in backups directory
+    if not backup_file.resolve().is_relative_to(backup_dir.resolve()):
+        messages.error(request, 'Invalid backup file.')
+        return redirect('backup_management')
+    
+    if not backup_file.exists():
+        messages.error(request, 'Backup file not found.')
+        return redirect('backup_management')
+    
+    # Serve file
+    response = FileResponse(open(backup_file, 'rb'), as_attachment=True, filename=filename)
+    return response
+
+
+@login_required
+def delete_backup(request, filename):
+    """Delete a backup file - admin only"""
+    if not request.user.is_admin():
+        messages.error(request, 'Only administrators can delete backups.')
+        return redirect('dashboard')
+    
+    if request.method != 'POST':
+        return redirect('backup_management')
+    
+    from pathlib import Path
+    
+    backup_dir = Path(settings.BASE_DIR) / 'backups'
+    backup_file = backup_dir / filename
+    
+    # Security check: ensure file is in backups directory
+    if not backup_file.resolve().is_relative_to(backup_dir.resolve()):
+        messages.error(request, 'Invalid backup file.')
+        return redirect('backup_management')
+    
+    if backup_file.exists():
+        try:
+            backup_file.unlink()
+            messages.success(request, f'Backup deleted: {filename}')
+        except Exception as e:
+            messages.error(request, f'Failed to delete backup: {str(e)}')
+    else:
+        messages.error(request, 'Backup file not found.')
+    
+    return redirect('backup_management')

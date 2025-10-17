@@ -5,6 +5,9 @@ urlpatterns = [
     # Specific paths must come before generic slug pattern
     path('create/', views.create_project, name='create_project'),
     path('archived/', views.archived_projects, name='archived_projects'),
+    path('backup/', views.backup_database, name='backup_management'),
+    path('backup/download/<str:filename>/', views.download_backup, name='download_backup'),
+    path('backup/delete/<str:filename>/', views.delete_backup, name='delete_backup'),
     path('file/<int:file_id>/download/', views.download_file, name='download_file'),
     path('modification/<int:mod_id>/approve/', views.approve_modification, name='approve_modification'),
     

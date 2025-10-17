@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Database Backup - Wedding Video Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="text-white">
+            <i class="bi bi-database"></i> Database Backup & Export
+            <span class="badge bg-danger">Admin</span>
+        </h2>
+        <p class="text-muted">Create, download, and manage database backups</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-light">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Create Backup Card -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-plus-circle"></i> Create New Backup
+    </div>
+    <div class="card-body">
+        <form method="post" action="{% url 'backup_management' %}">
+            {% csrf_token %}
+            <div class="row align-items-end">
+                <div class="col-md-6 mb-3">
+                    <label for="format" class="form-label">Backup Format</label>
+                    <select name="format" id="format" class="form-select">
+                        <option value="json">JSON (Portable, recommended)</option>
+                        <option value="sqlite">SQLite File (Full database copy)</option>
+                        <option value="both">Both Formats</option>
+                    </select>
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i> JSON format can be restored on any database. SQLite is a complete file copy.
+                    </small>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-download"></i> Create Backup Now
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-lightbulb"></i> <strong>Backup Information:</strong>
+            <ul class="mb-0 mt-2">
+                <li><strong>JSON Format:</strong> Portable backup that can be restored to any database type</li>
+                <li><strong>SQLite Format:</strong> Complete database file copy (only for SQLite databases)</li>
+                <li><strong>Location:</strong> <code>{{ backup_dir }}</code></li>
+                <li><strong>Automatic Naming:</strong> Files are named with timestamp for easy identification</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Existing Backups Card -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="bi bi-archive"></i> Existing Backups
+            {% if backups %}
+                <span class="badge bg-secondary ms-2">{{ backups|length }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        {% if backups %}
+        <div class="table-responsive">
+            <table class="table table-hover table-dark">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-file-earmark"></i> Filename</th>
+                        <th><i class="bi bi-hdd"></i> Size</th>
+                        <th><i class="bi bi-calendar"></i> Created</th>
+                        <th><i class="bi bi-tag"></i> Type</th>
+                        <th class="text-end"><i class="bi bi-gear"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for backup in backups %}
+                    <tr>
+                        <td>
+                            <i class="bi bi-file-earmark-zip text-info"></i>
+                            <span class="font-monospace text-light">{{ backup.name }}</span>
+                        </td>
+                        <td class="text-light">{{ backup.size|floatformat:2 }} MB</td>
+                        <td class="text-light">{{ backup.date|date:"M d, Y H:i:s" }}</td>
+                        <td>
+                            <span class="badge {% if backup.type == 'JSON' %}bg-info{% else %}bg-secondary{% endif %}">
+                                {{ backup.type }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'download_backup' backup.name %}" 
+                               class="btn btn-sm btn-outline-primary me-1"
+                               title="Download backup">
+                                <i class="bi bi-download"></i> Download
+                            </a>
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="confirmDelete('{{ backup.name }}')"
+                                    title="Delete backup">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-muted);"></i>
+            <p class="mt-3 text-muted">No backups found</p>
+            <p class="text-muted">Create your first backup using the form above</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Command Line Instructions Card -->
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="bi bi-terminal"></i> Command Line Usage
+    </div>
+    <div class="card-body">
+        <h6>Create Backup via Command Line:</h6>
+        <div class="bg-dark p-3 rounded mb-3">
+            <code class="text-light">
+                # JSON backup (recommended)<br>
+                python manage.py backup_database --format=json<br><br>
+                
+                # SQLite file copy<br>
+                python manage.py backup_database --format=sqlite<br><br>
+                
+                # Both formats<br>
+                python manage.py backup_database --format=both<br><br>
+                
+                # Custom output directory<br>
+                python manage.py backup_database --output-dir=/path/to/backups<br><br>
+                
+                # Custom filename<br>
+                python manage.py backup_database --filename=my_backup
+            </code>
+        </div>
+        
+        <h6>Restore from Backup:</h6>
+        <div class="bg-dark p-3 rounded">
+            <code class="text-light">
+                # Restore from JSON backup (merges with existing data)<br>
+                python manage.py restore_database backups/wedding_portal_backup_20250101_120000.json<br><br>
+                
+                # Restore with flush (WARNING: deletes all existing data first)<br>
+                python manage.py restore_database backups/wedding_portal_backup_20250101_120000.json --flush
+            </code>
+        </div>
+        
+        <div class="alert alert-warning mt-3">
+            <i class="bi bi-exclamation-triangle"></i> <strong>Warning:</strong> 
+            Always test restores in a development environment first. The <code>--flush</code> option will delete all existing data before restoring.
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Form (Hidden) -->
+<form id="deleteForm" method="post" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<script>
+function confirmDelete(filename) {
+    if (confirm(`Are you sure you want to delete this backup?\n\nFilename: ${filename}\n\nThis action cannot be undone.`)) {
+        const form = document.getElementById('deleteForm');
+        form.action = `/projects/backup/delete/${filename}/`;
+        form.submit();
+    }
+}
+</script>
+
+{% endblock %}
