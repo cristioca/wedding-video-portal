@@ -19,6 +19,23 @@
     </div>
 </div>
 
+<!-- Restore Database Card -->
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <i class="bi bi-arrow-counterclockwise"></i> Restore Database
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill"></i> <strong>Warning:</strong> 
+            Restoring a database is a critical operation. Make sure you have a current backup before proceeding.
+        </div>
+        
+        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#restoreModal">
+            <i class="bi bi-upload"></i> Upload & Restore Backup
+        </button>
+    </div>
+</div>
+
 <!-- Create Backup Card -->
 <div class="card mb-4">
     <div class="card-header">
@@ -173,6 +190,74 @@
     {% csrf_token %}
 </form>
 
+<!-- Restore Modal -->
+<div class="modal fade" id="restoreModal" tabindex="-1" aria-labelledby="restoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="restoreModalLabel">
+                    <i class="bi bi-arrow-counterclockwise"></i> Restore Database
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'restore_database' %}" enctype="multipart/form-data" id="restoreForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Critical Warning:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>This operation will modify your database</li>
+                            <li>Create a backup of current data before proceeding</li>
+                            <li>Server restart may be required after restore</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="backup_file" class="form-label">
+                            <i class="bi bi-file-earmark-arrow-up"></i> Select Backup File
+                        </label>
+                        <input type="file" class="form-control" id="backup_file" name="backup_file" accept=".json" required>
+                        <small class="text-muted">Only JSON backup files (.json) are supported</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Restore Mode</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="restore_mode" id="merge_mode" value="merge" checked>
+                            <label class="form-check-label" for="merge_mode">
+                                <strong>Merge Mode</strong> (Recommended)
+                                <br><small class="text-muted">Adds backup data to existing database. Safer option.</small>
+                            </label>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="radio" name="restore_mode" id="flush_mode" value="flush">
+                            <label class="form-check-label" for="flush_mode">
+                                <strong class="text-danger">Full Restore (Flush)</strong>
+                                <br><small class="text-muted">⚠️ Deletes ALL existing data first, then restores from backup.</small>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirm_restore" required>
+                        <label class="form-check-label" for="confirm_restore">
+                            I understand the risks and have created a backup of current data
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-warning" id="restoreBtn">
+                        <i class="bi bi-arrow-counterclockwise"></i> Restore Database
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function confirmDelete(filename) {
     if (confirm(`Are you sure you want to delete this backup?\n\nFilename: ${filename}\n\nThis action cannot be undone.`)) {
@@ -181,6 +266,39 @@ function confirmDelete(filename) {
         form.submit();
     }
 }
+
+// Handle restore form submission
+document.getElementById('restoreForm').addEventListener('submit', function(e) {
+    const flushMode = document.getElementById('flush_mode').checked;
+    const confirmCheckbox = document.getElementById('confirm_restore');
+    
+    if (!confirmCheckbox.checked) {
+        e.preventDefault();
+        alert('Please confirm that you understand the risks and have created a backup.');
+        return false;
+    }
+    
+    if (flushMode) {
+        if (!confirm('⚠️ FULL RESTORE MODE ⚠️\n\nThis will DELETE ALL EXISTING DATA and replace it with the backup.\n\nAre you absolutely sure you want to proceed?')) {
+            e.preventDefault();
+            return false;
+        }
+    }
+    
+    // Add flush_mode to form data if selected
+    if (flushMode) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'flush_mode';
+        input.value = 'on';
+        this.appendChild(input);
+    }
+    
+    // Show loading state
+    const btn = document.getElementById('restoreBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Restoring...';
+});
 </script>
 
 {% endblock %}

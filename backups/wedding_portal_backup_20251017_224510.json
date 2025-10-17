@@ -1,0 +1,2605 @@
+[
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$T4iewkGYoEMffPcvVTpAN1$LrD613cLcuabLt4dqdhFaGYg/A5viABY/UovpvWDIzY=",
+    "last_login": "2025-10-12T14:50:47.537Z",
+    "is_superuser": true,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-18T06:57:01.222Z",
+    "role": "ADMIN",
+    "username": "admin",
+    "email": "admin@admin.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$E07vzCexu2O8d2eRNIVYNi$QJ+5HYkCQqyBMfk+tg3UbeuS9ivVr2JpzfjdLWczOhs=",
+    "last_login": "2025-09-18T07:24:50Z",
+    "is_superuser": false,
+    "first_name": "Maria",
+    "last_name": "Ioana Zinga",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-18T06:57:14Z",
+    "role": "CLIENT",
+    "username": "client",
+    "email": "maria2@ioana3.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$t6NjKhUOALPWk5jBtFBkWA$D0bylDsEL36rCb6zh95McXVZ5CgWiee19QpeAXsgJ7A=",
+    "last_login": "2025-09-18T07:49:17.157Z",
+    "is_superuser": false,
+    "first_name": "Ana",
+    "last_name": "Bambola",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-18T06:57:15.642Z",
+    "role": "CLIENT",
+    "username": "maria",
+    "email": "anabambola@gmail.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$k3JEUjV7lzdFppwtqnjoss$tIy8ptFuPLXWA6ubHr2c4ibeHav4+pjQYD9ojnArXB8=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Test",
+    "last_name": "Client",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-18T07:36:56.022Z",
+    "role": "CLIENT",
+    "username": "test.client",
+    "email": "test.client@example.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$lLhlvUBAGD4e0leJubnVSp$E8GiMWGJ+/8vkuq0HD0gEDeRg3qsUh0ggDqbQ3MEpPg=",
+    "last_login": "2025-09-18T07:52:59.583Z",
+    "is_superuser": false,
+    "first_name": "Gigi",
+    "last_name": "Frana",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-18T07:52:06.473Z",
+    "role": "CLIENT",
+    "username": "gigi",
+    "email": "gigi@gmail.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$mnGNrWqIZnK1oRpZIK2hIJ$rLO3NtbqCcdVsDLC/xte9NDmteKjTZ/carVr03P5IwY=",
+    "last_login": "2025-09-18T08:32:01.810Z",
+    "is_superuser": false,
+    "first_name": "Irina",
+    "last_name": "Buna",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-18T07:59:01.556Z",
+    "role": "CLIENT",
+    "username": "irina",
+    "email": "irina@daniel.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$ZFqspagAJLFmGNVlJhT75T$1+ubGaqS1EUubqG+EoSjhW95rU/5RDbiBcBlPLjGLFk=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Irina",
+    "last_name": "Buna",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-18T08:09:38.091Z",
+    "role": "CLIENT",
+    "username": "irina+20250918080938",
+    "email": "irina+20250918080938@daniel.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$Gc0UJDhgKPFllGuKsnCpHP$H/Gx/FqVZVNH71LSgDPSVu24BhVnOiXo+Lj+BViq1yY=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Irina",
+    "last_name": "Buna",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-18T08:31:03.728Z",
+    "role": "CLIENT",
+    "username": "irina1",
+    "email": "irina@daniel.com2",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$NwBdcSZzTVp7P2SKmEMkA9$yQYsLc52KJhLPkIFN3pl9bCuJjX/6WehsI/IKm66QwM=",
+    "last_login": "2025-09-18T11:20:24.574Z",
+    "is_superuser": false,
+    "first_name": "Anca",
+    "last_name": "Grosu",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-18T09:23:02.264Z",
+    "role": "CLIENT",
+    "username": "ancagrosu",
+    "email": "ancagrosu@gmail.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$ZAHa7XKX6UBAKzbDNyLAOG$t7yyq+RclkKQj2sot2iR/uqqF0+DI+tRhnRJf++iwNQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Camelia",
+    "last_name": "Boanta",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-19T12:40:55.855Z",
+    "role": "CLIENT",
+    "username": "camib",
+    "email": "camib@gmaill.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$B4xqBwEkUApuYMpx1YrekM$ukaGbvdV8YMOHL1g7u+M2PELQ016WciLjqtfyCKzXNY=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Ionica",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-19T12:51:31.483Z",
+    "role": "CLIENT",
+    "username": "john",
+    "email": "john@cli.ro",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$ZHHWUGPCMJZgkwwflUPtUo$msToWSabGlEUOqOi2CRJhZ41joPs6vZ5frPLfA+ZAIU=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Diana",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-19T13:12:07.333Z",
+    "role": "CLIENT",
+    "username": "dcar",
+    "email": "dcar@gmaill.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$4M4Wy6FBtF69MEXIZ9YSVB$xk7dmiOR8FyCkHIAiTpJEe6e3TavoV1zRSzbjJAPXBQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Nicu",
+    "last_name": "Paleru",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-19T13:34:23.461Z",
+    "role": "CLIENT",
+    "username": "nicp",
+    "email": "nicp@gmaill.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$oLGJwQCdxroMNs5OxRUrur$+Su9HJ5wHI94qJz2c3DMcRhweN6zJRnwkc2P3JwrrP4=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Oana",
+    "last_name": "J",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-19T14:08:13.678Z",
+    "role": "CLIENT",
+    "username": "joana",
+    "email": "joana@yah.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$f2tG080MRHlLmePe3hK8dv$gka9q/xtyTAa8Du586wvgMWjNSrK8rt2KJgM6nHnpe8=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Gita",
+    "last_name": "Portita2ggg",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-19T15:46:32.461Z",
+    "role": "CLIENT",
+    "username": "hyyhy",
+    "email": "hyyhy@deed.err",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$2c8R0iFJDS92uZIyP7pCwk$tMJVTs1F7J9Rb2Z1ntWhuykA+n5nRVIf9oo1rrYYzt4=",
+    "last_login": "2025-10-10T18:49:40.021Z",
+    "is_superuser": false,
+    "first_name": "Elena",
+    "last_name": "Popescu",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-27T20:03:16.750Z",
+    "role": "CLIENT",
+    "username": "elenapop",
+    "email": "elenapop@gmail.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$HCDJiQh4n8qHlniEeWJHaR$Rqkx4eieJMJXMF86BJDvu4dHW8Ug+Xe6in0FrLzQNjg=",
+    "last_login": "2025-10-11T20:14:36.099Z",
+    "is_superuser": false,
+    "first_name": "George",
+    "last_name": "V",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-28T08:40:24.519Z",
+    "role": "CLIENT",
+    "username": "gvren",
+    "email": "gvren@yahoo.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$6sE7d7vYQGGrHtKUK76mRw$Krl/SdSqBPPqXhcDmtXGSRWtl1fCyEm/nM3V5beUN68=",
+    "last_login": "2025-10-09T20:21:43.531Z",
+    "is_superuser": false,
+    "first_name": "Marius",
+    "last_name": "Gingina",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-29T11:50:20.517Z",
+    "role": "CLIENT",
+    "username": "mariog",
+    "email": "mariog@gmail.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "testpass123",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Test Admin",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-29T12:11:42.968Z",
+    "role": "ADMIN",
+    "username": "test_admin",
+    "email": "test_admin@test.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "testpass123",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Test Client",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-29T12:11:43.328Z",
+    "role": "CLIENT",
+    "username": "test_client",
+    "email": "test_client@test.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$ss4Voqn4oVtAGK2axiPMO7$D8Dk8BdM1MCUuw4e6Ff87DT7sfT+iixINRf9mFGgmQY=",
+    "last_login": "2025-10-10T18:58:53.032Z",
+    "is_superuser": false,
+    "first_name": "Dana",
+    "last_name": "Butnaru",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-10T18:58:05.331Z",
+    "role": "CLIENT",
+    "username": "danab",
+    "email": "danab@yahoo.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$g5sf8yX5FVWaIxDfCD3H0F$rlOVO4onxZxuv66BCh8Abed4zypvr1TfjI+bwXVB2uQ=",
+    "last_login": "2025-10-10T19:43:51.197Z",
+    "is_superuser": false,
+    "first_name": "Luci",
+    "last_name": "Nucu",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-10T19:05:52.255Z",
+    "role": "CLIENT",
+    "username": "lucinucu",
+    "email": "lucinucu@haha.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$jSvXbI7zmxzHlS0SqcIlAY$Qu7grC5s+8Yly3UyIhGZ4HAro6RukgMasvbPmkor2Kg=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Cristina",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-13T11:35:41.292Z",
+    "role": "CLIENT",
+    "username": "cristina",
+    "email": "cristina@test.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$TCtlNeH0EJHxniggAWtKb6$vDHXPLQGRQQMN4Pa5U97ke1AymYSy2RF9lw2CI6aAtE=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Catalina",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-13T12:37:57.838Z",
+    "role": "CLIENT",
+    "username": "catalina",
+    "email": "catalina@yahoo.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$5j8ycuCzjwijjCDejw2dC6$1Ro5e36vc+SsE2awuHG8Bqp4wxS5ot2RIhdzndQ/MUY=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "nu",
+    "last_name": "stiu",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-13T14:55:26.815Z",
+    "role": "CLIENT",
+    "username": "nustiu",
+    "email": "nustiu@email.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$H73W5ZKQQz8pBq7DreNln6$X4DVhruNUffrQzKqTbnBgbYm03IDzBQxX79XovubREk=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Diana",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-13T17:32:36.148Z",
+    "role": "CLIENT",
+    "username": "diana",
+    "email": "diana@email.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$bXE88Q41uZmvO4Hg11N7u2$GVt/UmFgKeY9GJ3fWCnNQIsPYTxfttEqiz5f5qo7lTs=",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "Tereza",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-14T20:27:10.645Z",
+    "role": "CLIENT",
+    "username": "tereza",
+    "email": "tereza@email.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "projects.project",
+  "pk": 20,
+  "fields": {
+    "name": "Nunta - Cristina + Adrian + Iosif",
+    "slug": "2025-08-17-nunta(20251013-t-113542)",
+    "user": [
+      "cristina@test.com"
+    ],
+    "client_name": "Cristina",
+    "client_email": "cristina@test.com",
+    "status": "Editing",
+    "edit_status": "In Progress",
+    "editing_progress": 10,
+    "notes": null,
+    "is_archived": false,
+    "event_date": "2025-08-16T21:00:00Z",
+    "type": "NUNTA",
+    "title_video": "Cristina + Adrian + Iosif",
+    "city": "Iasi",
+    "civil_union_details": null,
+    "prep": null,
+    "church": null,
+    "session": null,
+    "restaurant": null,
+    "details_extra": null,
+    "editing_preferences": null,
+    "main_details": null,
+    "package_type": null,
+    "package_4k": true,
+    "package_fullhd": false,
+    "package_cameras": 1,
+    "montage_highlights": true,
+    "montage_movie": true,
+    "montage_movie_duration": "1h30min",
+    "montage_movie_other": "",
+    "montage_bonus_primary": false,
+    "montage_bonus_full": false,
+    "montage_cinema_duration": "1h30min",
+    "equipment_audio_recorder": true,
+    "equipment_stabilizer": true,
+    "equipment_external_light": false,
+    "team_videographer": 1,
+    "team_operator": 0,
+    "team_assistant": 0,
+    "delivery_online": true,
+    "delivery_usb": false,
+    "event_presence": "botez + restaurant",
+    "price": 1600,
+    "price_currency": "LEI",
+    "price_other_details": "platit prin banca",
+    "filming_details": null,
+    "videographer_filming_notes": null,
+    "critical_production_notes": null,
+    "videographer_editing_notes": null,
+    "due_date": "2025-11-16",
+    "ceremony_field_order": {},
+    "admin_notified_of_changes": false,
+    "last_admin_notification_date": null,
+    "last_client_notification_date": null,
+    "has_unsent_changes": true,
+    "current_guidance_message": "initial",
+    "dismissed_guidance_messages": [],
+    "created_at": "2025-10-13T11:35:42.001Z",
+    "updated_at": "2025-10-13T11:52:13.944Z"
+  }
+},
+{
+  "model": "projects.project",
+  "pk": 21,
+  "fields": {
+    "name": "Nunta - Catalina si Adrian",
+    "slug": "2025-07-13-nunta(20251013-t-123758)",
+    "user": [
+      "catalina@yahoo.com"
+    ],
+    "client_name": "Catalina",
+    "client_email": "catalina@yahoo.com",
+    "status": "Editing",
+    "edit_status": "In Progress",
+    "editing_progress": 80,
+    "notes": null,
+    "is_archived": false,
+    "event_date": "2025-07-12T21:00:00Z",
+    "type": "NUNTA",
+    "title_video": "Catalina si Adrian",
+    "city": "Iasi",
+    "civil_union_details": null,
+    "prep": null,
+    "church": null,
+    "session": null,
+    "restaurant": null,
+    "details_extra": null,
+    "editing_preferences": null,
+    "main_details": null,
+    "package_type": "Clasic",
+    "package_4k": true,
+    "package_fullhd": false,
+    "package_cameras": 1,
+    "montage_highlights": true,
+    "montage_movie": true,
+    "montage_movie_duration": "2h-3h",
+    "montage_movie_other": null,
+    "montage_bonus_primary": false,
+    "montage_bonus_full": false,
+    "montage_cinema_duration": "1h30min",
+    "equipment_audio_recorder": true,
+    "equipment_stabilizer": true,
+    "equipment_external_light": false,
+    "team_videographer": 1,
+    "team_operator": 0,
+    "team_assistant": 0,
+    "delivery_online": true,
+    "delivery_usb": false,
+    "event_presence": "tot evenimentul",
+    "price": 4000,
+    "price_currency": "LEI",
+    "price_other_details": null,
+    "filming_details": null,
+    "videographer_filming_notes": null,
+    "critical_production_notes": null,
+    "videographer_editing_notes": "finalizat montajul lung al nuntii (filmul de nunta)",
+    "due_date": "2025-10-13",
+    "ceremony_field_order": {},
+    "admin_notified_of_changes": false,
+    "last_admin_notification_date": null,
+    "last_client_notification_date": null,
+    "has_unsent_changes": true,
+    "current_guidance_message": "initial",
+    "dismissed_guidance_messages": [],
+    "created_at": "2025-10-13T12:37:58.572Z",
+    "updated_at": "2025-10-15T20:38:20.635Z"
+  }
+},
+{
+  "model": "projects.project",
+  "pk": 22,
+  "fields": {
+    "name": "Botez - nu stiu",
+    "slug": "2026-07-24-botez(20251013-t-145527)",
+    "user": [
+      "nustiu@email.com"
+    ],
+    "client_name": "nu stiu",
+    "client_email": "nustiu@email.com",
+    "status": "Not Started",
+    "edit_status": "Not Started",
+    "editing_progress": 0,
+    "notes": null,
+    "is_archived": false,
+    "event_date": "2026-07-23T21:00:00Z",
+    "type": "BOTEZ",
+    "title_video": null,
+    "city": "Iasi",
+    "civil_union_details": null,
+    "prep": null,
+    "church": null,
+    "session": null,
+    "restaurant": null,
+    "details_extra": null,
+    "editing_preferences": null,
+    "main_details": null,
+    "package_type": null,
+    "package_4k": true,
+    "package_fullhd": false,
+    "package_cameras": 1,
+    "montage_highlights": false,
+    "montage_movie": true,
+    "montage_movie_duration": "30min",
+    "montage_movie_other": null,
+    "montage_bonus_primary": false,
+    "montage_bonus_full": false,
+    "montage_cinema_duration": "1h30min",
+    "equipment_audio_recorder": true,
+    "equipment_stabilizer": false,
+    "equipment_external_light": false,
+    "team_videographer": 1,
+    "team_operator": 0,
+    "team_assistant": 0,
+    "delivery_online": true,
+    "delivery_usb": false,
+    "event_presence": "doar ceremonie",
+    "price": 180,
+    "price_currency": "EUR",
+    "price_other_details": "400 euro 4k botez+petrecere + clip rezumat - 1 camera\n",
+    "filming_details": null,
+    "videographer_filming_notes": null,
+    "critical_production_notes": null,
+    "videographer_editing_notes": null,
+    "due_date": "2026-10-23",
+    "ceremony_field_order": {},
+    "admin_notified_of_changes": false,
+    "last_admin_notification_date": null,
+    "last_client_notification_date": null,
+    "has_unsent_changes": true,
+    "current_guidance_message": "initial",
+    "dismissed_guidance_messages": [],
+    "created_at": "2025-10-13T14:55:27.466Z",
+    "updated_at": "2025-10-13T14:58:38.666Z"
+  }
+},
+{
+  "model": "projects.project",
+  "pk": 23,
+  "fields": {
+    "name": "Nunta - Diana si Carlos Augusto",
+    "slug": "2025-08-23-nunta(20251013-t-173236)",
+    "user": [
+      "diana@email.com"
+    ],
+    "client_name": "Diana",
+    "client_email": "diana@email.com",
+    "status": "Not Started",
+    "edit_status": "Not Started",
+    "editing_progress": 0,
+    "notes": null,
+    "is_archived": false,
+    "event_date": "2025-08-22T21:00:00Z",
+    "type": "NUNTA",
+    "title_video": "Diana si Carlos Augusto",
+    "city": "Iasi",
+    "civil_union_details": null,
+    "prep": null,
+    "church": null,
+    "session": null,
+    "restaurant": null,
+    "details_extra": null,
+    "editing_preferences": null,
+    "main_details": null,
+    "package_type": "Cinema",
+    "package_4k": true,
+    "package_fullhd": false,
+    "package_cameras": 2,
+    "montage_highlights": true,
+    "montage_movie": false,
+    "montage_movie_duration": null,
+    "montage_movie_other": null,
+    "montage_bonus_primary": true,
+    "montage_bonus_full": true,
+    "montage_cinema_duration": "1h30min",
+    "equipment_audio_recorder": true,
+    "equipment_stabilizer": true,
+    "equipment_external_light": true,
+    "team_videographer": 2,
+    "team_operator": 0,
+    "team_assistant": 0,
+    "delivery_online": true,
+    "delivery_usb": false,
+    "event_presence": null,
+    "price": 1300,
+    "price_currency": "EUR",
+    "price_other_details": null,
+    "filming_details": null,
+    "videographer_filming_notes": null,
+    "critical_production_notes": null,
+    "videographer_editing_notes": null,
+    "due_date": "2025-11-22",
+    "ceremony_field_order": {},
+    "admin_notified_of_changes": false,
+    "last_admin_notification_date": null,
+    "last_client_notification_date": null,
+    "has_unsent_changes": true,
+    "current_guidance_message": "initial",
+    "dismissed_guidance_messages": [],
+    "created_at": "2025-10-13T17:32:36.802Z",
+    "updated_at": "2025-10-13T17:33:55.463Z"
+  }
+},
+{
+  "model": "projects.project",
+  "pk": 24,
+  "fields": {
+    "name": "Nunta - Tereza si Eugen",
+    "slug": "2025-08-31-nunta(20251014-t-202711)",
+    "user": [
+      "tereza@email.com"
+    ],
+    "client_name": "Tereza",
+    "client_email": "tereza@email.com",
+    "status": "Editing",
+    "edit_status": "Not Started",
+    "editing_progress": 0,
+    "notes": null,
+    "is_archived": false,
+    "event_date": "2025-08-30T21:00:00Z",
+    "type": "NUNTA",
+    "title_video": "Tereza si Eugen",
+    "city": "Miclauseni",
+    "civil_union_details": null,
+    "prep": null,
+    "church": null,
+    "session": null,
+    "restaurant": null,
+    "details_extra": null,
+    "editing_preferences": null,
+    "main_details": null,
+    "package_type": "Clasic",
+    "package_4k": true,
+    "package_fullhd": false,
+    "package_cameras": 1,
+    "montage_highlights": true,
+    "montage_movie": true,
+    "montage_movie_duration": "2h-3h",
+    "montage_movie_other": null,
+    "montage_bonus_primary": false,
+    "montage_bonus_full": false,
+    "montage_cinema_duration": "1h30min",
+    "equipment_audio_recorder": true,
+    "equipment_stabilizer": true,
+    "equipment_external_light": false,
+    "team_videographer": 1,
+    "team_operator": 0,
+    "team_assistant": 0,
+    "delivery_online": true,
+    "delivery_usb": false,
+    "event_presence": null,
+    "price": null,
+    "price_currency": "EUR",
+    "price_other_details": null,
+    "filming_details": null,
+    "videographer_filming_notes": null,
+    "critical_production_notes": null,
+    "videographer_editing_notes": null,
+    "due_date": "2025-11-30",
+    "ceremony_field_order": {},
+    "admin_notified_of_changes": false,
+    "last_admin_notification_date": null,
+    "last_client_notification_date": null,
+    "has_unsent_changes": true,
+    "current_guidance_message": "initial",
+    "dismissed_guidance_messages": [],
+    "created_at": "2025-10-14T20:27:11.306Z",
+    "updated_at": "2025-10-14T20:29:29.068Z"
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1616,
+  "fields": {
+    "project": 20,
+    "field_name": "title_video",
+    "old_value": "",
+    "new_value": "deeed",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:48:37.690Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1617,
+  "fields": {
+    "project": 20,
+    "field_name": "status",
+    "old_value": "Not Started",
+    "new_value": "Editing",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:49:13.343Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1618,
+  "fields": {
+    "project": 20,
+    "field_name": "edit_status",
+    "old_value": "Not Started",
+    "new_value": "In Progress",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:49:13.582Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1619,
+  "fields": {
+    "project": 20,
+    "field_name": "title_video",
+    "old_value": "deeed",
+    "new_value": "Cristina + Adrian + Iosif",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:49:13.901Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1620,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:49:50.387Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1621,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie_duration",
+    "old_value": "",
+    "new_value": "1h30min",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:49:55.987Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1622,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie_other",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:49:56.511Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1623,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie_other",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:49:58.821Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1624,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie_duration",
+    "old_value": "",
+    "new_value": "1h",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:49:59.263Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1625,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie_duration",
+    "old_value": "1h",
+    "new_value": "1h30min",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:50:07.471Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1626,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie_other",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:50:08.055Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1627,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_highlights",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:32.711Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1628,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie",
+    "old_value": "True",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:33.070Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1629,
+  "fields": {
+    "project": 20,
+    "field_name": "montage_movie_duration",
+    "old_value": "1h",
+    "new_value": "1h30min",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:33.295Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1630,
+  "fields": {
+    "project": 20,
+    "field_name": "equipment_audio_recorder",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:33.578Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1631,
+  "fields": {
+    "project": 20,
+    "field_name": "equipment_stabilizer",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:33.811Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1632,
+  "fields": {
+    "project": 20,
+    "field_name": "event_presence",
+    "old_value": "",
+    "new_value": "botez + restaurant",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:33.979Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1633,
+  "fields": {
+    "project": 20,
+    "field_name": "price",
+    "old_value": "",
+    "new_value": "1600",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:34.153Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1634,
+  "fields": {
+    "project": 20,
+    "field_name": "price_currency",
+    "old_value": "EUR",
+    "new_value": "LEI",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:34.370Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1635,
+  "fields": {
+    "project": 20,
+    "field_name": "price_other_details",
+    "old_value": "",
+    "new_value": "platit prin banca",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:51:34.628Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1636,
+  "fields": {
+    "project": 20,
+    "field_name": "editing_progress",
+    "old_value": "",
+    "new_value": "10",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T11:52:14.721Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1637,
+  "fields": {
+    "project": 21,
+    "field_name": "title_video",
+    "old_value": "",
+    "new_value": "Catalina si Adrian",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:38:50.230Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1638,
+  "fields": {
+    "project": 21,
+    "field_name": "package_type",
+    "old_value": "",
+    "new_value": "Clasic",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:42.077Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1639,
+  "fields": {
+    "project": 21,
+    "field_name": "package_4k",
+    "old_value": "True",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:42.285Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1640,
+  "fields": {
+    "project": 21,
+    "field_name": "package_fullhd",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:42.493Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1641,
+  "fields": {
+    "project": 21,
+    "field_name": "package_cameras",
+    "old_value": "1",
+    "new_value": "1",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:42.659Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1642,
+  "fields": {
+    "project": 21,
+    "field_name": "montage_highlights",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:42.843Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1643,
+  "fields": {
+    "project": 21,
+    "field_name": "montage_bonus_full",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:43.027Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1644,
+  "fields": {
+    "project": 21,
+    "field_name": "montage_cinema_duration",
+    "old_value": "1h30min",
+    "new_value": "1h30min",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:43.226Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1645,
+  "fields": {
+    "project": 21,
+    "field_name": "montage_movie",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:43.410Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1646,
+  "fields": {
+    "project": 21,
+    "field_name": "montage_movie_duration",
+    "old_value": "",
+    "new_value": "2h-3h",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:43.593Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1647,
+  "fields": {
+    "project": 21,
+    "field_name": "montage_bonus_primary",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:43.835Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1648,
+  "fields": {
+    "project": 21,
+    "field_name": "equipment_audio_recorder",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:44.097Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1649,
+  "fields": {
+    "project": 21,
+    "field_name": "equipment_stabilizer",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:44.294Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1650,
+  "fields": {
+    "project": 21,
+    "field_name": "equipment_external_light",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:44.493Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1651,
+  "fields": {
+    "project": 21,
+    "field_name": "team_videographer",
+    "old_value": "1",
+    "new_value": "1",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:44.751Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1652,
+  "fields": {
+    "project": 21,
+    "field_name": "team_operator",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:45.349Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1653,
+  "fields": {
+    "project": 21,
+    "field_name": "team_assistant",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:45.577Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1654,
+  "fields": {
+    "project": 21,
+    "field_name": "delivery_online",
+    "old_value": "True",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:45.777Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1655,
+  "fields": {
+    "project": 21,
+    "field_name": "delivery_usb",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:45.977Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1656,
+  "fields": {
+    "project": 21,
+    "field_name": "event_presence",
+    "old_value": "",
+    "new_value": "tot evenimentul",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:46.226Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1657,
+  "fields": {
+    "project": 21,
+    "field_name": "price",
+    "old_value": "",
+    "new_value": "4000",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:46.394Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1658,
+  "fields": {
+    "project": 21,
+    "field_name": "price_currency",
+    "old_value": "EUR",
+    "new_value": "LEI",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:39:46.568Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1659,
+  "fields": {
+    "project": 21,
+    "field_name": "edit_status",
+    "old_value": "Not Started",
+    "new_value": "In Progress",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:40:44.400Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1660,
+  "fields": {
+    "project": 21,
+    "field_name": "editing_progress",
+    "old_value": "",
+    "new_value": "80",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:40:44.624Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1661,
+  "fields": {
+    "project": 21,
+    "field_name": "videographer_editing_notes",
+    "old_value": "",
+    "new_value": "finalizat montajul lung al nuntii (filmul de nunta)",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T12:41:22.493Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1662,
+  "fields": {
+    "project": 21,
+    "field_name": "status",
+    "old_value": "Not Started",
+    "new_value": "Editing",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T13:01:48.246Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1663,
+  "fields": {
+    "project": 22,
+    "field_name": "montage_movie",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:57:26.029Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1664,
+  "fields": {
+    "project": 22,
+    "field_name": "montage_movie_duration",
+    "old_value": "",
+    "new_value": "30min",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:57:27.595Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1665,
+  "fields": {
+    "project": 22,
+    "field_name": "montage_movie_other",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:57:27.429Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1666,
+  "fields": {
+    "project": 22,
+    "field_name": "montage_movie",
+    "old_value": "True",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:58:39.244Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1667,
+  "fields": {
+    "project": 22,
+    "field_name": "montage_movie_duration",
+    "old_value": "30min",
+    "new_value": "30min",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:58:39.451Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1668,
+  "fields": {
+    "project": 22,
+    "field_name": "equipment_audio_recorder",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:58:39.701Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1669,
+  "fields": {
+    "project": 22,
+    "field_name": "event_presence",
+    "old_value": "",
+    "new_value": "doar ceremonie",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:58:39.885Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1670,
+  "fields": {
+    "project": 22,
+    "field_name": "price",
+    "old_value": "",
+    "new_value": "180",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:58:40.068Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1671,
+  "fields": {
+    "project": 22,
+    "field_name": "price_other_details",
+    "old_value": "",
+    "new_value": "400 euro 4k botez+petrecere + clip rezumat - 1 camera\n",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T14:58:40.251Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1672,
+  "fields": {
+    "project": 23,
+    "field_name": "package_type",
+    "old_value": "",
+    "new_value": "Cinema",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:23.581Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1673,
+  "fields": {
+    "project": 23,
+    "field_name": "package_4k",
+    "old_value": "True",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:23.787Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1674,
+  "fields": {
+    "project": 23,
+    "field_name": "package_fullhd",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:23.988Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1675,
+  "fields": {
+    "project": 23,
+    "field_name": "package_cameras",
+    "old_value": "1",
+    "new_value": "2",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:24.230Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1676,
+  "fields": {
+    "project": 23,
+    "field_name": "montage_highlights",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:24.454Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1677,
+  "fields": {
+    "project": 23,
+    "field_name": "montage_bonus_full",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:24.688Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1678,
+  "fields": {
+    "project": 23,
+    "field_name": "montage_cinema_duration",
+    "old_value": "1h30min",
+    "new_value": "1h30min",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:24.871Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1679,
+  "fields": {
+    "project": 23,
+    "field_name": "montage_movie",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:25.055Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1680,
+  "fields": {
+    "project": 23,
+    "field_name": "montage_bonus_primary",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:25.238Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1681,
+  "fields": {
+    "project": 23,
+    "field_name": "equipment_audio_recorder",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:25.454Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1682,
+  "fields": {
+    "project": 23,
+    "field_name": "equipment_stabilizer",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:25.704Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1683,
+  "fields": {
+    "project": 23,
+    "field_name": "equipment_external_light",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:25.904Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1684,
+  "fields": {
+    "project": 23,
+    "field_name": "team_videographer",
+    "old_value": "1",
+    "new_value": "2",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:26.104Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1685,
+  "fields": {
+    "project": 23,
+    "field_name": "team_operator",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:26.546Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1686,
+  "fields": {
+    "project": 23,
+    "field_name": "team_assistant",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:26.747Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1687,
+  "fields": {
+    "project": 23,
+    "field_name": "delivery_online",
+    "old_value": "True",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:26.946Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1688,
+  "fields": {
+    "project": 23,
+    "field_name": "delivery_usb",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:27.163Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1689,
+  "fields": {
+    "project": 23,
+    "field_name": "price",
+    "old_value": "",
+    "new_value": "1300",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:27.379Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1690,
+  "fields": {
+    "project": 23,
+    "field_name": "title_video",
+    "old_value": "",
+    "new_value": "Diana si Carlos Augusto",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-13T17:33:55.791Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1691,
+  "fields": {
+    "project": 24,
+    "field_name": "title_video",
+    "old_value": "",
+    "new_value": "Tereza si Eugen",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:26.729Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1692,
+  "fields": {
+    "project": 24,
+    "field_name": "package_type",
+    "old_value": "",
+    "new_value": "Clasic",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:47.581Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1693,
+  "fields": {
+    "project": 24,
+    "field_name": "package_4k",
+    "old_value": "True",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:47.656Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1694,
+  "fields": {
+    "project": 24,
+    "field_name": "package_fullhd",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:47.721Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1695,
+  "fields": {
+    "project": 24,
+    "field_name": "package_cameras",
+    "old_value": "1",
+    "new_value": "1",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:47.780Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1696,
+  "fields": {
+    "project": 24,
+    "field_name": "montage_highlights",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:47.838Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1697,
+  "fields": {
+    "project": 24,
+    "field_name": "montage_bonus_full",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:47.898Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1698,
+  "fields": {
+    "project": 24,
+    "field_name": "montage_cinema_duration",
+    "old_value": "1h30min",
+    "new_value": "1h30min",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:47.988Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1699,
+  "fields": {
+    "project": 24,
+    "field_name": "montage_movie",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.063Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1700,
+  "fields": {
+    "project": 24,
+    "field_name": "montage_movie_duration",
+    "old_value": "",
+    "new_value": "2h-3h",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.230Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1701,
+  "fields": {
+    "project": 24,
+    "field_name": "montage_bonus_primary",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.313Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1702,
+  "fields": {
+    "project": 24,
+    "field_name": "equipment_audio_recorder",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.397Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1703,
+  "fields": {
+    "project": 24,
+    "field_name": "equipment_stabilizer",
+    "old_value": "",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.472Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1704,
+  "fields": {
+    "project": 24,
+    "field_name": "equipment_external_light",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.547Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1705,
+  "fields": {
+    "project": 24,
+    "field_name": "team_videographer",
+    "old_value": "1",
+    "new_value": "1",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.630Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1706,
+  "fields": {
+    "project": 24,
+    "field_name": "team_operator",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.748Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1707,
+  "fields": {
+    "project": 24,
+    "field_name": "team_assistant",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.814Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1708,
+  "fields": {
+    "project": 24,
+    "field_name": "delivery_online",
+    "old_value": "True",
+    "new_value": "True",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.881Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1709,
+  "fields": {
+    "project": 24,
+    "field_name": "delivery_usb",
+    "old_value": "",
+    "new_value": "",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:27:48.947Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1710,
+  "fields": {
+    "project": 24,
+    "field_name": "status",
+    "old_value": "Not Started",
+    "new_value": "Editing",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:28:21.009Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1711,
+  "fields": {
+    "project": 24,
+    "field_name": "edit_status",
+    "old_value": "Not Started",
+    "new_value": "In Progress",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:28:21.092Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1712,
+  "fields": {
+    "project": 24,
+    "field_name": "edit_status",
+    "old_value": "In Progress",
+    "new_value": "Not Started",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-14T20:29:29.514Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "projects.projectmodification",
+  "pk": 1713,
+  "fields": {
+    "project": 21,
+    "field_name": "due_date",
+    "old_value": "",
+    "new_value": "2025-10-13",
+    "status": "AUTO_APPLIED",
+    "created_by": [
+      "admin@admin.com"
+    ],
+    "approved_by": null,
+    "notes": null,
+    "created_at": "2025-10-15T20:38:20.851Z",
+    "approved_at": null
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2025-09-18T07:35:12.062Z",
+    "user": [
+      "admin@admin.com"
+    ],
+    "content_type": [
+      "projects",
+      "user"
+    ],
+    "object_id": "2",
+    "object_repr": "maria2@ioana3.com",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Last name\"]}}]"
+  }
+}
+]

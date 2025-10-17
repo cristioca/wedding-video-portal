@@ -1473,3 +1473,66 @@ def delete_backup(request, filename):
         messages.error(request, 'Backup file not found.')
     
     return redirect('backup_management')
+
+
+@login_required
+def restore_database_view(request):
+    """Restore database from uploaded backup file - admin only"""
+    if not request.user.is_admin():
+        messages.error(request, 'Only administrators can restore backups.')
+        return redirect('dashboard')
+    
+    if request.method != 'POST':
+        return redirect('backup_management')
+    
+    from django.core.management import call_command
+    from pathlib import Path
+    import tempfile
+    import shutil
+    
+    # Get the uploaded file
+    backup_file = request.FILES.get('backup_file')
+    flush_mode = request.POST.get('flush_mode') == 'on'
+    
+    if not backup_file:
+        messages.error(request, 'No backup file selected.')
+        return redirect('backup_management')
+    
+    # Validate file extension
+    if not backup_file.name.endswith('.json'):
+        messages.error(request, 'Only JSON backup files are supported for restore.')
+        return redirect('backup_management')
+    
+    try:
+        # Create a temporary file to store the upload
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.json', delete=False) as temp_file:
+            # Write uploaded file to temp location
+            for chunk in backup_file.chunks():
+                temp_file.write(chunk)
+            temp_path = temp_file.name
+        
+        try:
+            # Flush database if requested
+            if flush_mode:
+                messages.warning(request, 'Flushing database...')
+                call_command('flush', '--no-input')
+            
+            # Load data from backup
+            call_command('loaddata', temp_path)
+            
+            if flush_mode:
+                messages.success(request, f'Database restored successfully from {backup_file.name} (full restore with flush)')
+            else:
+                messages.success(request, f'Database restored successfully from {backup_file.name} (merged with existing data)')
+            
+            messages.info(request, 'Please restart the Django server for all changes to take effect.')
+            
+        finally:
+            # Clean up temp file
+            Path(temp_path).unlink(missing_ok=True)
+    
+    except Exception as e:
+        messages.error(request, f'Restore failed: {str(e)}')
+        messages.warning(request, 'The database may be in an inconsistent state. Consider restoring from a different backup.')
+    
+    return redirect('backup_management')
